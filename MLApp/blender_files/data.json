@@ -1,0 +1,1 @@
+{"nodes['Principled BSDF'].inputs[0].default_value": [0.800000011920929, 0.800000011920929, 0.800000011920929, 1.0], "nodes['Principled BSDF'].inputs[6].default_value": 1.0, "nodes['Principled BSDF'].inputs[9].default_value": 0.05}

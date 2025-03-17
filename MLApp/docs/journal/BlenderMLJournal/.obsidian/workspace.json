@@ -1,0 +1,213 @@
+{
+  "main": {
+    "id": "a671d7ebe983606f",
+    "type": "split",
+    "children": [
+      {
+        "id": "54490f13b8c121f9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "29474d235e1e432e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Daily Entries/2024/October/23-10-2024-Wednesday.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "23-10-2024-Wednesday"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "a45204b33adf0e20",
+    "type": "split",
+    "children": [
+      {
+        "id": "925de9dab5e2a944",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d1da867d9353551d",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "906499e381dbabf0",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "e46517650e2c9eef",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 298.5
+  },
+  "right": {
+    "id": "afd6eb6355213a3f",
+    "type": "split",
+    "children": [
+      {
+        "id": "258536feaa9c0fb0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5e83c29582b73ee3",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Daily Entries/2024/October/17-10-2024-Thursday.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 17-10-2024-Thursday"
+            }
+          },
+          {
+            "id": "60c71879b2f5886f",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Daily Entries/2024/October/17-10-2024-Thursday.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 17-10-2024-Thursday"
+            }
+          },
+          {
+            "id": "6cd9b6e3ed705c82",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "488cca3e76a7f49c",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Daily Entries/2024/October/17-10-2024-Thursday.md"
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 17-10-2024-Thursday"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "29474d235e1e432e",
+  "lastOpenFiles": [
+    "Daily Entries/2024/October/28-10-2024-Monday.md",
+    "Daily Entries/2025/January/07-01-2025-Tuesday.md",
+    "Daily Entries/2025/January/08-01-2025-Wednesday.md",
+    "Daily Entries/2025/January/09-01-2025-Thursday.md",
+    "Daily Entries/2024/November/17-11-2024-Sunday.md",
+    "Daily Entries/2025/January/04-01-2025-Saturday.md",
+    "Daily Entries/2025/January/02-01-2025-Thursday.md",
+    "Daily Entries/2024/November/29-11-2024-Friday.md",
+    "Daily Entries/2024/October/23-10-2024-Wednesday.md",
+    "Daily Entries/2024/January/18-01-2024-Thursday.md",
+    "Daily Entries/2025/January",
+    "Daily Entries/2025",
+    "Daily Entries/2024/December/30-12-2024-Monday.md",
+    "Daily Entries/2024/December/26-12-2024-Thursday.md",
+    "Notes/Memory Anxiety.md",
+    "Daily Entries/2024/November/18-11-2024-Monday.md",
+    "Daily Entries/2024/November/23-11-2024-Saturday.md",
+    "Daily Entries/2024/November/19-11-2024-Tuesday.md",
+    "Daily Entries/2024/November/20-11-2024-Wednesday.md",
+    "Daily Entries/2024/November/22-11-2024-Friday.md",
+    "Daily Entries/2024/November/25-11-2024-Monday.md",
+    "Daily Entries/2024/November/26-11-2024-Tuesday.md",
+    "Daily Entries/2024/November/28-11-2024-Thursday.md",
+    "Daily Entries/2024/November/30-11-2024-Saturday.md",
+    "Daily Entries/2024/January/13-01-2024-Saturday.md",
+    "Daily Entries/2024/December/19-12-2024-Thursday.md",
+    "Daily Entries/2024/December",
+    "Daily Entries/2024/November/27-11-2024-Wednesday.md",
+    "Pasted image 20241126162324.png",
+    "PreviousEntryCompilation.md",
+    "Pasted image 20230828133845.png",
+    "Pasted image 20241118231153.png",
+    "BlenderML Overall Plan.jpg",
+    "UI - Create Model 1.jpg",
+    "UI - Model Selection.jpg",
+    "UI - Training.jpg",
+    "UI - Generate Dataset.jpg",
+    "UI - Create Model.jpg",
+    "Notes",
+    "Daily Entries/2024/October",
+    "Daily Entries/2024/April",
+    "Daily Entries/2024/March",
+    "Daily Entries/2024/February",
+    "Daily Entries/2024/January",
+    "Daily Entries/2024"
+  ]
+}

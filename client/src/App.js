@@ -1,0 +1,75 @@
+import React, {useState, useEffect} from 'react'
+import LoadModel from './pages/LoadModel'
+import GenerateMaterials from './pages/GenerateMaterials'
+import DatasetGenerator from './pages/DatasetGenerator'
+import CreateModifyModel from './pages/CreateModifyModel'
+import Training from './pages/Training'
+import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+
+import CssBaseline from '@mui/material/CssBaseline';
+
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
+import { Typography } from '@mui/material';
+
+const defaultTheme = createTheme();
+
+function App() {
+
+    const [selectedTab, setSelectedTab] = React.useState('GENERATE_MATERIALS');
+    const handleChange = (event, newSelectedTab) => {
+      setSelectedTab(newSelectedTab);
+    };
+    const availabeTabs = ['MODEL_SELECTION', 'CREATE_MODEL', 'TRAINING', 'GENERATE_MATERIALS']
+
+    const [appData, setAppData] = React.useState([]);
+
+/*     React.useEffect(()=> {
+        //response.json() creates an array from the JSON in the response
+        fetch('loadData').then(response => response.json()).then(data => {
+          setAppData(data)
+        }).catch(error => console.error('Error fetching data:', error))
+    }, []); */
+  return (
+      <div>
+        <Box sx={{ width: '100%', }}>
+          <Tabs
+            value={selectedTab}
+            onChange={handleChange}
+            textColor="secondary"
+            indicatorColor="secondary"
+            aria-label="secondary tabs example"
+          >
+            <Tab value="GENERATE_MATERIALS" label="Generate Materials" />
+            <Tab value="CREATE_MODEL" label="Create Model" />
+            <Tab value="TRAINING" label="Training" />
+            <Tab value="DATASET_GENERATOR" label="Generate Dataset" />
+
+          </Tabs>
+        </Box>
+        <Box sx={{ width: '100%', p: 1}}>
+        <ThemeProvider theme={defaultTheme}>
+          <CssBaseline />
+          { (() => {
+            switch (selectedTab) {
+              case "DATASET_GENERATOR":
+                return <DatasetGenerator />
+              case "CREATE_MODEL":
+                return <CreateModifyModel />;
+              case "TRAINING":
+                return <Training />;
+              case "GENERATE_MATERIALS":
+                return <GenerateMaterials />;
+              default:
+                return <Typography>Default</Typography>;
+            }
+          })()
+        }
+        </ThemeProvider>        
+        </Box>
+      </div>
+  )
+}
+
+export default App;
