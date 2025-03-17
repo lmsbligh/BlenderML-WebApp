@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useImmer } from 'use-immer';
 import produce from "immer";
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import { Accordion, AccordionDetails, AccordionSummary, Button, Card, Grid } from '@mui/material/';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CardContent from '@mui/material/CardContent';
@@ -16,18 +16,11 @@ import ListItem from '@mui/material/ListItem';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
 import ModelDetailsCard from '../components/ModelDetailsCard/ModelDetailsCard.js'
 import SelectedModel from '../components/SelectedModel/SelectedModel.js'
-import ModelSelector from '../components/ModelSelector/ModelSelector.js';
-import DatasetSelector from '../components/DatasetSelector/DatasetSelector.js'
-import CheckpointSelector from '../components/CheckpointSelector/CheckpointSelector.js';
-const defaultTheme = createTheme();
-  
-
+import SelectorModel from '../components/SelectorModel/SelectorModel.js';
+import SelectorDataset from '../components/SelectorDataset/SelectorDataset.js'
+import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpoint.js';
 
 export default function Training() {
 
@@ -58,18 +51,6 @@ export default function Training() {
     const [checkpointOptions, setCheckpointOptions] = React.useState([]);
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
 
-    const VisuallyHiddenInput = styled('input')({
-        clip: 'rect(0 0 0 0)',
-        clipPath: 'inset(50%)',
-        height: 1,
-        overflow: 'hidden',
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        whiteSpace: 'nowrap',
-        width: 1,
-      });
-
     React.useEffect(()=> {
                 //response.json() creates an array from the JSON in the response
                 fetch('getDatasets').then(response => response.json()).then(data => {
@@ -96,7 +77,7 @@ export default function Training() {
             .catch(error => console.error('Error fetching data:', error))
     }, [selectedModel]);
 
-    const handleChangeModel = (event) => {
+    const handleModelChange = (event) => {
         // setSelectedModel(modelData[event.target.value]);
         const model = modelData.find((option) => option.value === event.target.value);
         setSelectedModel(model)
@@ -108,7 +89,7 @@ export default function Training() {
         })
     };
 
-    const handleChangeDataset = (event) => {
+    const handleDatasetChange = (event) => {
         const datasetVal = datasetOptions.find((option) => option.value === event.target.value);
         setSelectedDataset(datasetVal)
         setTrainingForm((prevVals) => {
@@ -118,7 +99,7 @@ export default function Training() {
         })
         };
 
-    const handleChangeOptimizer = (event) => {
+    const handleOptimizerChange = (event) => {
         const optimizerVal = optimizerOptions.find((option) => option.value === event.target.value);
         setSelectedOptimizer(optimizerVal)
         setTrainingForm((prevVals) => {
@@ -128,7 +109,7 @@ export default function Training() {
         })
     };
 
-    const handleChangeLoss = (event) => {
+    const handleLossChange = (event) => {
         setSelectedLoss(lossOptions[event.target.value])
         const lossVal = lossOptions.find((option) => option.value === event.target.value);
         setTrainingForm((prevVals) => {
@@ -146,7 +127,7 @@ export default function Training() {
         })
     }
 
-    const handleChangeCheckpoint = (event) => {
+    const handleCheckpointChange = (event) => {
         setSelectedCheckpoint(event.target.value)
         setTrainingForm((prevVals) => {
             return produce(prevVals, (draft) => {
@@ -156,14 +137,6 @@ export default function Training() {
         })
     }
     
-    const handleChangeRandomOrientation = (event) => {
-        setTrainingForm((prevVals) => {
-            return produce(prevVals, (draft) => {
-                draft.checkpoint = event.target.value;
-            }
-            )
-        })
-    }
     const handleTrain = (event) => {
         console.log("handleTrain ran")
         try {
@@ -180,13 +153,13 @@ export default function Training() {
             console.error('Error:', error);
         }
     }
+
     return (
-        <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex', flexDirection: 'column'}}><Grid container>
             <Grid item  sm={6} xs={12} sx={{display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around"}}>
                 <CssBaseline />
                 <FormControl fullWidth>
-                { modelData ? <ModelSelector selectedModel={selectedModel} handleChange={handleChangeModel} modelOptions={modelData}/> : null}
+                { modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleModelChange} modelOptions={modelData}/> : null}
                 <Box>
                     <List>
                         <SelectedModel selectedModel={selectedModel} />
@@ -219,8 +192,8 @@ export default function Training() {
                     </Box>
                     <Button variant="contained" disabled style={{ width: '150px' }}>Load</Button>
                 </FormControl>
-                <CheckpointSelector selectedCheckpoint={selectedCheckpoint} handleChange={handleChangeCheckpoint} checkpointOptions={checkpointOptions}/>
-                <DatasetSelector selectedDataset={selectedDataset} handleChange={handleChangeDataset} datasetOptions={datasetOptions} />
+                <SelectorCheckpoint selectedCheckpoint={selectedCheckpoint} handleChange={handleCheckpointChange} checkpointOptions={checkpointOptions}/>
+                <SelectorDataset selectedDataset={selectedDataset} handleChange={handleDatasetChange} datasetOptions={datasetOptions} />
                 <Button variant='contained' disabled style={{width: '150px' }}>Add Dataset </Button>
                 <TextField name="epochs" label="Epochs" value={trainingForm.epochs} onChange={handleTextFieldChange}></TextField>
                 <TextField name="learningRate" label="Learning rate" value={trainingForm.learningRate} onChange={handleTextFieldChange}></TextField>
@@ -230,7 +203,7 @@ export default function Training() {
                         labelId="Optimizer-Selector-Label"
                         label="Optimizer"
                         id="simple-select"
-                        onChange={handleChangeOptimizer}
+                        onChange={handleOptimizerChange}
                         renderValue={() => selectedOptimizer ? selectedOptimizer.label : "Select an optimizer" // Show the label as the selected text
                         }
                     >
@@ -253,7 +226,7 @@ export default function Training() {
                         labelId="Loss-Selector-Label"
                         label="Loss function"
                         id="simple-select"
-                        onChange={handleChangeLoss}
+                        onChange={handleLossChange}
                         renderValue={() => selectedLoss ? selectedLoss.label : "Select an optimizer" // Show the label as the selected text
                         }
                     >
@@ -275,6 +248,5 @@ export default function Training() {
             </Grid>
             </Grid>
             </Box>
-        </ThemeProvider>
     )
 }

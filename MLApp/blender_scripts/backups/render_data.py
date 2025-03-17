@@ -37,8 +37,6 @@ nodes : bpy.types.Nodes
 
 """
 material_props = []
-#fp = os.getcwd()+f"\\blender_files\\scene.blend"
-#print(f"{fp=}")
 bpy.ops.wm.open_mainfile(filepath=os.getcwd()+f"\\MLApp\\blender_files\\scene.blend")
 mat = bpy.data.materials['mat_name']
 nodes = mat.node_tree.nodes
@@ -47,7 +45,6 @@ BATCH_SIZE = 20
 data = ""
 
 if isinstance(sys.argv[3], str):
-      #data = os.getcwd()+"\\"+sys.argv[3]
       data = sys.argv[3]
 
       print("Data: ", data)

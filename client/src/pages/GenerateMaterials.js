@@ -5,10 +5,10 @@ import Box from '@mui/material/Box';
 import { Button, Card, CardMedia } from '@mui/material/';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import ModelSelector from '../components/ModelSelector/ModelSelector.js';
+import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import SelectedModel from '../components/SelectedModel/SelectedModel.js'
 import FileUpload from '../components/FileUpload/FileUpload.js'; 
-import CheckpointSelector from '../components/CheckpointSelector/CheckpointSelector.js';
+import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpoint.js';
 
 export default function GenerateMaterials() {
     const [generateMaterialForm, setGenerateMaterialForm] = useImmer({
@@ -18,10 +18,12 @@ export default function GenerateMaterials() {
             "render_url": "",
             "checkpoint":""
         })
+
     const [checkpointOptions, setCheckpointOptions] = React.useState([]);
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
     const [modelData, setModelData] = useImmer([]);
     const [selectedModel, setSelectedModel] = useImmer('');
+
     React.useEffect(()=> {
         //response.json() creates an array from the JSON in the response
         fetch('models').then(response => response.json()).then(data => {
@@ -41,7 +43,7 @@ export default function GenerateMaterials() {
                 .catch(error => console.error('Error fetching data:', error))
         }, [selectedModel]);
     
-    const handleChangeCheckpoint = (event) => {
+    const handleCheckpointChange = (event) => {
         setSelectedCheckpoint(event.target.value)
         setGenerateMaterialForm((prevVals) => {
             return produce(prevVals, (draft) => {
@@ -51,7 +53,7 @@ export default function GenerateMaterials() {
         })
     }
     
-    const handleChange = (event) => {
+    const handleSelectorModelChange = (event) => {
         const model = modelData.find((option) => option.value === event.target.value);
         setSelectedModel(model)
         setGenerateMaterialForm((prevVals) => {
@@ -60,7 +62,8 @@ export default function GenerateMaterials() {
                     })
                 })
         };
-    const handleUpload = (event) => {
+
+    const handleUploadFile = (event) => {
         console.log("upload event handler called")
         
         const formData = new FormData();
@@ -91,10 +94,8 @@ export default function GenerateMaterials() {
             console.error("Error:", error);
         });
     }
-    //const [model, setModel] = React.useState('');
 
-
-    const handleGenerate = (event) => {
+    const handleGenerateMaterial = (event) => {
         console.log("handleGenerate ran")
         try {
             fetch('generateMaterial', {
@@ -147,11 +148,11 @@ export default function GenerateMaterials() {
                 gap: '10px'
             }}>
 
-                    { modelData ? <ModelSelector selectedModel={selectedModel} handleChange={handleChange} modelOptions={modelData}/> : null}
+                    { modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleSelectorModelChange} modelOptions={modelData}/> : null}
                     {selectedModel ? <SelectedModel selectedModel={selectedModel} /> : null}
-                    <CheckpointSelector selectedCheckpoint={selectedCheckpoint} handleChange={handleChangeCheckpoint} checkpointOptions={checkpointOptions}/>
+                    <SelectorCheckpoint selectedCheckpoint={selectedCheckpoint} handleChange={handleCheckpointChange} checkpointOptions={checkpointOptions}/>
 
-                    <FileUpload handleUpload={handleUpload}/>
+                    <FileUpload handleUpload={handleUploadFile}/>
                     <Card sx={{
                     maxWidth: 300,
                     marginTop: "60px",
@@ -164,7 +165,7 @@ export default function GenerateMaterials() {
                         image={generateMaterialForm.image_url}
                         alt="Placeholder" />
                     </Card>
-                    <Button variant="contained" style={{ width: '100%' }} onClick={handleGenerate}>Generate</Button>
+                    <Button variant="contained" style={{ width: '100%' }} onClick={handleGenerateMaterial}>Generate</Button>
 
             </Box>
             <Box sx={{

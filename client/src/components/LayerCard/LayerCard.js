@@ -4,26 +4,14 @@ import IconButton from '@mui/material/IconButton';
 import * as React from 'react';
 import { useImmer } from 'use-immer';
 import produce from "immer";
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { Grid, Accordion, AccordionDetails, AccordionSummary, Button, Card, Paper, Tooltip } from '@mui/material/';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import CardContent from '@mui/material/CardContent';
+import { Paper, Tooltip } from '@mui/material/';
 import Typography from '@mui/material/Typography';
 import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
 import AddIcon from '@mui/icons-material/Add';
 
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
+
 import SelectorLayerType from '../SelectorLayerType/SelectorLayerType.js'
 import SelectorLayerActivation from '../SelectorLayerActivation/SelectorLayerActivation.js'
 
@@ -45,7 +33,7 @@ const LayerCard = ({layer, index, saveCallback, delFunction, moveFunction, addLa
     }, [localLayer, saveCallback])
     
 
-    const xHandleChange = (event) => {
+    const handleXChange = (event) => {
         const { name, value } = event.target;
         setLocalLayer((prevValues) => {
             return produce(prevValues, (draft) => {
@@ -53,20 +41,14 @@ const LayerCard = ({layer, index, saveCallback, delFunction, moveFunction, addLa
             })});
     };
 
-    // setLocalLayer((localLayerData) => {
-    //         return produce(localLayerData, (draft) => {
-    //             draft.layer_type = newLayerType.layer_type
-    //         })
-    //     });
-
-    const handleChangeLayerType = (newLayerType) => {
+    const handleLayerTypeChange = (newLayerType) => {
         setLocalLayer((localLayerData) => {
             return produce(localLayerData, (draft) => {
                 draft.layer_type = newLayerType.layer_type
             })
         });
     };
-    const handleChangeActivationType = (newActivation) => {
+    const handleActivationTypeChange = (newActivation) => {
         setLocalLayer((localLayerData) => {
             return produce(localLayerData, (draft) => {
                 draft.activation = newActivation.activation
@@ -84,17 +66,17 @@ const LayerCard = ({layer, index, saveCallback, delFunction, moveFunction, addLa
                 
             </Box>
             <Box sx={{display:'flex', flexDirection: 'row', justifyContent:'space-between', padding: '10px' }}>
-                <SelectorLayerType  layer_type={localLayer.layer_type} updateState={handleChangeLayerType}/>
+                <SelectorLayerType  layer_type={localLayer.layer_type} updateState={handleLayerTypeChange}/>
             </Box>
             <Box sx={{display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px'}}>
-                <TextField name="x_0" label="x_0" value={localLayer.x_0} onChange={xHandleChange}></TextField>
-                <TextField name="x_1" label="x_1" value={localLayer.x_1} onChange={xHandleChange}></TextField>
-                <TextField name="x_2" label="x_2" value={localLayer.x_2} onChange={xHandleChange}></TextField>
-                <TextField name="x_3" label="x_3" value={localLayer.x_3} onChange={xHandleChange}></TextField>
+                <TextField name="x_0" label="x_0" value={localLayer.x_0} onChange={handleXChange}></TextField>
+                <TextField name="x_1" label="x_1" value={localLayer.x_1} onChange={handleXChange}></TextField>
+                <TextField name="x_2" label="x_2" value={localLayer.x_2} onChange={handleXChange}></TextField>
+                <TextField name="x_3" label="x_3" value={localLayer.x_3} onChange={handleXChange}></TextField>
             </Box>
-                <TextField name="padding" label="padding" value={x_DimsInput.padding} onChange={xHandleChange} sx={{display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px'}} ></TextField>
+                <TextField name="padding" label="padding" value={x_DimsInput.padding} onChange={handleXChange} sx={{display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px'}} ></TextField>
             <Box sx={{display:'flex', flexDirection: 'row', justifyContent:'space-between', padding: '10px' }}>
-                <SelectorLayerActivation  activation_type={localLayer.activation} updateState={handleChangeActivationType}/>
+                <SelectorLayerActivation  activation_type={localLayer.activation} updateState={handleActivationTypeChange}/>
             </Box>
             <Tooltip title="Move down."><IconButton color='primary' onClick={() => moveFunction(index, +1)}><VerticalAlignBottomIcon /></IconButton></Tooltip>
             <Tooltip title="Add succeeding layer."><IconButton color='primary' onClick={() => addLayerFunction(index, +1)}><AddIcon /></IconButton></Tooltip>

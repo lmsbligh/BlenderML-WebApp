@@ -1,16 +1,17 @@
 import * as React from 'react';
 import { useImmer } from 'use-immer';
 import produce from "immer";
-import {useRef} from 'react'
+
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
-import { Grid, Button, Paper, TextField } from '@mui/material/';
+import { Grid, Button } from '@mui/material/';
 
-import ModelSelector from '../components/ModelSelector/ModelSelector.js';
-import LayerCard from '../components/LayerCard/LayerCard.js';
 import { v4 as uuidv4 } from 'uuid';
+
+import SelectorModel from '../components/SelectorModel/SelectorModel.js';
+import LayerCard from '../components/LayerCard/LayerCard.js';
 import ModelPropertiesModifier from '../components/ModelPropertiesModifier/ModelPropertiesModifier.js';
 
 
@@ -35,11 +36,10 @@ function CreateModifyModel() {
     }
     //callbacks passed to children
     const layerCallbacks = [];
-    let saveTextField = null;
+    let handleTextFieldSave = null;
 
     //Local states
     const [selectedModel, setSelectedModel] = useImmer('');
-    //const [selectedModelLayers, setSelectedModelLayers] = useImmer([]);
     const [modelData, setModelData] = useImmer([]);
 
 
@@ -51,56 +51,37 @@ function CreateModifyModel() {
         console.log()
     }, []);
 
-    const handleChange = (event) => {
+    const handleModelSelectorChange = (event) => {
         if (event.target.value === -1) {
             const val = uuidv4().slice(0, 8);
-            //setSelectedModel({...structuredClone(defaultModel), value: val});
-            //setSelectedModelLayers([...structuredClone(defaultModel.layers)]);
-            console.log('new model selected')
-            // setSelectedModel((prevSelectedModel) => {
-            //     return produce(prevSelectedModel, (draft) => 
-            //         {...defaultModel, value: val};
-            //     )
-            // })
             setSelectedModel({...defaultModel, value: val});
         }
         else {
-            //setSelectedModel({...structuredClone(modelData.find((option) => option.value === event.target.value))})
-            //setSelectedModelLayers([...structuredClone(modelData.find((option) => option.value === event.target.value).layers)]);
             const model = modelData.find((option) => option.value === event.target.value);
-
             setSelectedModel(model)
             }
         };
     
 
-    const delHandleChange = (index) => {
-        console.log("Prior to slice, setSelectedModel: ", selectedModel)
+    const handleLayerDelete = (index) => {
         setSelectedModel((prevSelectedModel) => {
             return produce(prevSelectedModel, (draft) => {
-                console.log("Before splice, layers:", JSON.parse(JSON.stringify(draft.layers)));
                 if (index >= 0 && index < draft.layers.length) {
-                    console.log("draft.layers.splice(index, 1) ran")
                     draft.layers.splice(index, 1);
                     layerCallbacks.splice(index, 1);
-                    console.log("After splice, layers:", JSON.parse(JSON.stringify(draft.layers)));
                 } else {
                     console.error("Index out of bounds:", index);
                 }
             })
         });
-        console.log("Post slice, setSelectedModel: ", selectedModel)
     };
     
-    const moveHandleChange = (index, direction) => {
+    const handleLayerMove = (index, direction) => {
         setSelectedModel((prevSelectedModel) => {
             return produce(prevSelectedModel, (draft) => {
-                console.log("Before splice, layers:", JSON.parse(JSON.stringify(draft.layers)));
                 if (index+direction >= 0 && index+direction < draft.layers.length) {
-                    console.log("draft.layers.splice(index, 1) ran")
                     var layer = draft.layers.splice(index,1)[0];
                     draft.layers.splice(index+direction,0,layer)
-                    console.log("After splice, layers:", JSON.parse(JSON.stringify(draft.layers)));
                 } else {
                     console.error("Index out of bounds:", index);
                 }
@@ -108,32 +89,17 @@ function CreateModifyModel() {
         });
     }
 
-    const addLayerHandle = (index, direction) => {
+    const handleLayerAdd = (index, direction) => {
         setSelectedModel((prevSelectedModel) => {
             return produce(prevSelectedModel, (draft) => {
-                console.log("Before splice, layers:", JSON.parse(JSON.stringify(draft.layers)));
                 var layer = {"id": Date.now(), "layer_type":'Dense', "x_0":'0', "x_1":'0',"x_2":'0',"x_3":'0', "activation":'ReLU'};
                 draft.layers.splice(direction == -1? index : index + 1,0,layer)
-                console.log("After splice, layers:", JSON.parse(JSON.stringify(draft.layers)));
             })
         });
     }
-    const delModel = () => {
-        console.log('delModel called')
-        // setSelectedModel((prev) => {
-        //     return produce(prev, (draft) => {
-        //         draft = ''
-        //     })
-        // })
+
+    const handleModelDelete = () => {
         const val = uuidv4().slice(0, 8);
-        //setSelectedModel({...structuredClone(defaultModel), value: val});
-        //setSelectedModelLayers([...structuredClone(defaultModel.layers)]);
-        console.log('new model selected')
-        // setSelectedModel((prevSelectedModel) => {
-        //     return produce(prevSelectedModel, (draft) => 
-        //         {...defaultModel, value: val};
-        //     )
-        // })
         setModelData((prevData) => {
             return produce(prevData, (draft) => {
                 const delIndex = draft.findIndex((option) => option.value === selectedModel.value)
@@ -157,11 +123,12 @@ function CreateModifyModel() {
             console.error('Error:', error);
         }
     }
-    const handleSave = () => {
+    
+    const handleModelSave = () => {
         const updatedLayers = layerCallbacks.map((callback, index) => {
             return layerCallbacks[index](); // Collect state from each child
         });
-        const updatedTextFields = saveTextField();
+        const updatedTextFields = handleTextFieldSave();
         const updatedModel = {
             ...selectedModel,
             modelName: updatedTextFields.modelName,
@@ -202,15 +169,6 @@ function CreateModifyModel() {
         }
     }
 
-    React.useEffect( () => {
-        console.log('selectedModel Changed:', selectedModel)
-    }, [selectedModel])
-
-    React.useEffect( () => {
-        console.log('modelData Changed:', modelData)
-    }, [modelData])
-    
-
     return (
         <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
@@ -218,24 +176,24 @@ function CreateModifyModel() {
                 <Grid item  sm={6} xs={12} sx={{display: "flex", flexDirection: "column"}}>
                     <CssBaseline />
                     <FormControl fullWidth>
-                        { modelData ? <ModelSelector selectedModel={selectedModel} handleChange={handleChange} modelOptions={modelData}/> : null}
+                        { modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleModelSelectorChange} modelOptions={modelData}/> : null}
                         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px', paddingTop: '10px'}}>
                             {
                                 selectedModel ? console.log("selectedModel.value:", selectedModel.value) : console.log("selectedModel is null")
                             }
-                            {selectedModel ? <ModelPropertiesModifier model={selectedModel} saveCallback={(saveFunction) => (saveTextField = saveFunction)}/> : null} 
+                            {selectedModel ? <ModelPropertiesModifier model={selectedModel} saveCallback={(saveFunction) => (handleTextFieldSave = saveFunction)}/> : null} 
                             {
                                 selectedModel ? selectedModel.layers.map((option, ind) => {
                                     console.log("LayerCard about to be run");
-                                    return <LayerCard key={option.id} layer={option} index={ind} saveCallback={(callback) => (layerCallbacks[ind] = callback)} delFunction={delHandleChange} moveFunction={moveHandleChange} addLayerFunction={addLayerHandle} />
+                                    return <LayerCard key={option.id} layer={option} index={ind} saveCallback={(callback) => (layerCallbacks[ind] = callback)} delFunction={handleLayerDelete} moveFunction={handleLayerMove} addLayerFunction={handleLayerAdd} />
 
                                     // return <LayerCard key={useMemo(() => option.id, [option.id])} layer={useMemo(() => option, [option])} index={useMemo(() => ind, [ind])} delFunction={delHandleChange} moveFunction={moveHandleChange} addLayerFunction={addLayerHandle}/>
                                 }
                                 ) : ''
                             }
                         </Box>
-                        <Button variant="contained" style={{ width: '150px' }} onClick={handleSave}>Save</Button>
-                        <Button variant="contained" color='error' style={{ width: '150px' }} onClick={delModel}>Delete</Button>
+                        <Button variant="contained" style={{ width: '150px' }} onClick={handleModelSave}>Save</Button>
+                        <Button variant="contained" color='error' style={{ width: '150px' }} onClick={handleModelDelete}>Delete</Button>
                     </FormControl>
                     </Grid>
                 </Grid>

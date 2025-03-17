@@ -3,6 +3,7 @@ import { useImmer } from 'use-immer';
 import produce from "immer";
 import { Grid, Button, Paper, TextField } from '@mui/material/';
 import LayerCard from '../LayerCard/LayerCard';
+
 function ModelPropertiesModifier({model, saveCallback}) {
     const [draftModel, setDraftModel] = useImmer(model);
     React.useEffect(() => {
@@ -14,12 +15,9 @@ function ModelPropertiesModifier({model, saveCallback}) {
     }, [model]
     );
 
-    const textFieldHandleChange = (event) => {
+    const handleTextFieldChange = (event) => {
             const { name, value } = event.target;
-            // setSelectedModel(prevVals => ({
-            //     ...prevVals,
-            //     [name]: value
-            // }))
+            
             setDraftModel((prevModel) => {
                 return produce(prevModel, (draft) => {
                     if (name in draft) {
@@ -36,8 +34,8 @@ function ModelPropertiesModifier({model, saveCallback}) {
         <>
 {/*         {console.log("ModelPropertiesModifier ran, draftModel:", draftModel)}
  */}        { draftModel ?  <Paper variant='outlined' sx={{ display: 'flex', padding: '10px'}} >
-                                    <TextField name="modelName" label="Model Name" onChange={textFieldHandleChange} value={draftModel.modelName} sx={{width: "100%"}}></TextField>
-                                    <TextField name="description" label="Model Description" onChange={textFieldHandleChange} value={draftModel.description} sx={{width: "100%"}}></TextField>
+                                    <TextField name="modelName" label="Model Name" onChange={handleTextFieldChange} value={draftModel.modelName} sx={{width: "100%"}}></TextField>
+                                    <TextField name="description" label="Model Description" onChange={handleTextFieldChange} value={draftModel.description} sx={{width: "100%"}}></TextField>
                             </Paper> : null }
         
         </>

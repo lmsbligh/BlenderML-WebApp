@@ -11,11 +11,11 @@ from flask import g
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))  # Adds WebApp root to path
 
-from MLApp.data_generator.prop_generator import write_props_json, gen_props_json
+from MLApp.data_generator.prop_generator import gen_props_json
 from MLApp.blender_scripts.blender_launcher import launch_blender
 from MLApp.parameters import render_data_script
-from MLApp.custom_nn.train_flask import train_flask
-from MLApp.custom_nn.flask_generate_material import flask_generate_material
+from MLApp.custom_torch.flask_train import flask_train
+from MLApp.custom_torch.flask_generate_material import flask_generate_material
 
 
 # con = sqlite3.connect("data.db")
@@ -43,7 +43,7 @@ app.secret_key = 'asdjkfnasdouif2398r'
 app.config['UPLOAD_FOLDER'] = os.path.join('MLApp', 'data', 'user_uploaded_test')
 
 @app.route("/models")
-def models():
+def get_models():
     global modelsList
     con = sqlite3.connect("data.db")
     con.row_factory = sqlite3.Row  # Allows row to be treated as a dictionary
@@ -72,7 +72,7 @@ def models():
 datasetProfilesList = []
 
 @app.route("/datasetProfiles")
-def datasetProfiles():
+def get_dataset_profiles():
     global datasetProfilesList
     con = sqlite3.connect("data.db")
     con.row_factory = sqlite3.Row  # Allows row to be treated as a dictionary
@@ -101,143 +101,21 @@ def datasetProfiles():
         con.close()
         
 @app.route("/layerTypes")
-def datasetLayerTypes():
+def get_layer_types():
                 return [{"value": 1, "layer_type": 'Dense'},
         {"value": 2, "layer_type": 'CNN'},
         {"value": 3, "layer_type": 'Pooling'}]
                 
 @app.route("/activationTypes")
-def datasetActivationTypes():
+def get_activation_types():
                 return [{"value": 1, "activation": 'Linear'},
         {"value": 2, "activation": 'ReLU'},
         {"value": 3, "activation": 'Heaviside'},
         {"value": 4, "activation": 'Sigmoid'},
         {"value": 5, "activation": 'None'}]
-                
-@app.route("/data")
-def loadData():    
-        return {
-    "layerTypes": [
-        {
-            "value": 0,
-            "layer_type": 'Dense'
-        },
-        {
-            "value": 1,
-            "layer_type": 'CNN'
-        },
-        {
-            "value": 2,
-            "layer_type": 'Pooling'
-        }
-    ],
-    "models": [
-        {
-            "value": 0,
-            "label": 'Model 1',
-            "input": "50x50",
-            "output": "10x1",
-            "description": "Brief description of model 1",
-            "layers": [
-                {
-                    "layer_type":'CNN',
-                    "x_0":'4',
-                    "x_1":'5',
-                    "x_2":'6',
-                    "x_3":'7',
-                    "activation":'ReLU'
-                },
-                {
-                    "layer_type":'Dense',
-                    "x_0":'4',
-                    "x_1":'5',
-                    "x_2":'6',
-                    "x_3":'7',
-                    "activation":'ReLU'
-                },
-                {
-                    "layer_type":'Dense',
-                    "x_0":'5',
-                    "x_1":'0',
-                    "x_2":'0',
-                    "x_3":'0',
-                    "activation":'sigmoid'
-                }
-            ]
-        },
-        {
-            "value": 1,
-            "label": 'Model 2',
-            "input": "75x75",
-            "output": "12x1",
-            "description": "Brief description of model 2", \
-                        "layers": [
-                {
-                    "layer_type":'Dense',
-                    "x_0":'4',
-                    "x_1":'5',
-                    "x_2":'6',
-                    "x_3":'7',
-                    "activation":'ReLU'
-                },
-                {
-                    "layer_type":'Dense',
-                    "x_0":'4',
-                    "x_1":'3',
-                    "x_2":'9',
-                    "x_3":'7',
-                    "activation":'ReLU'
-                },
-                {
-                    "layer_type":'Dense',
-                    "x_0":'5',
-                    "x_1":'2',
-                    "x_2":'3',
-                    "x_3":'8',
-                    "activation":'sigmoid'
-                },
-                {
-                    "layer_type":'Dense',
-                    "x_0":'4',
-                    "x_1":'5',
-                    "x_2":'6',
-                    "x_3":'7',
-                    "activation":'ReLU'
-                },
-                {
-                    "layer_type":'Dense',
-                    "x_0":'4',
-                    "x_1":'3',
-                    "x_2":'9',
-                    "x_3":'7',
-                    "activation":'ReLU'
-                },
-                {
-                    "layer_type":'Dense',
-                    "x_0":'5',
-                    "x_1":'2',
-                    "x_2":'3',
-                    "x_3":'8',
-                    "activation":'sigmoid'
-                }
-            ]
-        }
-    ],
-    
-    "datasetProfiles": [{
-        "value": 0,
-        "label": 'Profile 1',
-        "description": "Brief description of profile 1"
-    },
-    {
-        "value": 1,
-        "label": 'Profile 2',
-        "description": "Brief description of profile 2"
-    }]
-}
 
 @app.route('/submitDatasetProfile', methods=["POST"])
-def submitDatasetProfile():
+def submit_datset_profile():
     
     print("POST req received, dataset profile submission")
     
@@ -266,7 +144,7 @@ def submitDatasetProfile():
     return jsonify({"value": saveProfile['value'], "body": "success!"}), 200
 
 @app.route('/submitModel', methods=["POST"])
-def submitModel():
+def submit_model():
     con = sqlite3.connect("data.db")
     cur = con.cursor()
     # cur.execute("CREATE TABLE models(value, modelName, input, output, description, layers)")
@@ -293,7 +171,7 @@ def submitModel():
     
     
 @app.route('/deleteModel', methods=["POST"])
-def deleteModel():
+def delete_model():
     print("POST req received, model deletion")
     print(f"modelsList: {modelsList}")
 
@@ -316,7 +194,7 @@ def deleteModel():
     return jsonify({"body": "success!"}), 200
     
 @app.route('/deleteDatasetProfile', methods=["POST"])
-def deleteDatasetProfile():
+def delete_dataset_profile():
     print(f"request.data: {request.data}")
     print(f"request.data type: {type(request.data)}")
     delProfile = json.loads(request.data.decode('utf-8'))
@@ -342,16 +220,16 @@ def deleteDatasetProfile():
     return jsonify({"body": "Profile deleted successfully!"}), 200
 
 @app.route('/submitTraining', methods=["POST"])
-def submitTraining():
+def submit_training():
     print(f"Training form submitted: {request.data}")
     
     training_form = json.loads(request.data.decode("utf-8"))
-    train_flask(training_form)
+    flask_train(training_form)
     
     return jsonify({"body": "Training request received successfully."}), 200
 
 @app.route('/submitGenerateDataset', methods=["POST"])
-def submitGenerateDataset():
+def submit_generate_dataset():
     print(f"POST Req: submitGenerateDataset():")
     
     generateProfile = json.loads(request.data.decode('utf-8'))
@@ -409,7 +287,7 @@ def return_sample(profile_id, dataset_render_date, dataset_filename):
     return send_from_directory(f"../MLApp/data/training_datasets/{profile_id}/{dataset_render_date}/", dataset_filename)
 
 @app.route('/getDatasets')
-def getDatasets():
+def get_datasets():
     print("getting datasets")
     
     global datasetList
@@ -439,7 +317,7 @@ def getDatasets():
     
     
 @app.route('/<path:filename>')
-def serv_image(filename):
+def serve_image(filename):
     print(f"filename is: {filename}")
     return send_from_directory("../", filename)
 
@@ -448,17 +326,17 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
            
 @app.route('/MLApp/data/user_uploaded_test/<path:filename>', methods=['GET'])
-def serv_uploaded_file(filename):
+def serve_uploaded_file(filename):
     print(f"filename is: {filename}")
     return send_from_directory('../'+app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/checkpoints/<string:model_id>')
-def getCheckpoints(model_id):
+def get_checkpoints(model_id):
     checkpoints = os.listdir(f'MLApp\\data\\w_and_b\\{model_id}')
     return checkpoints
 
 @app.route('/uploadFile', methods=['POST'])
-def uploadFile():
+def upload_file():
     print("uploadFile() ran: ")
     if 'uploadFile' not in request.files:
         flash('No file part')
@@ -477,7 +355,7 @@ def uploadFile():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        download_url = url_for('serv_uploaded_file', filename=filename, _external=True)
+        download_url = url_for('serve_uploaded_file', filename=filename, _external=True)
         print("download_url: ", download_url)
         return jsonify({"url": download_url,
                         "image_path":file_path}), 200
@@ -487,7 +365,7 @@ def uploadFile():
         return redirect(request.url)
 
 @app.route('/generateMaterial', methods=['POST'])
-def generateMaterial():
+def generate_material():
     print("Generate Material Submitted")
     
     generateMaterialForm = json.loads(request.data.decode('utf-8'))
@@ -507,7 +385,7 @@ def generateMaterial():
     
     print("sample_URLs: ", sample_URLs)
     return jsonify({"predicted_props": predicted_props,
-                    "render_url": url_for('serv_uploaded_file', filename=f"{predicted_props['name']}.jpg", _external=True)})
+                    "render_url": url_for('serve_uploaded_file', filename=f"{predicted_props['name']}.jpg", _external=True)})
     
 if __name__ == "__main__":
         app.run(debug=True)

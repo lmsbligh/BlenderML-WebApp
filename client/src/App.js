@@ -1,10 +1,9 @@
-import React, {useState, useEffect} from 'react'
-import LoadModel from './pages/LoadModel'
+import React from 'react'
 import GenerateMaterials from './pages/GenerateMaterials'
 import DatasetGenerator from './pages/DatasetGenerator'
 import CreateModifyModel from './pages/CreateModifyModel'
 import Training from './pages/Training'
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -18,25 +17,20 @@ const defaultTheme = createTheme();
 function App() {
 
     const [selectedTab, setSelectedTab] = React.useState('GENERATE_MATERIALS');
-    const handleChange = (event, newSelectedTab) => {
+    const handleSelectorPageChange = (event, newSelectedTab) => {
       setSelectedTab(newSelectedTab);
     };
     const availabeTabs = ['MODEL_SELECTION', 'CREATE_MODEL', 'TRAINING', 'GENERATE_MATERIALS']
 
     const [appData, setAppData] = React.useState([]);
 
-/*     React.useEffect(()=> {
-        //response.json() creates an array from the JSON in the response
-        fetch('loadData').then(response => response.json()).then(data => {
-          setAppData(data)
-        }).catch(error => console.error('Error fetching data:', error))
-    }, []); */
+
   return (
       <div>
         <Box sx={{ width: '100%', }}>
           <Tabs
             value={selectedTab}
-            onChange={handleChange}
+            onChange={handleSelectorPageChange}
             textColor="secondary"
             indicatorColor="secondary"
             aria-label="secondary tabs example"

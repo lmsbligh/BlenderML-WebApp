@@ -1,11 +1,9 @@
 import os
 import os.path
 import json
-import sys
 import bpy
 import random
 import argparse
-import math
 """
 !!! needs rewriting
 This script is run by Blender, should take in the paths of param 
@@ -75,8 +73,6 @@ mat = bpy.data.materials['mat_name']
 mat_nodes = mat.node_tree.nodes
 
 material_props = []
-
-
 
 def render_loop():
     for ind, material_prop in enumerate(material_props):

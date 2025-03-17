@@ -1,31 +1,16 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import { Button, Card, Paper, Grid, TextField, List, ListItem } from '@mui/material/';
-import DeleteIcon from '@mui/icons-material/Delete';
-
-import { styled } from '@mui/material/styles';
-import CardMedia from '@mui/material/CardMedia';
-
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import DatasetProfileSelector from '../components/DatasetProfileSelector/DatasetProfileSelector.js';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import { useImmer } from 'use-immer';
 import produce from "immer";
+
+import Box from '@mui/material/Box';
+import { Button, Card, Paper, Grid, TextField, List, ListItem } from '@mui/material/';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import SelectorDatasetProfile from '../components/SelectorDatasetProfile/SelectorDatasetProfile.js';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+
 import { v4 as uuidv4 } from 'uuid';
-// const Item = styled(Paper)(({ theme }) => ({
-//     backgroundColor: '#fff',
-//     ...theme.typography.body2,
-//     padding: theme.spacing(1),
-//     textAlign: 'center',
-//     color: theme.palette.text.secondary,
-//     ...theme.applyStyles('dark', {
-//       backgroundColor: '#1A2027',
-//     }),
-//   }));
-
-
 
 export default function DatasetGenerator() {
     const defaultProfile = {
@@ -44,18 +29,10 @@ export default function DatasetGenerator() {
         "randomOrientation": false
     }
     
-    const handleChange = (event) => {
-        event.target.value == -1 ? setSelectedDatasetProfile({...structuredClone(defaultProfile), value: uuidv4().slice(0, 8)}) : setSelectedDatasetProfile(structuredClone(profileOptions.find((option) => option.value === event.target.value)));
-        console.log("selected dataset profile: ", selectedDatasetProfile)
-        //console.log("selected dataset profile value: ", selectedDatasetProfile.value)
-    }
-
-    const handleSubmit = (event) => {
-        console.log("submitted");
-    }
     const [profileOptions, setProfileOptions] = useImmer([]);
     const [selectedDatasetProfile, setSelectedDatasetProfile] = useImmer('');
     const [sampleImages, setSampleImages] = useImmer([]);
+    
     React.useEffect(()=> {
             //response.json() creates an array from the JSON in the response
             fetch('datasetProfiles').then(response => response.json()).then(data => {
@@ -63,13 +40,15 @@ export default function DatasetGenerator() {
             }).catch(error => console.error('Error fetching data:', error))
         }, []);
 
-    const handleChangeTextField = (event) => {
+    const handleProfileChange = (event) => {
+        event.target.value == -1 ? setSelectedDatasetProfile({...structuredClone(defaultProfile), value: uuidv4().slice(0, 8)}) : setSelectedDatasetProfile(structuredClone(profileOptions.find((option) => option.value === event.target.value)));
+        console.log("selected dataset profile: ", selectedDatasetProfile)
+        //console.log("selected dataset profile value: ", selectedDatasetProfile.value)
+    }
+    const handleTextFieldChange = (event) => {
         const { name, value } = event.target;
         setSelectedDatasetProfile((prevDatasetProfile) => {
             return produce(prevDatasetProfile, (draft) => {
-                console.log("handleChangeTextField selectedDatasetProfile: ", selectedDatasetProfile )
-                console.log("prevDatasetProfile: ", prevDatasetProfile)
-                console.log("draft: ", draft)
                 if (name in draft) {
                     draft[name] = value;
                 }
@@ -80,7 +59,7 @@ export default function DatasetGenerator() {
         });
     };
 
-    const handleChangeMeshList = (event) => {
+    const handleMeshListChange = (event) => {
         const { name, checked } = event.target;
         setSelectedDatasetProfile((prevDatasetProfile) => {
             return produce(prevDatasetProfile, (draft) => {
@@ -89,7 +68,7 @@ export default function DatasetGenerator() {
         console.log("updated selectedDatasetProfile:")
     };
 
-    const handleChangeRandomOrientation = (event) => {
+    const handleRandomOrientationChange = (event) => {
         const { name, checked } = event.target;
         setSelectedDatasetProfile((prevDatasetProfile) => {
             return produce(prevDatasetProfile, (draft) => {
@@ -97,7 +76,7 @@ export default function DatasetGenerator() {
                     })})
     };
 
-    const delProfile = (value) => {
+    const handleProfileDelete = (value) => {
         console.log("delProfile ran!!!")
         setProfileOptions((prevOptions) => {
                     return produce(prevOptions, (draft) => {
@@ -120,7 +99,7 @@ export default function DatasetGenerator() {
         }
     }
 
-    const saveProfile = (event) => {
+    const handleProfileSave = (event) => {
         event.preventDefault();
         setProfileOptions((prevOptions) => 
             produce(prevOptions, (draft) => {
@@ -152,8 +131,8 @@ export default function DatasetGenerator() {
         }
     }
 
-    const generateDataset = (event) => {
-        saveProfile(event)
+    const handleGenerateDataset = (event) => {
+        handleProfileSave(event)
         try {
             fetch('submitGenerateDataset', {
                 method: 'POST',
@@ -180,18 +159,6 @@ export default function DatasetGenerator() {
             console.error('Error:', error);
         }
     }
-        
-
-    React.useEffect(() => {
-        console.log("Updated profileOptions: ", profileOptions);
-    }, [profileOptions]);
-
-    React.useEffect(() => {
-        console.log("Updated sampleImages: ", sampleImages);
-    }, [sampleImages]);
-    React.useEffect(() => {
-        console.log("Updated selectedDatasetProfile: ", selectedDatasetProfile);
-    }, [selectedDatasetProfile]);
     
     return (    
         <Box sx={{
@@ -205,54 +172,52 @@ export default function DatasetGenerator() {
         }}>
             <Grid container>
                 <Grid item  sm={6} xs={12} sx={{display: "flex", flexDirection: "column", rowGap: "5px", columnGap: "5px"}}>
-                    <form onSubmit={handleSubmit}>
-                        <DatasetProfileSelector selectedDatasetProfile={selectedDatasetProfile}
-                            handleChange={handleChange} 
+                        <SelectorDatasetProfile selectedDatasetProfile={selectedDatasetProfile}
+                            handleChange={handleProfileChange} 
                             profileOptions={profileOptions}
                         />
                         {console.log()}
                         {selectedDatasetProfile ? <Box>
-                            <TextField name="datasetName" onChange={handleChangeTextField} sx={{width: "50%", padding: "5px"}} label="Dataset Name" value={selectedDatasetProfile.datasetName}></TextField>
-                        <TextField name="datasetSize" onChange={handleChangeTextField} sx={{width: "50%", padding: "5px"}} label="Dataset Size" value={selectedDatasetProfile.datasetSize}></TextField>
-                        <TextField name="skyboxPath" onChange={handleChangeTextField} sx={{width: "50%", padding: "5px"}}label="Skybox path" value={selectedDatasetProfile.skyboxPath}></TextField>
+                            <TextField name="datasetName" onChange={handleTextFieldChange} sx={{width: "50%", padding: "5px"}} label="Dataset Name" value={selectedDatasetProfile.datasetName}></TextField>
+                        <TextField name="datasetSize" onChange={handleTextFieldChange} sx={{width: "50%", padding: "5px"}} label="Dataset Size" value={selectedDatasetProfile.datasetSize}></TextField>
+                        <TextField name="skyboxPath" onChange={handleTextFieldChange} sx={{width: "50%", padding: "5px"}}label="Skybox path" value={selectedDatasetProfile.skyboxPath}></TextField>
                         <Box sx={{display: "flex",
                             flexDirection: "horizontal"
                         }}>
-                            <TextField name="imageWidth" onChange={handleChangeTextField} label="Image width" value={selectedDatasetProfile.imageWidth} sx={{padding: "5px"}}></TextField>
-                            <TextField name="imageHeight" onChange={handleChangeTextField} label="Image height" value={selectedDatasetProfile.imageHeight} sx={{padding: "5px"}}></TextField>
+                            <TextField name="imageWidth" onChange={handleTextFieldChange} label="Image width" value={selectedDatasetProfile.imageWidth} sx={{padding: "5px"}}></TextField>
+                            <TextField name="imageHeight" onChange={handleTextFieldChange} label="Image height" value={selectedDatasetProfile.imageHeight} sx={{padding: "5px"}}></TextField>
                         </Box>
-                        <TextField name="description" multiline maxRows={4} onChange={handleChangeTextField} label="Profile description" value={selectedDatasetProfile.description} sx={{padding: "5px", width: "100%"}}></TextField>
+                        <TextField name="description" multiline maxRows={4} onChange={handleTextFieldChange} label="Profile description" value={selectedDatasetProfile.description} sx={{padding: "5px", width: "100%"}}></TextField>
                         <Paper variant='outlined'>
                             <Typography>
                                 Available meshes:
                             </Typography>
                             <List sx={{display: "flex", flexDirection: "column"}}>
                                 <ListItem>
-                                    <FormControlLabel control={<Checkbox checked={selectedDatasetProfile.meshes["cube"] ||false} name="cube" onChange={handleChangeMeshList}  sx={{padding: "5px"}}/>} label="Cube" />
+                                    <FormControlLabel control={<Checkbox checked={selectedDatasetProfile.meshes["cube"] ||false} name="cube" onChange={handleMeshListChange}  sx={{padding: "5px"}}/>} label="Cube" />
                                 </ListItem>
                                 <ListItem>
-                                    <FormControlLabel control={<Checkbox checked={selectedDatasetProfile.meshes["sphere"] ||false} name="sphere" onChange={handleChangeMeshList}  sx={{padding: "5px"}}/>} label="Sphere" />
+                                    <FormControlLabel control={<Checkbox checked={selectedDatasetProfile.meshes["sphere"] ||false} name="sphere" onChange={handleMeshListChange}  sx={{padding: "5px"}}/>} label="Sphere" />
                                 </ListItem>
                                 <ListItem>
-                                    <FormControlLabel control={<Checkbox checked={selectedDatasetProfile.meshes["monkey"] ||false} name="monkey" onChange={handleChangeMeshList}  sx={{padding: "5px"}}/>} label="Monkey" />
+                                    <FormControlLabel control={<Checkbox checked={selectedDatasetProfile.meshes["monkey"] ||false} name="monkey" onChange={handleMeshListChange}  sx={{padding: "5px"}}/>} label="Monkey" />
                                 </ListItem>
                                 <ListItem>
-                                    <FormControlLabel control={<Checkbox checked={selectedDatasetProfile.meshes["car"] ||false} name="car" onChange={handleChangeMeshList}  sx={{padding: "5px"}}/>} label="Car" />
+                                    <FormControlLabel control={<Checkbox checked={selectedDatasetProfile.meshes["car"] ||false} name="car" onChange={handleMeshListChange}  sx={{padding: "5px"}}/>} label="Car" />
                                 </ListItem>
                             </List>
                             
                         </Paper>
-                        <FormControlLabel control={<Checkbox checked={selectedDatasetProfile.randomOrientation ||false}  onChange={handleChangeRandomOrientation} sx={{padding: "10px"}}/>} label="Randomized orientation" />
+                        <FormControlLabel control={<Checkbox checked={selectedDatasetProfile.randomOrientation ||false}  onChange={handleRandomOrientationChange} sx={{padding: "10px"}}/>} label="Randomized orientation" />
                         <Box sx={{display: "flex",
                             flexDirection: "horizontal",
                             justifyContent:'space-between'
                         }}>
-                            <Button variant="contained" sx={{width: "49%"}} label="Save Profile" onClick={saveProfile}>Save Preset</Button>
-                            <Button variant="contained" color="error" sx={{width: "49%"}} label="Delete Profile" onClick={() => delProfile(selectedDatasetProfile.value)}>Delete Profile</Button>
-                            <Button variant="contained" sx={{width: "49%"}} label="Generate Dataset" onClick={generateDataset}>Generate Dataset</Button>
+                            <Button variant="contained" sx={{width: "49%"}} label="Save Profile" onClick={handleProfileSave}>Save Preset</Button>
+                            <Button variant="contained" color="error" sx={{width: "49%"}} label="Delete Profile" onClick={() => handleProfileDelete(selectedDatasetProfile.value)}>Delete Profile</Button>
+                            <Button variant="contained" sx={{width: "49%"}} label="Generate Dataset" onClick={handleGenerateDataset}>Generate Dataset</Button>
                         </Box>
                         </Box> : console.log("NULL profile selected")}
-                    </form>
                 </Grid>
                 <Grid item  sm={6} xs={12} sx={{padding: "10px", display: "flex", flexDirection: "column", rowGap: "5px", columnGap: "5px"}}>
                 <Box sx={{display: "flex",
