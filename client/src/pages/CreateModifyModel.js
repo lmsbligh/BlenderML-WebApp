@@ -14,7 +14,7 @@ import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import LayerCard from '../components/LayerCard/LayerCard.js';
 import ModelPropertiesModifier from '../components/ModelPropertiesModifier/ModelPropertiesModifier.js';
 
-
+import fetchData from '../utils.js'
 const defaultTheme = createTheme();
 
 function CreateModifyModel() {
@@ -43,12 +43,15 @@ function CreateModifyModel() {
     const [modelData, setModelData] = useImmer([]);
 
 
+    // React.useEffect(()=> {
+    //     //response.json() creates an array from the JSON in the response
+    //     fetch('models').then(response => response.json()).then(data => {
+    //         setModelData(data)
+    //     }).catch(error => console.error('Error fetching data:', error))
+    //     console.log()
+    // }, []);
     React.useEffect(()=> {
-        //response.json() creates an array from the JSON in the response
-        fetch('models').then(response => response.json()).then(data => {
-            setModelData(data)
-        }).catch(error => console.error('Error fetching data:', error))
-        console.log()
+        fetchData('models', setModelData)
     }, []);
 
     const handleModelSelectorChange = (event) => {

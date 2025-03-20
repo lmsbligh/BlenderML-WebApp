@@ -1,16 +1,16 @@
-import TextField from '@mui/material/TextField';
-import DeleteIcon from '@mui/icons-material/Delete';
-import IconButton from '@mui/material/IconButton';
 import * as React from 'react';
 import { useImmer } from 'use-immer';
 import produce from "immer";
+
 import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
 import { Paper, Tooltip } from '@mui/material/';
 import Typography from '@mui/material/Typography';
 import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
 import AddIcon from '@mui/icons-material/Add';
-
 
 import SelectorLayerType from '../SelectorLayerType/SelectorLayerType.js'
 import SelectorLayerActivation from '../SelectorLayerActivation/SelectorLayerActivation.js'
@@ -66,7 +66,7 @@ const LayerCard = ({layer, index, saveCallback, delFunction, moveFunction, addLa
                 
             </Box>
             <Box sx={{display:'flex', flexDirection: 'row', justifyContent:'space-between', padding: '10px' }}>
-                <SelectorLayerType  layer_type={localLayer.layer_type} updateState={handleLayerTypeChange}/>
+                <SelectorLayerType  layerType={localLayer.layer_type} handleChange={handleLayerTypeChange}/>
             </Box>
             <Box sx={{display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px'}}>
                 <TextField name="x_0" label="x_0" value={localLayer.x_0} onChange={handleXChange}></TextField>
@@ -76,7 +76,7 @@ const LayerCard = ({layer, index, saveCallback, delFunction, moveFunction, addLa
             </Box>
                 <TextField name="padding" label="padding" value={x_DimsInput.padding} onChange={handleXChange} sx={{display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px'}} ></TextField>
             <Box sx={{display:'flex', flexDirection: 'row', justifyContent:'space-between', padding: '10px' }}>
-                <SelectorLayerActivation  activation_type={localLayer.activation} updateState={handleActivationTypeChange}/>
+                <SelectorLayerActivation  activationType={localLayer.activation} handleChange={handleActivationTypeChange}/>
             </Box>
             <Tooltip title="Move down."><IconButton color='primary' onClick={() => moveFunction(index, +1)}><VerticalAlignBottomIcon /></IconButton></Tooltip>
             <Tooltip title="Add succeeding layer."><IconButton color='primary' onClick={() => addLayerFunction(index, +1)}><AddIcon /></IconButton></Tooltip>

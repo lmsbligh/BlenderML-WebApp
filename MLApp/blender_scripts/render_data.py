@@ -1,5 +1,4 @@
 import os
-import os.path
 import json
 import bpy
 import random
@@ -46,6 +45,7 @@ args, unknown = parser.parse_known_args()
 
 data_path = args.data_path
 render_path = args.render_path if args.render_path else args.data_path
+scene_path = os.path.join(os.getcwd(),"MLApp", "blender_files","scene.blend")
 scene_props = args.scene_props if args.scene_props else  {
         "description": "",
         "datasetName": '',
@@ -66,7 +66,7 @@ if type(scene_props) == str and os.path.isfile(scene_props):
     with open(scene_props, 'r+') as file:
         scene_props = json.load(file)
         
-bpy.ops.wm.open_mainfile(filepath=os.getcwd()+f"\\MLApp\\blender_files\\scene.blend")
+bpy.ops.wm.open_mainfile(filepath=scene_path)
 obj = bpy.data.objects["Cube"]
 env_node = bpy.data.worlds["World"].node_tree.nodes["Environment Texture"]
 mat = bpy.data.materials['mat_name']

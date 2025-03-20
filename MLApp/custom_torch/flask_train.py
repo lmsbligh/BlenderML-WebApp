@@ -1,7 +1,6 @@
 import os
 import time
 import json
-import matplotlib.pyplot as plt
 import sqlite3
 
 import torch
@@ -11,15 +10,12 @@ from torch.utils.data import DataLoader
 from MLApp.custom_torch.image_dataset import ImageDataset
 from MLApp.custom_torch.custom_net import CustomNet
 
-from MLApp.parameters import EPOCHS, LEARNING_RATE, OPTIMIZER, loss_function, state_dict_dir
-from MLApp.parameters import BATCH_SIZE, train_dir, val_dir, test_dir
-from MLApp.parameters import TRAINING_SET_SIZE, VALIDATION_SET_SIZE, TEST_SET_SIZE
-from MLApp.parameters import render_data_script, state_dict_path, state_dict_dir
+from MLApp.parameters import OPTIMIZER, loss_function, state_dict_dir, DATABASE_PATH
+from MLApp.parameters import state_dict_dir
 from MLApp.parameters import device
 
 from MLApp.custom_torch.target_loader import target_loader
-#from MLApp.custom_nn.test import test
-#from MLApp.utils.utils import compare_images, load_from_dir, select_image_dir
+
 def flask_train(training_form):
     """
     """
@@ -28,16 +24,15 @@ def flask_train(training_form):
     dataset = training_form['dataset']
     epochs = int(training_form['epochs'])
     learning_rate = float(training_form['learningRate'])
-    xVal = training_form['xVal']
+    x_val = training_form['xVal']
     optimiser = training_form['optimizer']
-    #loss_function = training_form['lossFunction']
     
     model_id = training_form['model']
     model_checkpoint = training_form['checkpoint']
     dataset_profile = dataset[:dataset.find('-')]
     dataset_date_time = dataset[dataset.find('-')+1:]
-    dataset_dir = f'MLApp\\data\\training_datasets\\{dataset_profile}\\{dataset_date_time}'
-    
+    #dataset_dir = f'MLApp\\data\\training_datasets\\{dataset_profile}\\{dataset_date_time}'
+    dataset_dir = os.path.join("MLApp", "data", "training_datasets", dataset_profile, dataset_date_time)
     transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))])
     
     targets = target_loader(dataset_dir) 
@@ -46,7 +41,7 @@ def flask_train(training_form):
     model_data = []
     try:
         print("model_id: ", model_id)
-        con = sqlite3.connect("data.db")
+        con = sqlite3.connect(DATABASE_PATH)
         con.row_factory = sqlite3.Row
         cur = con.cursor()
         
@@ -59,29 +54,12 @@ def flask_train(training_form):
         print("Database error:", e)
     finally:
         con.close()
-    print("model_data:", model_data)
-    # print("model_data['layers']:", model_data['layers'])
-    # print("model_data['layers'] type:", type(model_data['layers']))
-
-
     
     model = CustomNet(json.loads(model_data['layers']))
     model.to(device)
-    model.load_state_dict(torch.load(f'MLApp\\{state_dict_dir}\\{model_id}\\{model_checkpoint}'))
-    # state_dicts_list = os.listdir(state_dict_dir)
-    # for i, state_dicts in enumerate(state_dicts_list):
-    #     print(i, state_dicts)
+    state_dict_path = os.path.join("MLApp", state_dict_dir, model_id, model_checkpoint)
+    model.load_state_dict(torch.load(state_dict_path))
 
-    # while True:
-    #     try:
-    #         state_dict_filename = state_dicts_list[int(input("Which state dict do you want to load?"))]
-    #         break
-    #     except:
-    #         print("Invalid option, please try again")
-    # print("state_dict_path set to: " + state_dict_path)
-       
-    # model.load_state_dict(torch.load(os.path.join(state_dict_dir, state_dict_filename)))
-    
     for epoch in range(epochs):  # loop over the dataset multiple times
         optim_instance = OPTIMIZER(model.parameters(), lr=learning_rate)
         running_loss = 0.0
@@ -108,8 +86,8 @@ def flask_train(training_form):
     
     state_filename = time.strftime('%d-%m-%Y-%H%M-%S')
     try:
-        os.mkdir(f"MLApp\\{state_dict_dir}\\{model_id}")
+        os.mkdir(os.path.join("MLApp", state_dict_dir, model_id))
     except OSError as e:
         print("OSError: ", e)
-    
-    torch.save(model.state_dict(), f"MLApp\\{state_dict_dir}\\{model_id}\\{state_filename}.pth")
+    save_state_path = os.path.join("MLApp", state_dict_dir, model_id, state_filename+".pth")
+    torch.save(model.state_dict(), save_state_path)

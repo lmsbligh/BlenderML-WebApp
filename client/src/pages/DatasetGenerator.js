@@ -12,6 +12,8 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { v4 as uuidv4 } from 'uuid';
 
+import fetchData from '../utils.js'
+
 export default function DatasetGenerator() {
     const defaultProfile = {
         "description": "",
@@ -34,10 +36,7 @@ export default function DatasetGenerator() {
     const [sampleImages, setSampleImages] = useImmer([]);
     
     React.useEffect(()=> {
-            //response.json() creates an array from the JSON in the response
-            fetch('datasetProfiles').then(response => response.json()).then(data => {
-                setProfileOptions(data)
-            }).catch(error => console.error('Error fetching data:', error))
+            fetchData('datasetProfiles', setProfileOptions)
         }, []);
 
     const handleProfileChange = (event) => {

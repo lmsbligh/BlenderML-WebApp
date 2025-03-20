@@ -1,5 +1,4 @@
 from torch import nn
-import json
 from MLApp.parameters import device
 
 class CustomNet(nn.Module):
@@ -22,7 +21,6 @@ class CustomNet(nn.Module):
  
         self.layers = nn.Sequential()
         for layer in layers_dict:
-            print("layer: ", json.dumps(layer, indent=4))
             match layer['layer_type']:
                 case "Dense":
                     self.layers.append(nn.Linear(int(layer['x_0']), int(layer['x_1'])))
@@ -44,18 +42,10 @@ class CustomNet(nn.Module):
         """Returns tensor representing estimated material
         parameters.
         """
-        for i, layer in enumerate(self.layers):
-            #print(f"Input shape: ", x.shape)
-            #print(f"Layer {i}: ", layer)
-            
+        for i, layer in enumerate(self.layers):            
             x = layer(x)
-            #print(f"layer is nn.Conv2d?: ", isinstance(layer, nn.Conv2d))
-            #print(f"next layer is nn.Conv2d?: ", isinstance(self.layers[i+1], nn.Linear))
             if (i+1 < len(self.layers)):
                 if isinstance(layer, nn.MaxPool2d) and isinstance(self.layers[i+1], nn.Linear):  # Flatten after last CNN layer
-                    #print("layer flattened")
-                    x = x.view(x.size(0), -1)
-                    ##x = x.flatten()
-            
+                    x = x.view(x.size(0), -1)            
         return x
 

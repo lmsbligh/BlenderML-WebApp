@@ -20,7 +20,6 @@ class ImageDataset(datasets.VisionDataset):
     """
 
     def __init__(self, root, targets, transform=None, target_transform=None):
-        print("ran init")
         super(ImageDataset, self).__init__(
             root, transform=transform, target_transform=target_transform)
         self.targets = targets

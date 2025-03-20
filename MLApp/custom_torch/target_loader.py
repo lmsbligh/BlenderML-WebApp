@@ -11,10 +11,7 @@ def target_loader(directory):
     """
     targets_json = []
     targets=[]
-    print("cwd: ", os.getcwd())
-    with open(f"{directory}\\props\\params.json", 'r+') as file:
-        #print("json.load(file): ",  json.load(file))
-        #print("Type of json.load(file): ",  type(json.load(file)))
+    with open(os.path.join(directory, "props", "params.json"), 'r+') as file:
 
         targets_json = json.load(file)
     
@@ -28,5 +25,4 @@ def target_loader(directory):
             material["nodes['Principled BSDF'].inputs[6].default_value"],
             material["nodes['Principled BSDF'].inputs[9].default_value"] 
         ])
-    print("Targets: ", targets)
     return targets

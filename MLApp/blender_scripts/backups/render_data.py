@@ -49,11 +49,9 @@ if isinstance(sys.argv[3], str):
 
       print("Data: ", data)
       if os.path.isfile(data):
-            print("true")
             with open(data, 'r+') as file:
                   material_props = json.load(file)
       elif os.path.isfile(data + "\\props\\params.json"):
-            print("true")
             with open(data + "\\props\\params.json", 'r+') as file:
                   material_props = list(json.load(file))
       else:
@@ -81,7 +79,6 @@ elif isinstance(sys.argv[3], list):
             bpy.data.scenes["Scene"].render.filepath = f"data\\val\\renders\\{ind}.jpg"
             bpy.ops.render.render(use_viewport = True, write_still=True)
 
-print(f"{data=}")
 
 
 

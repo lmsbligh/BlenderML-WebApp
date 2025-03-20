@@ -21,6 +21,7 @@ import SelectedModel from '../components/SelectedModel/SelectedModel.js'
 import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import SelectorDataset from '../components/SelectorDataset/SelectorDataset.js'
 import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpoint.js';
+import fetchData from '../utils.js';
 
 export default function Training() {
 
@@ -52,29 +53,13 @@ export default function Training() {
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
 
     React.useEffect(()=> {
-                //response.json() creates an array from the JSON in the response
-                fetch('getDatasets').then(response => response.json()).then(data => {
-                    setDatasetOptions(data)
-                }).catch(error => console.error('Error fetching data:', error))
+                fetchData('getDatasets', setDatasetOptions)
+                fetchData('models', setModelData)
             }, []);
-
-    React.useEffect(()=> {
-        //response.json() creates an array from the JSON in the response
-        fetch('models').then(response => response.json()).then(data => {
-            setModelData(data)
-        }).catch(error => console.error('Error fetching data:', error))
-        console.log()
-    }, []);
 
     React.useEffect(()=>{
         if (!selectedModel) return;
-        console.log("selectedModel: ", selectedModel)
-        fetch(`checkpoints/${selectedModel.value}`)
-            .then(response => response.json())
-            .then((data) => {
-            setCheckpointOptions(data)
-            })
-            .catch(error => console.error('Error fetching data:', error))
+        fetchData(`checkpoints/${selectedModel.value}`, setCheckpointOptions)
     }, [selectedModel]);
 
     const handleModelChange = (event) => {

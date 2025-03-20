@@ -14,8 +14,11 @@ def launch_blender(data="train", script="", scene_props="", render_dir=""):
         Location of the script to run in Blender on launch.
 
     """
-    script_path = f"{os.getcwd()}"+ script
+    script_path = os.path.join(os.getcwd(), script)
+    print("script_path:", script_path)
     data_path = os.path.join(os.getcwd(), data)
+    print("data_path:", data_path)
+
     command = []
     if (scene_props):    
         command = [blender_executable, "-P", script_path] + ["--data_path", data_path] + ["--scene_props", scene_props]

@@ -7,42 +7,33 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import SelectedModel from '../components/SelectedModel/SelectedModel.js'
-import FileUpload from '../components/FileUpload/FileUpload.js'; 
+import FileUpload from '../components/FileUpload/FileUpload.js';
 import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpoint.js';
+import fetchData from '../utils.js'
 
 export default function GenerateMaterials() {
     const [generateMaterialForm, setGenerateMaterialForm] = useImmer({
-            "model":"",
-            "image_url":"",
-            "image_path": "",
-            "render_url": "",
-            "checkpoint":""
-        })
+        "model": "",
+        "image_url": "",
+        "image_path": "",
+        "render_url": "",
+        "checkpoint": ""
+    })
 
     const [checkpointOptions, setCheckpointOptions] = React.useState([]);
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
     const [modelData, setModelData] = useImmer([]);
     const [selectedModel, setSelectedModel] = useImmer('');
 
-    React.useEffect(()=> {
-        //response.json() creates an array from the JSON in the response
-        fetch('models').then(response => response.json()).then(data => {
-            setModelData(data)
-        }).catch(error => console.error('Error fetching data:', error))
-        console.log()
+    React.useEffect(() => {
+        fetchData('models', setModelData)
     }, []);
 
-    React.useEffect(()=>{
-            if (!selectedModel) return;
-            console.log("selectedModel: ", selectedModel)
-            fetch(`checkpoints/${selectedModel.value}`)
-                .then(response => response.json())
-                .then((data) => {
-                setCheckpointOptions(data)
-                })
-                .catch(error => console.error('Error fetching data:', error))
-        }, [selectedModel]);
-    
+    React.useEffect(() => {
+        if (!selectedModel) return;
+        fetchData(`checkpoints/${selectedModel.value}`, setCheckpointOptions)
+    }, [selectedModel]);
+
     const handleCheckpointChange = (event) => {
         setSelectedCheckpoint(event.target.value)
         setGenerateMaterialForm((prevVals) => {
@@ -52,20 +43,20 @@ export default function GenerateMaterials() {
             )
         })
     }
-    
+
     const handleSelectorModelChange = (event) => {
         const model = modelData.find((option) => option.value === event.target.value);
         setSelectedModel(model)
         setGenerateMaterialForm((prevVals) => {
-                    return produce(prevVals, (draft) =>{
-                        draft.model = event.target.value
-                    })
-                })
-        };
+            return produce(prevVals, (draft) => {
+                draft.model = event.target.value
+            })
+        })
+    };
 
     const handleUploadFile = (event) => {
         console.log("upload event handler called")
-        
+
         const formData = new FormData();
         formData.append('uploadFile', event.target.files[0])
         //console.log("image file: ", generateMaterialForm.image)
@@ -77,22 +68,22 @@ export default function GenerateMaterials() {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             //console.log("response: ", response.json())
-            
+
             return response.json(); // or response.json(), depending on your server response
         })
-        .then(data => {
-            console.log("Response received:", data);
-            setGenerateMaterialForm((prevVals) => {
-                return produce(prevVals, (draft) =>{
-                    console.log("data.url", data.url)
-                    draft.image_url = data.url
-                    draft.image_path = data.image_path
+            .then(data => {
+                console.log("Response received:", data);
+                setGenerateMaterialForm((prevVals) => {
+                    return produce(prevVals, (draft) => {
+                        console.log("data.url", data.url)
+                        draft.image_url = data.url
+                        draft.image_path = data.image_path
+                    })
                 })
             })
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        });
+            .catch(error => {
+                console.error("Error:", error);
+            });
     }
 
     const handleGenerateMaterial = (event) => {
@@ -110,25 +101,25 @@ export default function GenerateMaterials() {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 //console.log("response: ", response.json())
-                
+
                 return response.json(); // or response.json(), depending on your server response
             })
-            .then(data => {
-                console.log("Response received:", data);
-                setGenerateMaterialForm((prevVals) => {
-                    return produce(prevVals, (draft) =>{
-                        console.log("data.url", data.url)
-                        draft.render_url = data.render_url
+                .then(data => {
+                    console.log("Response received:", data);
+                    setGenerateMaterialForm((prevVals) => {
+                        return produce(prevVals, (draft) => {
+                            console.log("data.url", data.url)
+                            draft.render_url = data.render_url
+                        })
                     })
                 })
-            })
 
-        }catch (error) {
+        } catch (error) {
             console.error('Error:', error);
         }
     }
 
-    return (    
+    return (
         <Box sx={{
             width: "100%",
             display: 'flex',
@@ -148,12 +139,12 @@ export default function GenerateMaterials() {
                 gap: '10px'
             }}>
 
-                    { modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleSelectorModelChange} modelOptions={modelData}/> : null}
-                    {selectedModel ? <SelectedModel selectedModel={selectedModel} /> : null}
-                    <SelectorCheckpoint selectedCheckpoint={selectedCheckpoint} handleChange={handleCheckpointChange} checkpointOptions={checkpointOptions}/>
+                {modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleSelectorModelChange} modelOptions={modelData} /> : null}
+                {selectedModel ? <SelectedModel selectedModel={selectedModel} /> : null}
+                <SelectorCheckpoint selectedCheckpoint={selectedCheckpoint} handleChange={handleCheckpointChange} checkpointOptions={checkpointOptions} />
 
-                    <FileUpload handleUpload={handleUploadFile}/>
-                    <Card sx={{
+                <FileUpload handleUpload={handleUploadFile} />
+                <Card sx={{
                     maxWidth: 300,
                     marginTop: "60px",
                     marginBottom: "60px",
@@ -164,8 +155,8 @@ export default function GenerateMaterials() {
                         height="300"
                         image={generateMaterialForm.image_url}
                         alt="Placeholder" />
-                    </Card>
-                    <Button variant="contained" style={{ width: '100%' }} onClick={handleGenerateMaterial}>Generate</Button>
+                </Card>
+                <Button variant="contained" style={{ width: '100%' }} onClick={handleGenerateMaterial}>Generate</Button>
 
             </Box>
             <Box sx={{
@@ -192,14 +183,14 @@ export default function GenerateMaterials() {
                         <Typography>
                             Material Properties:
                             &#123;
-                                RGB:...etc
+                            RGB:...etc
                             &#125;
                         </Typography>
                     </CardContent>
                 </Card>
                 <Button variant="contained" disabled style={{ color: 'grey', width: '100%' }}>Download Material</Button>
 
+            </Box>
         </Box>
-        </Box> 
     )
 }

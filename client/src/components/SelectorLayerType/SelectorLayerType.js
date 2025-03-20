@@ -1,34 +1,34 @@
 import React from 'react';
-import { Typography, Card, CardContent } from '@mui/material';
+
+import { Typography, Card } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
-import Select, {  } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
+import fetchData from '../../utils';
 
 
-function SelectorLayerType({layer_type, updateState}){
+function SelectorLayerType({layerType, handleChange}){
 
-    const [availableTypes, setAvailabeTypes] = React.useState('');
+    const [availableLayerTypes, setAvailabeTypes] = React.useState([]);
     const [initialLayerType, setInitialLayerType] = React.useState('')
     React.useEffect(()=> {
-        fetch('layerTypes').then(response => response.json()).then(data => {
-            setAvailabeTypes(data);
-            const initialType = data.find(lt => lt.layer_type === layer_type) || data[0];
-            setSelectedLayerType(initialType)
-        }).catch(error => console.error('Error fetching data:', error))
-    }, [])
+        fetchData('layerTypes', setAvailabeTypes)
+        const initialType = availableLayerTypes.find(lt => lt.layer_type === layerType) || availableLayerTypes[0];
+        setSelectedLayerType(initialType)
+    }, [availableLayerTypes])
 
         
     const [selectedLayerType, setSelectedLayerType] = React.useState(initialLayerType);
 
-    const handleChange = (event) => {
+    const handleSelectorChange = (event) => {
         const selectedValue = event.target.value;
-        const newType = availableTypes.find(
+        const newType = availableLayerTypes.find(
             option => option.value === selectedValue
             );
         if (newType) {
             setSelectedLayerType(newType);
-            updateState(newType);
+            handleChange(newType);
         }
     };
 
@@ -41,13 +41,13 @@ function SelectorLayerType({layer_type, updateState}){
                 id="simple-select"
                 value={selectedLayerType?.value  || ''}
                 renderValue={() => selectedLayerType.layer_type}
-                onChange={handleChange}
+                onChange={handleSelectorChange}
 
             >
                 { 
                 
-                Array.isArray(availableTypes) ? 
-                availableTypes.map(option => (
+                Array.isArray(availableLayerTypes) ? 
+                availableLayerTypes.map(option => (
                     
                     <MenuItem key={option.value} value={option.value}>        
                         <Card>
