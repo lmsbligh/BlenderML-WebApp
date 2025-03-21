@@ -14,7 +14,7 @@ import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import LayerCard from '../components/LayerCard/LayerCard.js';
 import ModelPropertiesModifier from '../components/ModelPropertiesModifier/ModelPropertiesModifier.js';
 
-import fetchData from '../utils.js'
+import { fetchData, handleSelectorFormChange } from '../utils.js'
 const defaultTheme = createTheme();
 
 function CreateModifyModel() {
@@ -42,14 +42,6 @@ function CreateModifyModel() {
     const [selectedModel, setSelectedModel] = useImmer('');
     const [modelData, setModelData] = useImmer([]);
 
-
-    // React.useEffect(()=> {
-    //     //response.json() creates an array from the JSON in the response
-    //     fetch('models').then(response => response.json()).then(data => {
-    //         setModelData(data)
-    //     }).catch(error => console.error('Error fetching data:', error))
-    //     console.log()
-    // }, []);
     React.useEffect(()=> {
         fetchData('models', setModelData)
     }, []);
@@ -138,11 +130,8 @@ function CreateModifyModel() {
             description: updatedTextFields.description,
             layers: updatedLayers,
         };
-        //console.log("updatedTextFields:", updatedTextFields)
         console.log('Saving model, updatedModel:', updatedModel);
         setSelectedModel(updatedModel);
-        //modelData.find((option) => option.value === updatedModel.value)
-        //setModelData(modelData.find((option) => option.value === updatedModel.value))
 
         setModelData((prevModelData) => {
             return produce(prevModelData, (draft) => {
@@ -179,7 +168,7 @@ function CreateModifyModel() {
                 <Grid item  sm={6} xs={12} sx={{display: "flex", flexDirection: "column"}}>
                     <CssBaseline />
                     <FormControl fullWidth>
-                        { modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleModelSelectorChange} modelOptions={modelData}/> : null}
+                        { modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleModelSelectorChange} modelOptions={modelData} isModify={true}/> : null}
                         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px', paddingTop: '10px'}}>
                             {
                                 selectedModel ? console.log("selectedModel.value:", selectedModel.value) : console.log("selectedModel is null")

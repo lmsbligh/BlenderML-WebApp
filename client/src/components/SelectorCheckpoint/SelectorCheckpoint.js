@@ -12,6 +12,7 @@ function SelectorCheckpoint({ selectedCheckpoint, handleChange, checkpointOption
             <Select
                 labelId="Checkpoint-Selector-Label"
                 id="simple-select"
+                name="checkpoint"
                 value={selectedCheckpoint ? selectedCheckpoint : ''}
                 onChange={handleChange}
                 renderValue={() => selectedCheckpoint ? selectedCheckpoint : "Select a checkpoint" // Show the label as the selected text

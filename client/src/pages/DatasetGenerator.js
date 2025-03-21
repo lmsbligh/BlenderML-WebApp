@@ -12,7 +12,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import fetchData from '../utils.js'
+import { fetchData, handleSelectorFormChange } from '../utils.js'
 
 export default function DatasetGenerator() {
     const defaultProfile = {

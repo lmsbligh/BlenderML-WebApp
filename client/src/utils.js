@@ -1,4 +1,5 @@
-const fetchData = (endpoint, setState) => {
+import produce from "immer";
+export const fetchData = (endpoint, setState) => {
     fetch(endpoint)
         .then(response => response.json())
         .then (data => {
@@ -7,4 +8,18 @@ const fetchData = (endpoint, setState) => {
         .catch(error => console.error('Error fetching data:', error))
 }
 
-export default fetchData
+export const handleSelectorFormChange = ({eve, setSelector, setForm, options}) => {
+    if (options) {
+        const option = options.find((option) => option.value === eve.target.value )
+        setSelector(option)
+    }
+    else {
+        setSelector(eve.target.value)
+    }
+    const selectLabel = eve.target.name
+    setForm((prevVals) => {
+        return produce(prevVals, (draft) => {
+            draft[selectLabel] = eve.target.value;
+        })
+    })
+}

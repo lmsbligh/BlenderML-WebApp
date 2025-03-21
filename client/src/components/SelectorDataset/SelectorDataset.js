@@ -15,6 +15,7 @@ function SelectorDataset ({ selectedDataset, handleChange, datasetOptions}){
                 labelId="Dataset-Selector-Label"
                 id="simple-select"
                 sx={{width: "100%"}}
+                name="dataset"
                 value={selectedDataset}
                 onChange={handleChange}
                 renderValue={(selected) => {

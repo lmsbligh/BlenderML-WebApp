@@ -9,7 +9,7 @@ import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import SelectedModel from '../components/SelectedModel/SelectedModel.js'
 import FileUpload from '../components/FileUpload/FileUpload.js';
 import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpoint.js';
-import fetchData from '../utils.js'
+import { fetchData, handleSelectorFormChange } from '../utils.js'
 
 export default function GenerateMaterials() {
     const [generateMaterialForm, setGenerateMaterialForm] = useImmer({
@@ -34,7 +34,7 @@ export default function GenerateMaterials() {
         fetchData(`checkpoints/${selectedModel.value}`, setCheckpointOptions)
     }, [selectedModel]);
 
-    const handleCheckpointChange = (event) => {
+    const handleSelectorCheckpointChange = (event) => {
         setSelectedCheckpoint(event.target.value)
         setGenerateMaterialForm((prevVals) => {
             return produce(prevVals, (draft) => {
@@ -139,9 +139,9 @@ export default function GenerateMaterials() {
                 gap: '10px'
             }}>
 
-                {modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleSelectorModelChange} modelOptions={modelData} /> : null}
+                {modelData ? <SelectorModel selectedModel={selectedModel} handleChange={(event) => {handleSelectorFormChange({eve: event, setSelector: setSelectedModel,setForm: setGenerateMaterialForm, options: modelData})}} modelOptions={modelData} /> : null}
                 {selectedModel ? <SelectedModel selectedModel={selectedModel} /> : null}
-                <SelectorCheckpoint selectedCheckpoint={selectedCheckpoint} handleChange={handleCheckpointChange} checkpointOptions={checkpointOptions} />
+                <SelectorCheckpoint selectedCheckpoint={selectedCheckpoint} handleChange={(event) => {handleSelectorFormChange({eve: event, setSelector: setSelectedCheckpoint, setForm: setGenerateMaterialForm})}} checkpointOptions={checkpointOptions} data-selectorID="checkpoint"/>
 
                 <FileUpload handleUpload={handleUploadFile} />
                 <Card sx={{

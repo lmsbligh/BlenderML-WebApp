@@ -7,13 +7,14 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 
 
-function SelectorModel({ selectedModel, handleChange, modelOptions }){
+function SelectorModel({ selectedModel, handleChange, modelOptions, isModify }){
     return (   
         <FormControl sx={{ width: "100%" }}> 
             {!selectedModel && <InputLabel >Select a model</InputLabel>}                  
             <Select
                 labelId="Model-Selector-Label"
                 id="simple-select"
+                name="model"
                 value={selectedModel.value ? selectedModel.value : ''}
                 onChange={handleChange}
                 renderValue={() => selectedModel ? selectedModel.modelName : "Select a model" // Show the label as the selected text
@@ -36,16 +37,16 @@ function SelectorModel({ selectedModel, handleChange, modelOptions }){
                                     {option.description}
                                 </Typography>
                     </MenuItem>
-                ))}
-                <MenuItem key={-1} value={-1}>        
-                    <Card sx={{ width: "100%"}}>
-                        <CardContent>
-                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                New Model
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </MenuItem>
+                ))}{ isModify ? <MenuItem key={-1} value={-1}>        
+                <Card sx={{ width: "100%"}}>
+                    <CardContent>
+                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                            New Model
+                        </Typography>
+                    </CardContent>
+                </Card>
+            </MenuItem> : null}
+                
             </Select>
         </FormControl>
             );
