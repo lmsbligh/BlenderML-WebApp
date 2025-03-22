@@ -21,7 +21,7 @@ import SelectedModel from '../components/SelectedModel/SelectedModel.js'
 import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import SelectorDataset from '../components/SelectorDataset/SelectorDataset.js'
 import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpoint.js';
-import { fetchData, handleSelectorFormChange } from '../utils.js'
+import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData } from '../utils.js'
 import SelectorOptimizer from '../components/SelectorOptimizer/SelectorOptimizer.js';
 import SelectorLoss from '../components/SelectorLoss/SelectorLoss.js';
 
@@ -64,89 +64,14 @@ export default function Training() {
         fetchData(`checkpoints/${selectedModel.value}`, setCheckpointOptions)
     }, [selectedModel]);
 
-    const handleSelectorModelChange = (event) => {
-        // setSelectedModel(modelData[event.target.value]);
-        const model = modelData.find((option) => option.value === event.target.value);
-        setSelectedModel(model)
-        setSelectedCheckpoint(null)
-        setTrainingForm((prevVals) => {
-            return produce(prevVals, (draft) => {
-                draft.model = event.target.value
-            })
-        })
-    };
-
-    const handleDatasetChange = (event) => {
-        const datasetVal = datasetOptions.find((option) => option.value === event.target.value);
-        setSelectedDataset(datasetVal)
-        setTrainingForm((prevVals) => {
-            return produce(prevVals, (draft) => {
-                draft.dataset = event.target.value
-            })
-        })
-    };
-
-    const handleOptimizerChange = (event) => {
-        const optimizerVal = optimizerOptions.find((option) => option.value === event.target.value);
-        setSelectedOptimizer(optimizerVal)
-        setTrainingForm((prevVals) => {
-            return produce(prevVals, (draft) => {
-                draft.optimizer = optimizerVal.label
-            })
-        })
-    };
-
-    const handleLossChange = (event) => {
-        setSelectedLoss(lossOptions[event.target.value])
-        const lossVal = lossOptions.find((option) => option.value === event.target.value);
-        setTrainingForm((prevVals) => {
-            return produce(prevVals, (draft) => {
-                draft.lossFunction = lossVal.label
-            })
-        })
-    };
-
-    const handleTextFieldChange = (event) => {
-        setTrainingForm((prevVals) => {
-            return produce(prevVals, (draft) => {
-                draft[event.target.name] = event.target.value;
-            })
-        })
-    }
-
-
-    const handleCheckpointChange = (event) => {
-        setSelectedCheckpoint(event.target.value)
-        setTrainingForm((prevVals) => {
-            return produce(prevVals, (draft) => {
-                draft.checkpoint = event.target.value;
-            }
-            )
-        })
-    }
-
     const handleTrain = (event) => {
-        console.log("handleTrain ran")
-        try {
-            fetch('submitTraining', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                title: 'title',
-                body: JSON.stringify(trainingForm),
-            })
-
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        pushData('submitTraining', trainingForm)
     }
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}><Grid container>
             <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
                 <CssBaseline />
-                <FormControl fullWidth>
                     {modelData ? <SelectorModel selectedModel={selectedModel} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedModel, setForm: setTrainingForm, options: modelData }) }} modelOptions={modelData} /> : null}
                     <Box>
                         <List>
@@ -169,7 +94,6 @@ export default function Training() {
                                                             }
                                                         </ListItem>
                                                     ))
-
                                                 }
                                             </List>
                                         </AccordionDetails>
@@ -179,16 +103,14 @@ export default function Training() {
                         </List>
                     </Box>
                     <Button variant="contained" disabled style={{ width: '150px' }}>Load</Button>
-                </FormControl>
                 <SelectorCheckpoint selectedCheckpoint={selectedCheckpoint} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedCheckpoint, setForm: setTrainingForm }) }} checkpointOptions={checkpointOptions} />
                 <SelectorDataset selectedDataset={selectedDataset} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedDataset, setForm: setTrainingForm, options: datasetOptions }) }} datasetOptions={datasetOptions} />
                 <Button variant='contained' disabled style={{ width: '150px' }}>Add Dataset </Button>
-                <TextField name="epochs" label="Epochs" value={trainingForm.epochs} onChange={handleTextFieldChange}></TextField>
-                <TextField name="learningRate" label="Learning rate" value={trainingForm.learningRate} onChange={handleTextFieldChange}></TextField>
+                <TextField name="epochs" label="Epochs" value={trainingForm.epochs} onChange={(event) => { handleTextFieldChange({ eve: event, setState: setTrainingForm })}}></TextField>
+                <TextField name="learningRate" label="Learning rate" value={trainingForm.learningRate} onChange={(event) => { handleTextFieldChange({ eve: event, setState: setTrainingForm })}}></TextField>
                 <SelectorOptimizer selectedOptimizer={selectedOptimizer} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedOptimizer, setForm: setTrainingForm, options: optimizerOptions }) }} optimizerOptions={optimizerOptions} />
                 <SelectorLoss selectedLoss={selectedLoss} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedLoss, setForm: setTrainingForm, options: lossOptions }) }} lossOptions={lossOptions} />
-
-                <TextField name="xVal" label="Cross validation set %" value={trainingForm.xVal} onChange={handleTextFieldChange}></TextField>
+                <TextField name="xVal" label="Cross validation set %" value={trainingForm.xVal} onChange={(event) => { handleTextFieldChange({ eve: event, setState: setTrainingForm })}}></TextField>
                 <Button variant='contained' style={{ alignSelf: 'center', width: '150px' }} onClick={handleTrain}>Train</Button>
             </Grid>
         </Grid>

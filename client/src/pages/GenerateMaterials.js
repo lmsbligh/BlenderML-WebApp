@@ -34,26 +34,6 @@ export default function GenerateMaterials() {
         fetchData(`checkpoints/${selectedModel.value}`, setCheckpointOptions)
     }, [selectedModel]);
 
-    const handleSelectorCheckpointChange = (event) => {
-        setSelectedCheckpoint(event.target.value)
-        setGenerateMaterialForm((prevVals) => {
-            return produce(prevVals, (draft) => {
-                draft.checkpoint = event.target.value;
-            }
-            )
-        })
-    }
-
-    const handleSelectorModelChange = (event) => {
-        const model = modelData.find((option) => option.value === event.target.value);
-        setSelectedModel(model)
-        setGenerateMaterialForm((prevVals) => {
-            return produce(prevVals, (draft) => {
-                draft.model = event.target.value
-            })
-        })
-    };
-
     const handleUploadFile = (event) => {
         console.log("upload event handler called")
 
@@ -87,7 +67,6 @@ export default function GenerateMaterials() {
     }
 
     const handleGenerateMaterial = (event) => {
-        console.log("handleGenerate ran")
         try {
             fetch('generateMaterial', {
                 method: 'POST',
@@ -96,23 +75,21 @@ export default function GenerateMaterials() {
                 },
                 title: 'title',
                 body: JSON.stringify(generateMaterialForm),
-            }).then(response => {
+            })
+            .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                //console.log("response: ", response.json())
-
                 return response.json(); // or response.json(), depending on your server response
             })
-                .then(data => {
-                    console.log("Response received:", data);
-                    setGenerateMaterialForm((prevVals) => {
-                        return produce(prevVals, (draft) => {
-                            console.log("data.url", data.url)
-                            draft.render_url = data.render_url
-                        })
+            .then(data => {
+                setGenerateMaterialForm((prevVals) => {
+                    return produce(prevVals, (draft) => {
+                        console.log("data.url", data.url)
+                        draft.render_url = data.render_url
                     })
                 })
+            })
 
         } catch (error) {
             console.error('Error:', error);

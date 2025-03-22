@@ -14,7 +14,7 @@ import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import LayerCard from '../components/LayerCard/LayerCard.js';
 import ModelPropertiesModifier from '../components/ModelPropertiesModifier/ModelPropertiesModifier.js';
 
-import { fetchData, handleSelectorFormChange } from '../utils.js'
+import { fetchData, pushData } from '../utils.js'
 const defaultTheme = createTheme();
 
 function CreateModifyModel() {
@@ -104,19 +104,7 @@ function CreateModifyModel() {
             })
         })
         setSelectedModel({...defaultModel, value: val});
-        try {
-            fetch('deleteModel', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                title: 'title',
-                body: JSON.stringify(selectedModel),
-            })
-
-        }catch (error) {
-            console.error('Error:', error);
-        }
+        pushData('deleteModel', selectedModel)
     }
     
     const handleModelSave = () => {
@@ -130,12 +118,10 @@ function CreateModifyModel() {
             description: updatedTextFields.description,
             layers: updatedLayers,
         };
-        console.log('Saving model, updatedModel:', updatedModel);
         setSelectedModel(updatedModel);
 
         setModelData((prevModelData) => {
             return produce(prevModelData, (draft) => {
-                console.log("Before (updating model data):", JSON.parse(JSON.stringify(prevModelData)));
                 const ind = prevModelData.findIndex((option) => option.value === updatedModel.value);
                 if (ind != -1) {
                     draft[ind] = updatedModel;
@@ -146,19 +132,7 @@ function CreateModifyModel() {
             })
         });
 
-        try {
-            fetch('submitModel', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                title: 'title',
-                body: JSON.stringify(updatedModel),
-            })
-
-        }catch (error) {
-            console.error('Error:', error);
-        }
+        pushData('submitModel', updatedModel)
     }
 
     return (

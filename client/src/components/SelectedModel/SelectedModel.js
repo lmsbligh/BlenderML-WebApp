@@ -4,7 +4,7 @@ import { Typography } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import ListItem from '@mui/material/ListItem';
 
-function selectedModel({ selectedModel }){
+function selectedModel({ selectedModel }) {
     return (
         <><Typography>Selected Model: </Typography><ListItem>
             <ListItemText>
