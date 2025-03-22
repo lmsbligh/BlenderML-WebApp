@@ -1,2 +1,8 @@
 MLApp/data/
+MLApp/__pycache__
 *.pth
+.venv
+flask-server/__pycache__
+flask-server/venv
+__pycache__
+client/node_modules
