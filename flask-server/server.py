@@ -42,6 +42,7 @@ app = Flask(__name__)
 app.secret_key = 'asdjkfnasdouif2398r'
 app.config['UPLOAD_FOLDER'] = os.path.join('MLApp', 'data', 'user_uploaded_test')
 DATABASE_PATH = os.path.join(os.getcwd(), "MLApp", "data", "data.db")
+
 @app.route("/models")
 def get_models():
     global MODELS_LIST
