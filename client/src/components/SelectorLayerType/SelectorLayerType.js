@@ -13,7 +13,9 @@ function SelectorLayerType({layerType, handleChange}){
     const [availableLayerTypes, setAvailabeTypes] = React.useState([]);
     const [initialLayerType, setInitialLayerType] = React.useState('')
     React.useEffect(()=> {
-        fetchData('layerTypes', setAvailabeTypes)
+        if ( availableLayerTypes.length === 0) {
+            fetchData('layer_types', setAvailabeTypes)
+        }
         const initialType = availableLayerTypes.find(lt => lt.layer_type === layerType) || availableLayerTypes[0];
         setSelectedLayerType(initialType)
     }, [availableLayerTypes])

@@ -55,7 +55,7 @@ export default function Training() {
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
 
     React.useEffect(() => {
-        fetchData('getDatasets', setDatasetOptions)
+        fetchData('datasets', setDatasetOptions)
         fetchData('models', setModelData)
     }, []);
 
@@ -65,7 +65,7 @@ export default function Training() {
     }, [selectedModel]);
 
     const handleTrain = (event) => {
-        pushData('submitTraining', trainingForm)
+        pushData('submit_training', trainingForm)
     }
 
     return (

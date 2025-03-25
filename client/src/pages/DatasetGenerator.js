@@ -36,7 +36,7 @@ export default function DatasetGenerator() {
     const [sampleImages, setSampleImages] = useImmer([]);
 
     React.useEffect(() => {
-        fetchData('datasetProfiles', setProfileOptions)
+        fetchData('dataset_profiles', setProfileOptions)
     }, []);
 
     const handleProfileChange = (event) => {
@@ -63,14 +63,13 @@ export default function DatasetGenerator() {
     };
 
     const handleProfileDelete = (value) => {
-        console.log("delProfile ran!!!")
         setProfileOptions((prevOptions) => {
             return produce(prevOptions, (draft) => {
                 const index = prevOptions.findIndex((option) => option.value === value)
                 draft.splice(index, 1)
             })
         })
-        pushData('deleteDatasetProfile', selectedDatasetProfile)
+        pushData('delete_dataset_profile', selectedDatasetProfile)
         setSelectedDatasetProfile(null)
     }
 
@@ -87,13 +86,13 @@ export default function DatasetGenerator() {
                 }
             })
         );
-        pushData('submitDatasetProfile', selectedDatasetProfile)
+        pushData('submit_dataset_profile', selectedDatasetProfile)
     }
 
     const handleGenerateDataset = (event) => {
         handleProfileSave(event)
         try {
-            fetch('submitGenerateDataset', {
+            fetch('submit_generate_dataset', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

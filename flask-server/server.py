@@ -70,7 +70,7 @@ def get_models():
     
 DATASET_PROFILES_LIST = []
 
-@app.route("/datasetProfiles")
+@app.route("/dataset_profiles")
 def get_dataset_profiles():
     global DATASET_PROFILES_LIST
     con = sqlite3.connect(DATABASE_PATH)
@@ -88,8 +88,6 @@ def get_dataset_profiles():
             data.append(row_dict)
         DATASET_PROFILES_LIST = data
         
-        
-        
         return data
     except sqlite3.Error as e:
         print("Database error:", e)
@@ -98,13 +96,13 @@ def get_dataset_profiles():
         # Close the connection
         con.close()
         
-@app.route("/layerTypes")
+@app.route("/layer_types")
 def get_layer_types():
                 return [{"value": 1, "layer_type": 'Dense'},
         {"value": 2, "layer_type": 'CNN'},
         {"value": 3, "layer_type": 'Pooling'}]
                 
-@app.route("/activationTypes")
+@app.route("/activation_types")
 def get_activation_types():
                 return [{"value": 1, "activation": 'Linear'},
         {"value": 2, "activation": 'ReLU'},
@@ -112,7 +110,7 @@ def get_activation_types():
         {"value": 4, "activation": 'Sigmoid'},
         {"value": 5, "activation": 'None'}]
 
-@app.route('/submitDatasetProfile', methods=["POST"])
+@app.route('/submit_dataset_profile', methods=["POST"])
 def submit_dataset_profile():
     
     print("POST req received, dataset profile submission")
@@ -137,7 +135,7 @@ def submit_dataset_profile():
         
     return jsonify({"value": profile_to_save['value'], "body": "success!"}), 200
 
-@app.route('/submitModel', methods=["POST"])
+@app.route('/submit_model', methods=["POST"])
 def submit_model():
     con = sqlite3.connect(DATABASE_PATH)
     cur = con.cursor()
@@ -159,9 +157,7 @@ def submit_model():
     con.close()
     return jsonify({"body": "success!"}), 200
 
-    
-    
-@app.route('/deleteModel', methods=["POST"])
+@app.route('/delete_model', methods=["POST"])
 def delete_model():
     model_to_del = json.loads(request.data.decode('utf-8'))
     ind, model = next(
@@ -179,7 +175,7 @@ def delete_model():
         return jsonify({"body": "success, but no model existed with this value"}), 200
     return jsonify({"body": "success!"}), 200
     
-@app.route('/deleteDatasetProfile', methods=["POST"])
+@app.route('/delete_dataset_profile', methods=["POST"])
 def delete_dataset_profile():
     profile_to_del = json.loads(request.data.decode('utf-8'))
     ind, profile = next(
@@ -199,14 +195,14 @@ def delete_dataset_profile():
 
     return jsonify({"body": "Profile deleted successfully!"}), 200
 
-@app.route('/submitTraining', methods=["POST"])
+@app.route('/submit_training', methods=["POST"])
 def submit_training():    
     training_form = json.loads(request.data.decode("utf-8"))
     flask_train(training_form)
     
     return jsonify({"body": "Training request received successfully."}), 200
 
-@app.route('/submitGenerateDataset', methods=["POST"])
+@app.route('/submit_generate_dataset', methods=["POST"])
 def submit_generate_dataset():    
     generate_profile = json.loads(request.data.decode('utf-8'))
     time_stamp = time.strftime('%d-%m-%Y-%H%M-%S')
@@ -258,7 +254,7 @@ def submit_generate_dataset():
 def return_sample(profile_id, dataset_render_date, dataset_filename):
     return send_from_directory(f"../MLApp/data/training_datasets/{profile_id}/{dataset_render_date}/", dataset_filename)
 
-@app.route('/getDatasets')
+@app.route('/datasets')
 def get_datasets():    
     global DATASET_LIST
 
@@ -302,7 +298,7 @@ def get_checkpoints(model_id):
     checkpoints = os.listdir(os.path.join("MLApp", "data", "w_and_b", model_id))
     return checkpoints
 
-@app.route('/uploadFile', methods=['POST'])
+@app.route('/upload_file', methods=['POST'])
 def upload_file():
     if 'uploadFile' not in request.files:
         flash('No file part')
@@ -329,7 +325,7 @@ def upload_file():
         flash('File not allowed')
         return redirect(request.url)
 
-@app.route('/generateMaterial', methods=['POST'])
+@app.route('/generate_material', methods=['POST'])
 def generate_material():    
     generate_mat_form = json.loads(request.data.decode('utf-8'))
     predicted_props = flask_generate_material(generate_mat_form, app.config['UPLOAD_FOLDER'])

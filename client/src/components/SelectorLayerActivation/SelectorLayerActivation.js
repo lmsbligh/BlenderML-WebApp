@@ -25,7 +25,9 @@ function SelectorLayerActivation({ activationType, handleChange }) {
     };
 
     React.useEffect(() => {
-        fetchData('activationTypes', setAvailableActivations)
+        if (availableActivations.length === 0) {
+            fetchData('activation_types', setAvailableActivations)
+        }
         const initialType = availableActivations.find(at => at.activation === activationType) || availableActivations[0];
         setSelectedLayerActivation(initialType)
     }, [availableActivations]);

@@ -40,7 +40,7 @@ export default function GenerateMaterials() {
         const formData = new FormData();
         formData.append('uploadFile', event.target.files[0])
         //console.log("image file: ", generateMaterialForm.image)
-        fetch('uploadFile', {
+        fetch('upload_file', {
             method: 'POST',
             body: formData
         }).then(response => {
@@ -68,7 +68,7 @@ export default function GenerateMaterials() {
 
     const handleGenerateMaterial = (event) => {
         try {
-            fetch('generateMaterial', {
+            fetch('generate_material', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

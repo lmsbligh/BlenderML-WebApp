@@ -104,7 +104,7 @@ function CreateModifyModel() {
             })
         })
         setSelectedModel({...defaultModel, value: val});
-        pushData('deleteModel', selectedModel)
+        pushData('delete_model', selectedModel)
     }
     
     const handleModelSave = () => {
@@ -132,7 +132,7 @@ function CreateModifyModel() {
             })
         });
 
-        pushData('submitModel', updatedModel)
+        pushData('submit_model', updatedModel)
     }
 
     return (
