@@ -1,12 +1,12 @@
 import React from 'react';
-import { Typography, Card, CardContent, IconButton } from '@mui/material';
+import { Typography, Card, CardContent, IconButton, FormHelperText } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 
 
-function SelectorDataset ({ selectedDataset, handleChange, datasetOptions}){
+function SelectorDataset ({ helperText, error, selectedDataset, handleChange, datasetOptions}){
     
     return (   
         <FormControl sx={{ width: "100%", padding: "5px" }}> 
@@ -18,6 +18,7 @@ function SelectorDataset ({ selectedDataset, handleChange, datasetOptions}){
                 name="dataset"
                 value={selectedDataset}
                 onChange={handleChange}
+                error={error}
                 renderValue={(selected) => {
                     const selectedOption = datasetOptions.find((option) => option.value === selected.value);
                     return selectedOption ? selectedOption.datasetName : <Typography>Select a Dataset</Typography>;
@@ -43,6 +44,7 @@ function SelectorDataset ({ selectedDataset, handleChange, datasetOptions}){
                     </MenuItem>
                 ))}
             </Select>
+            <FormHelperText sx={{color: 'error.main'}}>{helperText}</FormHelperText>
         </FormControl>
             );
 }

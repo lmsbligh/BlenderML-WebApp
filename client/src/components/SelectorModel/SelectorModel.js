@@ -1,13 +1,14 @@
 import React from 'react';
 
-import { Typography, Card, CardContent } from '@mui/material';
+import { Typography, Card, CardContent, TextField, FormHelperText  } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Select, {  } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
+import { red } from '@mui/material/colors';
 
 
-function SelectorModel({ selectedModel, handleChange, modelOptions, isModify }){
+function SelectorModel({ helperText, error, selectedModel, handleChange, modelOptions, isModify }){
     return (   
         <FormControl sx={{ width: "100%" }}> 
             {!selectedModel && <InputLabel >Select a model</InputLabel>}                  
@@ -15,6 +16,7 @@ function SelectorModel({ selectedModel, handleChange, modelOptions, isModify }){
                 labelId="Model-Selector-Label"
                 id="simple-select"
                 name="model"
+                error={error}
                 value={selectedModel.value ? selectedModel.value : ''}
                 onChange={handleChange}
                 renderValue={() => selectedModel ? selectedModel.modelName : "Select a model" // Show the label as the selected text
@@ -48,6 +50,7 @@ function SelectorModel({ selectedModel, handleChange, modelOptions, isModify }){
             </MenuItem> : null}
                 
             </Select>
+            <FormHelperText sx={{color: 'error.main'}}>{helperText}</FormHelperText>
         </FormControl>
             );
 }

@@ -29,8 +29,9 @@ export default function FileUpload({handleUpload}) {
       <VisuallyHiddenInput
         type="file"
         name="uploadFile"
+        accept='.jpg, .jpeg, .png'
         onChange={handleUpload}
-        multiple
+        single
       />
     </Button>
   );

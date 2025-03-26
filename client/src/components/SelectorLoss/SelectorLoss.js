@@ -15,7 +15,8 @@ function SelectorLoss({ selectedLoss, handleChange, lossOptions }) {
                 id="simple-select"
                 name="lossFunction"
                 onChange={handleChange}
-                renderValue={() => selectedLoss ? selectedLoss.label : "Select an optimizer" // Show the label as the selected text
+                value={selectedLoss ? selectedLoss.label : ''}
+                renderValue={() => selectedLoss ? selectedLoss.label : "Select a loss function" // Show the label as the selected text
                 }
             >
                 {lossOptions.map(option => (

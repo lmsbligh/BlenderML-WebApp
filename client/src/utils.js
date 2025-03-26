@@ -36,7 +36,7 @@ export const handleSelectorFormChange = ({eve, setSelector, setForm, options}) =
     const selectLabel = eve.target.name
     setForm((prevVals) => {
         return produce(prevVals, (draft) => {
-            draft[selectLabel] = eve.target.value;
+            draft[selectLabel].value = eve.target.value;
         })
     })
 }
@@ -44,7 +44,7 @@ export const handleSelectorFormChange = ({eve, setSelector, setForm, options}) =
 export const handleTextFieldChange = ({eve, setState}) => {
     setState((prevVals) => {
         return produce(prevVals, (draft) => {
-            draft[eve.target.name] = eve.target.value;
+            draft[eve.target.name].value = eve.target.value;
         })
     })
 }

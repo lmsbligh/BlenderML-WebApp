@@ -16,6 +16,7 @@ function SelectorOtimizer({ selectedOptimizer, handleChange, optimizerOptions })
                 id="simple-select"
                 name="optimizer"
                 onChange={handleChange}
+                value={selectedOptimizer ? selectedOptimizer.label : ''}
                 renderValue={() => selectedOptimizer ? selectedOptimizer.label : "Select an optimizer" // Show the label as the selected text
                 }
             >

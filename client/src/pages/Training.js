@@ -28,15 +28,60 @@ import SelectorLoss from '../components/SelectorLoss/SelectorLoss.js';
 export default function Training() {
 
     const [trainingForm, setTrainingForm] = useImmer({
-        "model": "",
-        "checkpoint": "",
-        "dataset": "",
-        "epochs": 100,
-        "learningRate": 0.001,
-        "optimizer": "ADAM",
-        "lossFunction": "MSE",
-        "xVal": 20,
-        "randomOrientation": true
+        "model": { 
+            value: "", 
+            error: false, 
+            regex: "", 
+            required: true,
+            helper: "Please select a model."
+        },
+        "checkpoint": { 
+            value: "", 
+            error: false, 
+            regex: "", 
+            required: true,
+            helper: "Please select a checkpoint."
+        },
+        "dataset": { 
+            value: "", 
+            error: false, 
+            regex: "", 
+            required: true,
+            helper: "Please select a dataset."
+        },
+        "epochs": { 
+            value: 100, 
+            error: false, 
+            regex: /^(?:[1-9]\d{0,2}|1000)$/, 
+            required: true,
+            helper: "Please enter an integer between 1 and 1000." 
+        },
+        "learningRate": { 
+            value: 0.001, 
+            error: false, 
+            regex: /^0.(?:1|(?:0[1-9]|10)|(?:00[1-9]|0[1-9]\d|100)|(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|1000))$/, 
+            required: true,
+            helper: "Please enter a number between 0.1 and 0.0001, with up to 4 decimal places." 
+        },
+        "optimizer": { 
+            value: "ADAM", 
+            error: false, 
+            regex: "", 
+            required: true, 
+        },
+        "lossFunction": { 
+            value: "MSE", 
+            error: false, 
+            regex: "", 
+            required: true 
+        },
+        "xVal": { 
+            value: 20, 
+            error: false, 
+            regex: /^(?:[0-9]\d?|99)$/, 
+            required: true,
+            helper: "Please enter an integer between 1 and 99" 
+        },
     })
 
     const [modelData, setModelData] = useImmer([]);
@@ -46,13 +91,14 @@ export default function Training() {
     const [selectedDataset, setSelectedDataset] = React.useState('');
 
     const [optimizerOptions, setOptimizerOptions] = React.useState([{ "value": 0, "label": "Gradient descent" }, { "value": 1, "label": "ADAM" }]);
-    const [selectedOptimizer, setSelectedOptimizer] = React.useState('');
+    const [selectedOptimizer, setSelectedOptimizer] = React.useState(optimizerOptions[1]);
 
     const [lossOptions, setLossOptions] = React.useState([{ "value": 0, "label": "MSE" }, { "value": 1, "label": "MAE" }]);
-    const [selectedLoss, setSelectedLoss] = React.useState('');
+    const [selectedLoss, setSelectedLoss] = React.useState(lossOptions[0]);
 
     const [checkpointOptions, setCheckpointOptions] = React.useState([]);
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
+
 
     React.useEffect(() => {
         fetchData('datasets', setDatasetOptions)
@@ -64,7 +110,47 @@ export default function Training() {
         fetchData(`checkpoints/${selectedModel.value}`, setCheckpointOptions)
     }, [selectedModel]);
 
+    const validateForm = () => {
+        setTrainingForm((prevForm) => {
+            return produce(prevForm, (draft) => {
+                for (var key in draft) {
+                    if (draft[key].required && draft[key].value == "") {
+                        draft[key].error = true
+                    }
+                    else {
+                        draft[key].error = false
+                    }
+                    if (draft[key].regex) {
+                        if (!draft[key].regex.test(draft[key].value)) {
+                            draft[key].error = true
+                        }
+                    }
+                }
+            })
+
+        })
+    }
+    const validateField = ({key, setFormState}) => {
+        setFormState((prevForm) => {
+            return produce(prevForm, (draft) => {
+                if (draft[key].required && draft[key].value == "") {
+                    draft[key].error = true
+                }
+                else {
+                    draft[key].error = false
+                }
+                if (draft[key].regex) {
+                    if (!draft[key].regex.test(draft[key].value)) {
+                        draft[key].error = true
+                    }
+                }
+            })
+        })
+    }
+
+
     const handleTrain = (event) => {
+        validateForm()
         pushData('submit_training', trainingForm)
     }
 
@@ -72,46 +158,147 @@ export default function Training() {
         <Box sx={{ display: 'flex', flexDirection: 'column' }}><Grid container>
             <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
                 <CssBaseline />
-                    {modelData ? <SelectorModel selectedModel={selectedModel} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedModel, setForm: setTrainingForm, options: modelData }) }} modelOptions={modelData} /> : null}
-                    <Box>
-                        <List>
-                            <SelectedModel selectedModel={selectedModel} />
-                            <ListItem>
-                                <div>
-                                    <Accordion>
-                                        <AccordionSummary
-                                            expandIcon={<ArrowDropDownIcon />}
-                                        >
-                                            Show more details
-                                        </AccordionSummary>
-                                        <AccordionDetails>
-                                            <List>
-                                                {
-                                                    Array.from({ length: 5 }, (_, i) => (
-                                                        <ListItem key={i} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                                            {
-                                                                <ModelDetailsCard layer_n={i} />
-                                                            }
-                                                        </ListItem>
-                                                    ))
-                                                }
-                                            </List>
-                                        </AccordionDetails>
-                                    </Accordion>
-                                </div>
-                            </ListItem>
-                        </List>
-                    </Box>
-                    <Button variant="contained" disabled style={{ width: '150px' }}>Load</Button>
-                <SelectorCheckpoint selectedCheckpoint={selectedCheckpoint} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedCheckpoint, setForm: setTrainingForm }) }} checkpointOptions={checkpointOptions} />
-                <SelectorDataset selectedDataset={selectedDataset} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedDataset, setForm: setTrainingForm, options: datasetOptions }) }} datasetOptions={datasetOptions} />
-                <Button variant='contained' disabled style={{ width: '150px' }}>Add Dataset </Button>
-                <TextField name="epochs" label="Epochs" value={trainingForm.epochs} onChange={(event) => { handleTextFieldChange({ eve: event, setState: setTrainingForm })}}></TextField>
-                <TextField name="learningRate" label="Learning rate" value={trainingForm.learningRate} onChange={(event) => { handleTextFieldChange({ eve: event, setState: setTrainingForm })}}></TextField>
-                <SelectorOptimizer selectedOptimizer={selectedOptimizer} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedOptimizer, setForm: setTrainingForm, options: optimizerOptions }) }} optimizerOptions={optimizerOptions} />
-                <SelectorLoss selectedLoss={selectedLoss} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedLoss, setForm: setTrainingForm, options: lossOptions }) }} lossOptions={lossOptions} />
-                <TextField name="xVal" label="Cross validation set %" value={trainingForm.xVal} onChange={(event) => { handleTextFieldChange({ eve: event, setState: setTrainingForm })}}></TextField>
-                <Button variant='contained' style={{ alignSelf: 'center', width: '150px' }} onClick={handleTrain}>Train</Button>
+                {modelData ? <SelectorModel
+                    error={trainingForm.model.error}
+                    helper={trainingForm.model.error ? trainingForm.model.helper : ''}
+                    selectedModel={selectedModel}
+                    modelOptions={modelData}
+                    handleChange={(event) => {
+                        handleSelectorFormChange({
+                            eve: event,
+                            setSelector: setSelectedModel,
+                            setForm: setTrainingForm,
+                            options: modelData
+                        })
+                        validateField({key: 'model', setFormState: setTrainingForm})
+                    }}
+
+                /> : null}
+                <Box>
+                    <List>
+                        <SelectedModel selectedModel={selectedModel} />
+                        <ListItem>
+                            <div>
+                                <Accordion>
+                                    <AccordionSummary
+                                        expandIcon={<ArrowDropDownIcon />}
+                                    >
+                                        Show more details
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <List>
+                                            {
+                                                Array.from({ length: 5 }, (_, i) => (
+                                                    <ListItem key={i} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                                        {
+                                                            <ModelDetailsCard layer_n={i} />
+                                                        }
+                                                    </ListItem>
+                                                ))
+                                            }
+                                        </List>
+                                    </AccordionDetails>
+                                </Accordion>
+                            </div>
+                        </ListItem>
+                    </List>
+                </Box>
+                {selectedModel ? <SelectorCheckpoint
+                    error={trainingForm.checkpoint.error}
+                    helperText={trainingForm.checkpoint.error ? trainingForm.checkpoint.helper : ''}
+                    selectedCheckpoint={selectedCheckpoint}
+                    handleChange={(event) => {
+                        handleSelectorFormChange({
+                            eve: event,
+                            setSelector: setSelectedCheckpoint,
+                            setForm: setTrainingForm
+                        })
+                        validateField({key: 'checkpoint', setFormState: setTrainingForm})
+                    }}
+                    checkpointOptions={checkpointOptions}
+                /> : null}
+                <SelectorDataset
+                    error={trainingForm.dataset.error}
+                    helperText={trainingForm.dataset.error ? trainingForm.dataset.helper : ''}
+                    selectedDataset={selectedDataset}
+                    handleChange={(event) => {
+                        handleSelectorFormChange({
+                            eve: event,
+                            setSelector: setSelectedDataset,
+                            setForm: setTrainingForm,
+                            options: datasetOptions
+                        })
+                        validateField({key: 'dataset', setFormState: setTrainingForm})
+
+                    }}
+                    datasetOptions={datasetOptions} />
+                <TextField
+                    error={trainingForm.epochs.error}
+                    name="epochs"
+                    label="Epochs"
+                    helperText={trainingForm.epochs.error ? trainingForm.epochs.helper : ''}
+                    value={trainingForm.epochs.value}
+                    onChange={(event) => {
+                        handleTextFieldChange({ eve: event, setState: setTrainingForm })
+                        validateField({key: 'epochs', setFormState: setTrainingForm})
+                    }}
+                />
+                <TextField
+                    error={trainingForm.learningRate.error}
+                    helperText={trainingForm.learningRate.error ? trainingForm.learningRate.helper : ''}
+                    name="learningRate"
+                    label="Learning rate"
+                    value={trainingForm.learningRate.value}
+                    onChange={(event) => {
+                        handleTextFieldChange({ eve: event, setState: setTrainingForm })
+                        validateField({key: 'learningRate', setFormState: setTrainingForm})
+                    }}
+                />
+                <SelectorOptimizer
+                    error={trainingForm.optimizer.error}
+                    selectedOptimizer={selectedOptimizer}
+                    handleChange={(event) => {
+                        handleSelectorFormChange({
+                            eve: event,
+                            setSelector: setSelectedOptimizer,
+                            setForm: setTrainingForm,
+                            options: optimizerOptions
+                        })
+                        validateField({key: 'optimizer', setFormState: setTrainingForm})
+                    }}
+                    optimizerOptions={optimizerOptions}
+                />
+                <SelectorLoss
+                    error={trainingForm.lossFunction.error}
+                    selectedLoss={selectedLoss}
+                    handleChange={(event) => {
+                        handleSelectorFormChange({
+                            eve: event,
+                            setSelector: setSelectedLoss,
+                            setForm: setTrainingForm,
+                            options: lossOptions
+                        })
+                        validateField({ key: 'lossFunction', setFormState: setTrainingForm })
+                    }}
+                    lossOptions={lossOptions}
+                />
+                <TextField
+                    error={trainingForm.xVal.error}
+                    helperText={trainingForm.xVal.error ? trainingForm.xVal.helper : ''}
+                    name="xVal"
+                    label="Cross validation set %"
+                    value={trainingForm.xVal.value}
+                    onChange={(event) => { 
+                        handleTextFieldChange({ eve: event, setState: setTrainingForm })
+                        validateField({ key: 'xVal', setFormState: setTrainingForm }) 
+                        }} />
+                <Button 
+                    variant='contained' 
+                    style={{ alignSelf: 'center', width: '150px' }} 
+                    onClick={handleTrain}
+                    >
+                    Train
+                </Button>
             </Grid>
         </Grid>
         </Box>

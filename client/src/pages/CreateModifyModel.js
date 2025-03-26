@@ -20,8 +20,6 @@ const defaultTheme = createTheme();
 function CreateModifyModel() {
     const defaultModel = {
         "modelName": '', 
-        "input": "", 
-        "output": "", 
         "description": "",
         "layers": [
             { 
@@ -108,6 +106,16 @@ function CreateModifyModel() {
     }
     
     const handleModelSave = () => {
+        var err = ""
+        for (var key in defaultModel) {
+            if (!Boolean(defaultModel[key])) {
+                err = err.concat(`${key}, `)
+            }
+        }
+        if (err) {
+            alert(`the following required fields are empty: ${err}`)
+            return
+        }
         const updatedLayers = layerCallbacks.map((callback, index) => {
             return layerCallbacks[index](); // Collect state from each child
         });
