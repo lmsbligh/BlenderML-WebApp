@@ -21,14 +21,14 @@ def flask_train(training_form):
     """
     print("Training Form: ", training_form)
     print("Training Form Type:", type(training_form))
-    dataset = training_form['dataset']
-    epochs = int(training_form['epochs'])
-    learning_rate = float(training_form['learningRate'])
-    x_val = training_form['xVal']
-    optimiser = training_form['optimizer']
+    dataset = training_form['dataset']['value']
+    epochs = int(training_form['epochs']['value'])
+    learning_rate = float(training_form['learningRate']['value'])
+    x_val = training_form['xVal']['value']
+    optimiser = training_form['optimizer']['value']
     
-    model_id = training_form['model']
-    model_checkpoint = training_form['checkpoint']
+    model_id = training_form['model']['value']
+    model_checkpoint = training_form['checkpoint']['value']
     dataset_profile = dataset[:dataset.find('-')]
     dataset_date_time = dataset[dataset.find('-')+1:]
     #dataset_dir = f'MLApp\\data\\training_datasets\\{dataset_profile}\\{dataset_date_time}'

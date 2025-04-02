@@ -21,7 +21,7 @@ import SelectedModel from '../components/SelectedModel/SelectedModel.js'
 import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import SelectorDataset from '../components/SelectorDataset/SelectorDataset.js'
 import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpoint.js';
-import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData } from '../utils.js'
+import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, validateField, validateForm } from '../utils.js'
 import SelectorOptimizer from '../components/SelectorOptimizer/SelectorOptimizer.js';
 import SelectorLoss from '../components/SelectorLoss/SelectorLoss.js';
 
@@ -110,50 +110,12 @@ export default function Training() {
         fetchData(`checkpoints/${selectedModel.value}`, setCheckpointOptions)
     }, [selectedModel]);
 
-    const validateForm = () => {
-        setTrainingForm((prevForm) => {
-            return produce(prevForm, (draft) => {
-                for (var key in draft) {
-                    if (draft[key].required && draft[key].value == "") {
-                        draft[key].error = true
-                    }
-                    else {
-                        draft[key].error = false
-                    }
-                    if (draft[key].regex) {
-                        if (!draft[key].regex.test(draft[key].value)) {
-                            draft[key].error = true
-                        }
-                    }
-                }
-            })
-
-        })
-    }
-    const validateField = ({key, setFormState}) => {
-        setFormState((prevForm) => {
-            return produce(prevForm, (draft) => {
-                if (draft[key].required && draft[key].value == "") {
-                    draft[key].error = true
-                }
-                else {
-                    draft[key].error = false
-                }
-                if (draft[key].regex) {
-                    if (!draft[key].regex.test(draft[key].value)) {
-                        draft[key].error = true
-                    }
-                }
-            })
-        })
-    }
-
 
     const handleTrain = (event) => {
-        validateForm()
+        validateForm(setTrainingForm)
         pushData('submit_training', trainingForm)
     }
-
+    
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}><Grid container>
             <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>

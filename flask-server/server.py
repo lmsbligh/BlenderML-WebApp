@@ -199,7 +199,9 @@ def delete_dataset_profile():
 @app.route('/submit_training', methods=["POST"])
 def submit_training():    
     training_form = json.loads(request.data.decode("utf-8"))
-    flask_train(training_form)
+    print("!!Training ran but disabled.")
+    print(training_form)
+    #flask_train(training_form)
     
     return jsonify({"body": "Training request received successfully."}), 200
 
@@ -341,8 +343,12 @@ def generate_material():
         json.dump(generate_mat_form, file)
         print("writing to scene_props.json")
         
-    sample_URLs = launch_blender(data=os.path.join(app.config['UPLOAD_FOLDER'],"props"), script=os.path.join("MLApp", render_data_script), render_dir=os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER']))
-    
+    sample_URLs = launch_blender(
+                                    data=os.path.join(app.config['UPLOAD_FOLDER'],"props"), 
+                                    script=os.path.join("MLApp", render_data_script),
+                                    render_dir=os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'])
+                                )
+    print("generate materials returning: ", url_for('serve_uploaded_file', filename=f"{predicted_props['name']}.jpg", _external=True))
     return jsonify({"predicted_props": predicted_props,
                     "render_url": url_for('serve_uploaded_file', filename=f"{predicted_props['name']}.jpg", _external=True)})
     

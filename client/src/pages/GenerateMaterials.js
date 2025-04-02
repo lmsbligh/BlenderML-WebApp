@@ -9,16 +9,41 @@ import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import SelectedModel from '../components/SelectedModel/SelectedModel.js'
 import FileUpload from '../components/FileUpload/FileUpload.js';
 import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpoint.js';
-import { fetchData, handleSelectorFormChange } from '../utils.js'
+import { fetchData, handleSelectorFormChange, validateField, validateForm } from '../utils.js'
 
 export default function GenerateMaterials() {
     const [generateMaterialForm, setGenerateMaterialForm] = useImmer({
-        "model": "",
-        "image_url": "",
-        "image_path": "",
-        "render_url": "",
-        "checkpoint": ""
+        "model": {
+            value: "",
+            error: false,
+            regex: "",
+            required: true,
+            helper: "Please select a model."
+        },
+        "image_url": {
+            value: "",
+            error: false,
+            regex: "",
+            required: true,
+            helper: ""
+        },
+        "image_path": {
+            value: "",
+            error: false,
+            regex: "",
+            required: true,
+            helper: ""
+        },
+        "checkpoint": {
+            value: "",
+            error: false,
+            regex: "",
+            required: true,
+            helper: "Please select a checkpoint."
+        }
     })
+    const [renderURL, setRenderURL] = React.useState('');
+    const [materialJSON, setMaterialJSON] = React.useState('');
 
     const [checkpointOptions, setCheckpointOptions] = React.useState([]);
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
@@ -28,6 +53,10 @@ export default function GenerateMaterials() {
     React.useEffect(() => {
         fetchData('models', setModelData)
     }, []);
+
+    React.useEffect(() => {
+        console.log("renderURL updated: ", renderURL)
+    }, [renderURL])
 
     React.useEffect(() => {
         if (!selectedModel) return;
@@ -56,8 +85,8 @@ export default function GenerateMaterials() {
                     setGenerateMaterialForm((prevVals) => {
                         return produce(prevVals, (draft) => {
                             console.log("data.url", data.url)
-                            draft.image_url = data.url
-                            draft.image_path = data.image_path
+                            draft.image_url.value = data.url
+                            draft.image_path.value = data.image_path
                         })
                     })
                 })
@@ -69,8 +98,8 @@ export default function GenerateMaterials() {
             alert("unnacceptable filetype")
             setGenerateMaterialForm((prevVals) => {
                 return produce(prevVals, (draft) => {
-                    draft.image_path = false
-                    draft.image_url = false
+                    draft.image_path.value = false
+                    draft.image_url.value = false
                 })
             })
         }
@@ -78,19 +107,11 @@ export default function GenerateMaterials() {
     }
 
     const handleGenerateMaterial = (event) => {
-        if (!generateMaterialForm.image_path && !generateMaterialForm.image_url) {
-            alert("please select an image")
+        if (!validateForm(setGenerateMaterialForm)){
+            console.log("form error")
             return
         }
-        if (!generateMaterialForm.model) {
-            alert("please select a model")
-            return
-        }
-        if(!generateMaterialForm.checkpoint) {
-            alert("please select a checkpoint")
-            return
-        }
-
+        
         try {
             fetch('generate_material', {
                 method: 'POST',
@@ -107,12 +128,8 @@ export default function GenerateMaterials() {
                     return response.json(); // or response.json(), depending on your server response
                 })
                 .then(data => {
-                    setGenerateMaterialForm((prevVals) => {
-                        return produce(prevVals, (draft) => {
-                            console.log("data.url", data.url)
-                            draft.render_url = data.render_url
-                        })
-                    })
+                    setRenderURL(data.render_url)
+                    setMaterialJSON(JSON.stringify(data.predicted_props))
                 })
 
         } catch (error) {
@@ -140,7 +157,12 @@ export default function GenerateMaterials() {
                 gap: '10px'
             }}>
 
-                {modelData ? <SelectorModel selectedModel={selectedModel} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedModel, setForm: setGenerateMaterialForm, options: modelData }) }} modelOptions={modelData} /> : null}
+                {modelData ?
+                    <SelectorModel
+                        error={generateMaterialForm.model.error}
+                        helper={generateMaterialForm.model.error ? generateMaterialForm.model.helper : ''}
+                        selectedModel={selectedModel}
+                        handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedModel, setForm: setGenerateMaterialForm, options: modelData }) }} modelOptions={modelData} /> : null}
                 {selectedModel ? <SelectedModel selectedModel={selectedModel} /> : null}
                 <SelectorCheckpoint selectedCheckpoint={selectedCheckpoint} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedCheckpoint, setForm: setGenerateMaterialForm }) }} checkpointOptions={checkpointOptions} data-selectorID="checkpoint" />
 
@@ -154,7 +176,7 @@ export default function GenerateMaterials() {
                     <CardMedia
                         component="img"
                         height="300"
-                        image={generateMaterialForm.image_url}
+                        image={generateMaterialForm.image_url.value}
                         alt="Placeholder" />
                 </Card>
                 <Button variant="contained" style={{ width: '100%' }} onClick={handleGenerateMaterial}>Generate</Button>
@@ -178,14 +200,12 @@ export default function GenerateMaterials() {
                     <CardMedia
                         component="img"
                         height="300"
-                        image={generateMaterialForm.render_url}
+                        image={renderURL}
                         alt="Placeholder" />
                     <CardContent>
                         <Typography>
                             Material Properties:
-                            &#123;
-                            RGB:...etc
-                            &#125;
+                            {materialJSON}
                         </Typography>
                     </CardContent>
                 </Card>

@@ -48,3 +48,46 @@ export const handleTextFieldChange = ({eve, setState}) => {
         })
     })
 }
+
+export const validateForm = (setForm) => {
+    const formError = false
+    setForm((prevForm) => {
+        return produce(prevForm, (draft) => {
+            for (var key in draft) {
+                if (draft[key].required && draft[key].value == "") {
+                    draft[key].error = true
+                    formError = true
+                }
+                else {
+                    draft[key].error = false
+                }
+                if (draft[key].regex && draft[key].value) {
+                    if (!draft[key].regex.test(draft[key].value)) {
+                        draft[key].error = true
+                        formError = true
+                    }
+                }
+            }
+        })
+
+    })
+    return formError
+}
+
+export const validateField = ({key, setFormState}) => {
+    setFormState((prevForm) => {
+        return produce(prevForm, (draft) => {
+            if (draft[key].required && draft[key].value == "") {
+                draft[key].error = true
+            }
+            else {
+                draft[key].error = false
+            }
+            if (draft[key].regex && draft[key].value) {
+                if (!draft[key].regex.test(draft[key].value)) {
+                    draft[key].error = true
+                }
+            }
+        })
+    })
+}
