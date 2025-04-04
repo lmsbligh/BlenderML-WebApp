@@ -12,7 +12,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, validateForm } from '../utils.js'
+import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, validateField, validateForm } from '../utils.js'
 
 export default function DatasetGenerator() {
     const defaultProfile = {
@@ -105,13 +105,9 @@ export default function DatasetGenerator() {
         fetchData('dataset_profiles', setProfileOptions)
     }, []);
     const fillForm = () => {
-        console.log("fillForm(): ")
         setProfileForm((prevVals) => {
             return produce(prevVals, (draft) => {
-                console.log("draft: ", draft)
-                console.log("selectedDatasetProfile: ", selectedDatasetProfile)
                 for (var key in draft) {
-                    console.log("key: ", key)
                     draft[key].value = selectedDatasetProfile[key]
                 }
             })
@@ -119,22 +115,16 @@ export default function DatasetGenerator() {
     }
     React.useEffect(() => {
         if (selectedDatasetProfile && Object.keys(selectedDatasetProfile).length > 0) {
-            console.log("fillForm()")
             fillForm()
         }
     }, [selectedDatasetProfile])
 
 
     const handleProfileChange = (event) => {
-        console.log("profileOptions: ", profileOptions)
         if (event.target.value == -1 ) {
-            console.log("ran new profile")
             setSelectedDatasetProfile({ ...structuredClone(defaultProfile), value: uuidv4().slice(0, 8) })
         }
         else {
-            console.log("ran else")
-            console.log(event.target.value)
-            console.log(profileOptions)
             setSelectedDatasetProfile(structuredClone(profileOptions.find((option) => option.value === event.target.value)))
         }
     }
@@ -158,6 +148,7 @@ export default function DatasetGenerator() {
     };
 
     const handleProfileDelete = (value) => {
+        
         setProfileOptions((prevOptions) => {
             return produce(prevOptions, (draft) => {
                 const index = prevOptions.findIndex((option) => option.value === value)
@@ -165,11 +156,11 @@ export default function DatasetGenerator() {
             })
         })
         pushData('delete_dataset_profile', selectedDatasetProfile)
-        setSelectedDatasetProfile(null)
+        setSelectedDatasetProfile(defaultProfile)
     }
     const fillObject = () => {
         setSelectedDatasetProfile((prevVals) => {
-            produce(prevVals, (draft) => {
+            return produce(prevVals, (draft) => {
                 for (var key in profileForm) {
                     draft[key] = profileForm[key].value
                 }
@@ -177,9 +168,9 @@ export default function DatasetGenerator() {
         })
     }
     React.useEffect(() => {
-        console.log("fillObject()")
         fillObject()
     }, [profileForm])
+
     const handleProfileSave = (event) => {
         event.preventDefault();
         if (!validateForm(setProfileForm)) {
@@ -201,6 +192,7 @@ export default function DatasetGenerator() {
     }
 
     const handleGenerateDataset = (event) => {
+        validateForm(setProfileForm)
         handleProfileSave(event)
         try {
             fetch('submit_generate_dataset', {
@@ -239,29 +231,44 @@ export default function DatasetGenerator() {
         }}>
             <Grid container>
                 <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", rowGap: "5px", columnGap: "5px" }}>
-                    <SelectorDatasetProfile selectedDatasetProfile={selectedDatasetProfile}
+                    <SelectorDatasetProfile 
+                        selectedDatasetProfile={selectedDatasetProfile}
                         handleChange={handleProfileChange}
                         profileOptions={profileOptions}
                     />
-                    {console.log()}
-                    {selectedDatasetProfile.value ? <Box>
+                    {'value' in selectedDatasetProfile ? <Box>
                         <TextField
                             name="datasetName"
-                            onChange={(event) => { handleTextFieldChange({ eve: event, setState: setProfileForm }) }}
+                            onChange={(event) => { 
+                                handleTextFieldChange({ eve: event, setState: setProfileForm })
+                                validateField({key: 'datasetName', setFormState: setProfileForm}) 
+                            }}
                             sx={{ width: "50%", padding: "5px" }}
                             label="Dataset Name"
+                            error={profileForm.datasetName.error}
+                            helperText={profileForm.datasetName.error ? profileForm.datasetName.helper : ''}
                             value={profileForm.datasetName.value}></TextField>
                         <TextField
                             name="datasetSize"
-                            onChange={(event) => { handleTextFieldChange({ eve: event, setState: setProfileForm }) }}
+                            onChange={(event) => { 
+                                handleTextFieldChange({ eve: event, setState: setProfileForm })
+                                validateField({key: 'datasetSize', setFormState: setProfileForm})  
+                            }}
                             sx={{ width: "50%", padding: "5px" }}
                             label="Dataset Size"
+                            error={profileForm.datasetSize.error}
+                            helperText={profileForm.datasetSize.error ? profileForm.datasetSize.helper : ''}
                             value={profileForm.datasetSize.value}></TextField>
                         <TextField
                             name="skyboxPath"
-                            onChange={(event) => { handleTextFieldChange({ eve: event, setState: setProfileForm }) }}
+                            onChange={(event) => { 
+                                handleTextFieldChange({ eve: event, setState: setProfileForm }) 
+                                validateField({key: 'skyboxPath', setFormState: setProfileForm})
+                            }}
                             sx={{ width: "50%", padding: "5px" }}
                             label="Skybox path"
+                            error={profileForm.skyboxPath.error}
+                            helperText={profileForm.skyboxPath.error ? profileForm.skyboxPath.helper : ''}
                             value={profileForm.skyboxPath.value}></TextField>
                         <Box sx={{
                             display: "flex",
@@ -269,14 +276,24 @@ export default function DatasetGenerator() {
                         }}>
                             <TextField
                                 name="imageWidth"
-                                onChange={(event) => { handleTextFieldChange({ eve: event, setState: setProfileForm }) }}
+                                onChange={(event) => { 
+                                    handleTextFieldChange({ eve: event, setState: setProfileForm }) 
+                                    validateField({key: 'imageWidth', setFormState: setProfileForm})
+                                }}
                                 label="Image width"
+                                error={profileForm.imageWidth.error}
+                                helperText={profileForm.imageWidth.error ? profileForm.imageWidth.helper : ''}
                                 value={profileForm.imageWidth.value}
                                 sx={{ padding: "5px" }}></TextField>
                             <TextField
                                 name="imageHeight"
-                                onChange={(event) => { handleTextFieldChange({ eve: event, setState: setProfileForm }) }}
+                                onChange={(event) => { 
+                                    handleTextFieldChange({ eve: event, setState: setProfileForm }) 
+                                    validateField({key: 'imageHeight', setFormState: setProfileForm})
+                                }}
                                 label="Image height"
+                                error={profileForm.imageHeight.error}
+                                helperText={profileForm.imageHeight.error ? profileForm.imageHeight.helper : ''}
                                 value={profileForm.imageHeight.value}
                                 sx={{ padding: "5px" }}></TextField>
                         </Box>
@@ -284,8 +301,13 @@ export default function DatasetGenerator() {
                             name="description"
                             multiline
                             maxRows={4}
-                            onChange={(event) => { handleTextFieldChange({ eve: event, setState: setProfileForm }) }}
+                            onChange={(event) => { 
+                                handleTextFieldChange({ eve: event, setState: setProfileForm }) 
+                                validateField({key: 'description', setFormState: setProfileForm})
+                            }}
                             label="Profile description"
+                            error={profileForm.description.error}
+                            helperText={profileForm.description.error ? profileForm.description.helper : ''}
                             value={profileForm.description.value}
                             sx={{ padding: "5px", width: "100%" }}></TextField>
                         <Paper variant='outlined'>
@@ -294,16 +316,34 @@ export default function DatasetGenerator() {
                             </Typography>
                             <List sx={{ display: "flex", flexDirection: "column" }}>
                                 <ListItem>
-                                    <FormControlLabel control={<Checkbox checked={profileForm.meshes.value["cube"] || false} name="cube" onChange={handleMeshListChange} sx={{ padding: "5px" }} />} label="Cube" />
+                                    <FormControlLabel 
+                                        control={<Checkbox checked={profileForm.meshes.value["cube"] || false} 
+                                        name="cube" onChange={handleMeshListChange} 
+                                        sx={{ padding: "5px" }} />} 
+                                        label="Cube" />
                                 </ListItem>
                                 <ListItem>
-                                    <FormControlLabel control={<Checkbox checked={profileForm.meshes.value["sphere"] || false} name="sphere" onChange={handleMeshListChange} sx={{ padding: "5px" }} />} label="Sphere" />
+                                    <FormControlLabel 
+                                        control={<Checkbox 
+                                        checked={profileForm.meshes.value["sphere"] || false} 
+                                        name="sphere" onChange={handleMeshListChange} 
+                                        sx={{ padding: "5px" }} />} 
+                                        label="Sphere" />
                                 </ListItem>
                                 <ListItem>
-                                    <FormControlLabel control={<Checkbox checked={profileForm.meshes.value["monkey"] || false} name="monkey" onChange={handleMeshListChange} sx={{ padding: "5px" }} />} label="Monkey" />
+                                    <FormControlLabel 
+                                        control={<Checkbox checked={profileForm.meshes.value["monkey"] || false} 
+                                        name="monkey" 
+                                        onChange={handleMeshListChange} 
+                                        sx={{ padding: "5px" }} />} 
+                                        label="Monkey" />
                                 </ListItem>
                                 <ListItem>
-                                    <FormControlLabel control={<Checkbox checked={profileForm.meshes.value["car"] || false} name="car" onChange={handleMeshListChange} sx={{ padding: "5px" }} />} label="Car" />
+                                    <FormControlLabel 
+                                        control={<Checkbox checked={profileForm.meshes.value["car"] || false} 
+                                        name="car" onChange={handleMeshListChange} 
+                                        sx={{ padding: "5px" }} />} 
+                                        label="Car" />
                                 </ListItem>
                             </List>
 
@@ -318,7 +358,7 @@ export default function DatasetGenerator() {
                             <Button variant="contained" color="error" sx={{ width: "49%" }} label="Delete Profile" onClick={() => handleProfileDelete(selectedDatasetProfile.value)}>Delete Profile</Button>
                             <Button variant="contained" sx={{ width: "49%" }} label="Generate Dataset" onClick={handleGenerateDataset}>Generate Dataset</Button>
                         </Box>
-                    </Box> : console.log("NULL profile selected")}
+                    </Box> : null}
                 </Grid>
                 <Grid item sm={6} xs={12} sx={{ padding: "10px", display: "flex", flexDirection: "column", rowGap: "5px", columnGap: "5px" }}>
                     <Box sx={{
