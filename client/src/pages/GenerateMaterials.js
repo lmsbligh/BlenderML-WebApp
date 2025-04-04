@@ -25,21 +25,21 @@ export default function GenerateMaterials() {
             error: false,
             regex: "",
             required: true,
-            helper: ""
+            helper: "Please select an image."
         },
         "image_path": {
             value: "",
             error: false,
             regex: "",
             required: true,
-            helper: ""
+            helper: "Please select an image."
         },
         "checkpoint": {
             value: "",
             error: false,
             regex: "",
             required: true,
-            helper: "Please select a checkpoint."
+            helper: "Please select a model, then a checkpoint."
         }
     })
     const [renderURL, setRenderURL] = React.useState('');
@@ -89,6 +89,7 @@ export default function GenerateMaterials() {
                             draft.image_path.value = data.image_path
                         })
                     })
+                    validateField({key: 'image_url', setFormState: setGenerateMaterialForm})
                 })
                 .catch(error => {
                     console.error("Error:", error);
@@ -107,7 +108,7 @@ export default function GenerateMaterials() {
     }
 
     const handleGenerateMaterial = (event) => {
-        if (!validateForm(setGenerateMaterialForm)){
+        if (validateForm(setGenerateMaterialForm)){
             console.log("form error")
             return
         }
@@ -160,13 +161,22 @@ export default function GenerateMaterials() {
                 {modelData ?
                     <SelectorModel
                         error={generateMaterialForm.model.error}
-                        helper={generateMaterialForm.model.error ? generateMaterialForm.model.helper : ''}
+                        helperText={generateMaterialForm.model.error ? generateMaterialForm.model.helper : ''}
                         selectedModel={selectedModel}
-                        handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedModel, setForm: setGenerateMaterialForm, options: modelData }) }} modelOptions={modelData} /> : null}
+                        handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedModel, setForm: setGenerateMaterialForm, options: modelData }) }} 
+                        modelOptions={modelData} /> : null}
                 {selectedModel ? <SelectedModel selectedModel={selectedModel} /> : null}
-                <SelectorCheckpoint selectedCheckpoint={selectedCheckpoint} handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedCheckpoint, setForm: setGenerateMaterialForm }) }} checkpointOptions={checkpointOptions} data-selectorID="checkpoint" />
+                <SelectorCheckpoint 
+                    selectedCheckpoint={selectedCheckpoint}
+                    error={generateMaterialForm.checkpoint.error}
+                    helperText={generateMaterialForm.checkpoint.error ? generateMaterialForm.checkpoint.helper : ''} 
+                    handleChange={(event) => { handleSelectorFormChange({ eve: event, setSelector: setSelectedCheckpoint, setForm: setGenerateMaterialForm }) }} 
+                    checkpointOptions={checkpointOptions} 
+                    data-selectorID="checkpoint" />
 
-                <FileUpload handleUpload={handleUploadFile} />
+                <FileUpload handleUpload={handleUploadFile} 
+                    error={generateMaterialForm.image_url.error} 
+                    helperText={generateMaterialForm.image_url.helper}/>
                 <Card sx={{
                     maxWidth: 300,
                     marginTop: "60px",

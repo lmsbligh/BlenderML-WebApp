@@ -3,6 +3,7 @@ import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { FormHelperText } from '@mui/material';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -16,10 +17,11 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-export default function FileUpload({handleUpload}) {
+export default function FileUpload({handleUpload, error, helperText}) {
   return (
-    <Button
+    <><Button
       component="label"
+      color={error ? "error" : "primary"}
       role={undefined}
       variant="contained"
       tabIndex={-1}
@@ -31,8 +33,9 @@ export default function FileUpload({handleUpload}) {
         name="uploadFile"
         accept='.jpg, .jpeg, .png'
         onChange={handleUpload}
-        single
-      />
+        single />
     </Button>
+    {error ? <FormHelperText sx={{ color: 'error.main' }}>{helperText}</FormHelperText> : null}
+    </>
   );
 }

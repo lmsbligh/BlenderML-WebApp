@@ -50,7 +50,7 @@ export const handleTextFieldChange = ({eve, setState}) => {
 }
 
 export const validateForm = (setForm) => {
-    const formError = false
+    var formError = false
     setForm((prevForm) => {
         return produce(prevForm, (draft) => {
             for (var key in draft) {
@@ -71,6 +71,7 @@ export const validateForm = (setForm) => {
         })
 
     })
+    console.log("formError: ", formError)
     return formError
 }
 

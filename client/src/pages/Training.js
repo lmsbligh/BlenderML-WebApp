@@ -122,7 +122,7 @@ export default function Training() {
                 <CssBaseline />
                 {modelData ? <SelectorModel
                     error={trainingForm.model.error}
-                    helper={trainingForm.model.error ? trainingForm.model.helper : ''}
+                    helperText={trainingForm.model.error ? trainingForm.model.helper : ''}
                     selectedModel={selectedModel}
                     modelOptions={modelData}
                     handleChange={(event) => {
