@@ -1,5 +1,4 @@
 import produce from "immer";
-
 export const fetchData = (endpoint, setState) => {
     fetch(endpoint)
         .then(response => response.json())
@@ -69,7 +68,7 @@ export const validateForm = (setForm) => {
                 }
             }
         })
-
+    
     })
     console.log("formError: ", formError)
     return formError
@@ -91,4 +90,14 @@ export const validateField = ({key, setFormState}) => {
             }
         })
     })
+}
+
+export class Validation {
+    constructor({value="", error=false, regex="", required=false, helper=""}) {
+        this.value = value;
+        this.error = error;
+        this.regex = regex;
+        this.required = required;
+        this.helper = helper;
+    }
 }

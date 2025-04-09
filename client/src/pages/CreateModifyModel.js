@@ -14,24 +14,79 @@ import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import LayerCard from '../components/LayerCard/LayerCard.js';
 import ModelPropertiesModifier from '../components/ModelPropertiesModifier/ModelPropertiesModifier.js';
 
-import { fetchData, pushData } from '../utils.js'
+import { fetchData, pushData, Validation } from '../utils.js'
 const defaultTheme = createTheme();
+
+class Layer {
+    constructor(layer_type='Dense', activation='Linear') {
+        this.id = Date.now();
+        this.layer_type = layer_type;
+        this.x_0 = new Validation({regex: /^(?:[1-9]\d{0,2}|1000)$/})
+        this.x_1 = new Validation({regex: /^(?:[1-9]\d{0,2}|1000)$/})
+        this.x_2 = new Validation({regex: /^(?:[1-9]\d{0,2}|1000)$/})
+        this.x_3 = new Validation({regex: /^(?:[1-9]\d{0,2}|1000)$/})
+        this.padding = new Validation({regex: /^(?:[1-9]\d{0,2}|1000)$/})
+        this.activation = activation
+    }
+}
 
 function CreateModifyModel() {
     const defaultModel = {
         "modelName": '', 
         "description": "",
+        "layers": [new Layer()]
+    }
+    const [modelForm, setModelForm] = useImmer({
+        "modelName": {
+            value: "",
+            error: false,
+            regex: "",
+            required: true,
+            helper: "Please enter an alphanumeric name for your model."
+        }, 
+        "description": {
+            value: "",
+            error: false,
+            regex: "",
+            required: false,
+            helper: ""
+        },
         "layers": [
             { 
                 "id": 1, 
                 "layer_type": 'Dense', 
-                "x_0": '0', 
-                "x_1": '0', 
-                "x_2": '0', 
-                "x_3": '0', 
+                "x_0": {
+                    value: "",
+                    error: false,
+                    regex: "",
+                    required: false,
+                    helper: ""
+                }, 
+                "x_1": {
+                    value: "",
+                    error: false,
+                    regex: "",
+                    required: false,
+                    helper: ""
+                }, 
+                "x_2": {
+                    value: "",
+                    error: false,
+                    regex: "",
+                    required: false,
+                    helper: ""
+                }, 
+                "x_3": {
+                    value: "",
+                    error: false,
+                    regex: "",
+                    required: false,
+                    helper: ""
+                }, 
                 "activation": 'Linear' 
             }]
-    }
+    });
+
     //callbacks passed to children
     const layerCallbacks = [];
     let handleTextFieldSave = null;
@@ -43,7 +98,9 @@ function CreateModifyModel() {
     React.useEffect(()=> {
         fetchData('models', setModelData)
     }, []);
-
+    React.useEffect(() => {
+        console.log("layers changed!!!")
+    },[modelData.layers] )
     const handleModelSelectorChange = (event) => {
         if (event.target.value === -1) {
             const val = uuidv4().slice(0, 8);
@@ -85,8 +142,8 @@ function CreateModifyModel() {
     const handleLayerAdd = (index, direction) => {
         setSelectedModel((prevSelectedModel) => {
             return produce(prevSelectedModel, (draft) => {
-                var layer = {"id": Date.now(), "layer_type":'Dense', "x_0":'0', "x_1":'0',"x_2":'0',"x_3":'0', "activation":'ReLU'};
-                draft.layers.splice(direction == -1? index : index + 1,0,layer)
+                //var layer = {"id": Date.now(), "layer_type":'Dense', "x_0":'0', "x_1":'0',"x_2":'0',"x_3":'0', "activation":'ReLU'};
+                draft.layers.splice(direction == -1? index : index + 1,0, new Layer)
             })
         });
     }
@@ -160,8 +217,6 @@ function CreateModifyModel() {
                                 selectedModel ? selectedModel.layers.map((option, ind) => {
                                     console.log("LayerCard about to be run");
                                     return <LayerCard key={option.id} layer={option} index={ind} saveCallback={(callback) => (layerCallbacks[ind] = callback)} delFunction={handleLayerDelete} moveFunction={handleLayerMove} addLayerFunction={handleLayerAdd} />
-
-                                    // return <LayerCard key={useMemo(() => option.id, [option.id])} layer={useMemo(() => option, [option])} index={useMemo(() => ind, [ind])} delFunction={delHandleChange} moveFunction={moveHandleChange} addLayerFunction={addLayerHandle}/>
                                 }
                                 ) : ''
                             }

@@ -54,12 +54,12 @@ const LayerCard = ({layer, index, saveCallback, delFunction, moveFunction, addLa
                 <SelectorLayerType  layerType={localLayer.layer_type} handleChange={handleLayerTypeChange}/>
             </Box>
             <Box sx={{display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px'}}>
-                <TextField name="x_0" label="x_0" value={localLayer.x_0} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
-                <TextField name="x_1" label="x_1" value={localLayer.x_1} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
-                <TextField name="x_2" label="x_2" value={localLayer.x_2} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
-                <TextField name="x_3" label="x_3" value={localLayer.x_3} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
+                <TextField name="x_0" label="x_0" value={localLayer.x_0.value} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
+                <TextField name="x_1" label="x_1" value={localLayer.x_1.value} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
+                <TextField name="x_2" label="x_2" value={localLayer.x_2.value} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
+                <TextField name="x_3" label="x_3" value={localLayer.x_3.value} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
             </Box>
-                <TextField name="padding" label="padding" value={localLayer.padding} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}} sx={{display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px'}} ></TextField>
+                <TextField name="padding" label="padding" value={localLayer.padding.value} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}} sx={{display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px'}} ></TextField>
             <Box sx={{display:'flex', flexDirection: 'row', justifyContent:'space-between', padding: '10px' }}>
                 <SelectorLayerActivation  activationType={localLayer.activation} handleChange={handleActivationTypeChange}/>
             </Box>
