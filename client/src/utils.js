@@ -93,7 +93,7 @@ export const validateField = ({key, setFormState}) => {
 }
 
 export class Validation {
-    constructor({value="", error=false, regex="", required=false, helper=""}) {
+    constructor({value="", error=false, regex="", required=false, helper=""}={}) {
         this.value = value;
         this.error = error;
         this.regex = regex;

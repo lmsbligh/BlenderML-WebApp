@@ -14,18 +14,69 @@ import AddIcon from '@mui/icons-material/Add';
 
 import SelectorLayerType from '../SelectorLayerType/SelectorLayerType.js'
 import SelectorLayerActivation from '../SelectorLayerActivation/SelectorLayerActivation.js'
-import { handleTextFieldChange } from '../../utils.js';
+import { handleTextFieldChange, validateField } from '../../utils.js';
 
-const LayerCard = ({layer, index, saveCallback, delFunction, moveFunction, addLayerFunction}) => {
+const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFunction, moveFunction, addLayerFunction }) => {
     //console.log("LayerCard ran with props:", layer, index, delFunction);
 
-    const [localLayer, setLocalLayer] = useImmer(layer);
+    const [localLayer, setLocalLayer] = useImmer({
+        "activation": layer.activation,
+        "id": layer.id,
+        "layer_type": layer.layer_type,
+        "padding": structuredClone(layer.padding),
+        "x_0": structuredClone(layer.x_0),
+        "x_1": structuredClone(layer.x_1),
+        "x_2": structuredClone(layer.x_2),
+        "x_3": structuredClone(layer.x_3)
+    });
 
     React.useEffect(() => {
-        console.log("saveCallback, localLayer: ", localLayer)
+        //console.log("saveCallback, localLayer: ", localLayer)
         saveCallback(() => (localLayer))
     }, [localLayer, saveCallback])
-
+    // React.useEffect(() => {
+    //     layerUpdater(localLayer)
+    // }, [localLayer])
+    React.useEffect(() => {
+        validateLayer()
+    }, [prevLayer])
+    const validateLayer = () => {
+        setLocalLayer((prevLocalLayer) => {
+            return produce (prevLocalLayer, (draft) => {
+                
+                if (prevLayer) {
+                    console.log("prevLayer.x_1",prevLayer.x_1)
+                    console.log("localLayer.x_0",localLayer.x_0)
+                    
+                    if ( draft.layer_type != 'Pooling' && prevLayer.layer_type != 'Pooling' ) {
+                        if ( draft.x_0.value != prevLayer.x_1.value) {
+                            console.log("layer missmatch error!!!!")
+                            console.log("localLayer.x_0: ", localLayer.x_0)
+                            draft.x_0.error = true
+                            draft.x_0.helper = "Input size must match output size of previous layer."
+                        }
+                        else {
+                            draft.x_0.error = false
+                            console.log("1NO layer missmatch error!!!!")
+                            draft.x_0.helper = "Please enter an integer from 0 to 1000."
+                        }
+                    }
+                    else {
+                        draft.x_0.error = false
+                        console.log("2NO layer missmatch error!!!!")
+                        draft.x_0.helper = "Please enter an integer from 0 to 1000."
+                    }
+                }
+                else {
+                    draft.x_0.error = false
+                    console.log("3NO layer missmatch error!!!!")
+                    draft.x_0.helper = "Please enter an integer from 0 to 1000."
+                }
+            })
+        })
+        
+        
+    }
     const handleLayerTypeChange = (newLayerType) => {
         setLocalLayer((localLayerData) => {
             return produce(localLayerData, (draft) => {
@@ -40,28 +91,85 @@ const LayerCard = ({layer, index, saveCallback, delFunction, moveFunction, addLa
             })
         });
     };
-    
-    return ( 
+    console.log(localLayer.padding)
+    return (
         <Paper variant='outlined' >
             <Tooltip title="Move up."><IconButton color='primary' onClick={() => moveFunction(index, -1)}><VerticalAlignTopIcon /></IconButton></Tooltip>
             <Tooltip title="Add preceding layer."><IconButton color='primary' onClick={() => addLayerFunction(index, -1)}><AddIcon /></IconButton></Tooltip>
-            <Box sx={{display:'flex', flexDirection: 'row', justifyContent:'space-between', padding: '10px' }}>
-                <Typography>Layer {index+1}</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
+                <Typography>Layer {index + 1}</Typography>
                 <IconButton aria-label="delete" color="primary" onClick={() => delFunction(index)}><DeleteIcon /></IconButton>
-                
+
             </Box>
-            <Box sx={{display:'flex', flexDirection: 'row', justifyContent:'space-between', padding: '10px' }}>
-                <SelectorLayerType  layerType={localLayer.layer_type} handleChange={handleLayerTypeChange}/>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
+                <SelectorLayerType layerType={localLayer.layer_type} handleChange={handleLayerTypeChange} />
             </Box>
-            <Box sx={{display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px'}}>
-                <TextField name="x_0" label="x_0" value={localLayer.x_0.value} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
-                <TextField name="x_1" label="x_1" value={localLayer.x_1.value} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
-                <TextField name="x_2" label="x_2" value={localLayer.x_2.value} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
-                <TextField name="x_3" label="x_3" value={localLayer.x_3.value} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}}></TextField>
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px' }}>
+                <TextField 
+                    name="x_0" 
+                    label="x_0" 
+                    error={localLayer.x_0.error}
+                    helperText={localLayer.x_0.error ? localLayer.x_0.helper : ''}
+                    value={localLayer.x_0.value}
+                    onBlur={() => {
+                        layerUpdater(localLayer);
+                        validateLayer();
+                    }} 
+                    onChange={
+                        (event) => {
+                            handleTextFieldChange({ eve: event, setState: setLocalLayer });
+                            validateField({ key: 'x_0', setFormState: setLocalLayer });
+                        }}/>
+                <TextField 
+                    name="x_1" 
+                    label="x_1"
+                    error={localLayer.x_1.error}
+                    helperText={localLayer.x_1.error ? localLayer.x_1.helper : ''}
+                    value={localLayer.x_1.value}
+                    onBlur={() => layerUpdater(localLayer)} 
+                    onChange={
+                        (event) => { 
+                            handleTextFieldChange({ eve: event, setState: setLocalLayer });
+                            validateField({ key: 'x_1', setFormState: setLocalLayer });
+                            validateLayer()
+                            }}/>
+                <TextField 
+                    name="x_2" 
+                    label="x_2" 
+                    error={localLayer.x_2.error}
+                    helperText={localLayer.x_2.error ? localLayer.x_2.helper : ''}
+                    value={localLayer.x_2.value} 
+                    onChange={
+                        (event) => { 
+                            handleTextFieldChange({ eve: event, setState: setLocalLayer });
+                            validateField({ key: 'x_2', setFormState: setLocalLayer });
+                            }}/>
+                <TextField 
+                    name="x_3" 
+                    label="x_3"
+                    error={localLayer.x_3.error}
+                    helperText={localLayer.x_3.error ? localLayer.x_3.helper : ''} 
+                    value={localLayer.x_3.value} 
+                    onChange={
+                        (event) => { 
+                            handleTextFieldChange({ eve: event, setState: setLocalLayer }) 
+                            validateField({ key: 'x_3', setFormState: setLocalLayer });
+                            }}/>
             </Box>
-                <TextField name="padding" label="padding" value={localLayer.padding.value} onChange={(event) => {handleTextFieldChange({eve: event, setState: setLocalLayer})}} sx={{display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px'}} ></TextField>
-            <Box sx={{display:'flex', flexDirection: 'row', justifyContent:'space-between', padding: '10px' }}>
-                <SelectorLayerActivation  activationType={localLayer.activation} handleChange={handleActivationTypeChange}/>
+            <TextField 
+                name="padding" 
+                label="padding" 
+                error={localLayer.padding.error}
+                helperText={localLayer.padding.error ? localLayer.padding.helper : ''}
+                value={localLayer.padding.value} 
+                onChange={
+                    (event) => { 
+                        handleTextFieldChange({ eve: event, setState: setLocalLayer })
+                        validateField({ key: 'padding', setFormState: setLocalLayer }); 
+                        }} 
+                sx={{ display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px' }} />
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
+                <SelectorLayerActivation activationType={localLayer.activation} handleChange={handleActivationTypeChange} />
             </Box>
             <Tooltip title="Move down."><IconButton color='primary' onClick={() => moveFunction(index, +1)}><VerticalAlignBottomIcon /></IconButton></Tooltip>
             <Tooltip title="Add succeeding layer."><IconButton color='primary' onClick={() => addLayerFunction(index, +1)}><AddIcon /></IconButton></Tooltip>
@@ -70,4 +178,9 @@ const LayerCard = ({layer, index, saveCallback, delFunction, moveFunction, addLa
     )
 }
 
+// export default React.memo(LayerCard, (prevProps, nextProps) => {
+//     return (
+
+//     )
+// })
 export default LayerCard;
