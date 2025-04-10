@@ -45,31 +45,31 @@ const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFun
             return produce (prevLocalLayer, (draft) => {
                 
                 if (prevLayer) {
-                    console.log("prevLayer.x_1",prevLayer.x_1)
-                    console.log("localLayer.x_0",localLayer.x_0)
+                    // console.log("prevLayer.x_1",prevLayer.x_1)
+                    // console.log("localLayer.x_0",localLayer.x_0)
                     
                     if ( draft.layer_type != 'Pooling' && prevLayer.layer_type != 'Pooling' ) {
                         if ( draft.x_0.value != prevLayer.x_1.value) {
-                            console.log("layer missmatch error!!!!")
-                            console.log("localLayer.x_0: ", localLayer.x_0)
+                            // console.log("layer missmatch error!!!!")
+                            // console.log("localLayer.x_0: ", localLayer.x_0)
                             draft.x_0.error = true
-                            draft.x_0.helper = "Input size must match output size of previous layer."
+                            // draft.x_0.helper = "Input size must match output size of previous layer."
                         }
                         else {
                             draft.x_0.error = false
-                            console.log("1NO layer missmatch error!!!!")
-                            draft.x_0.helper = "Please enter an integer from 0 to 1000."
+                            // console.log("1NO layer missmatch error!!!!")
+                            // draft.x_0.helper = "Please enter an integer from 0 to 1000."
                         }
                     }
                     else {
                         draft.x_0.error = false
-                        console.log("2NO layer missmatch error!!!!")
+                        // console.log("2NO layer missmatch error!!!!")
                         draft.x_0.helper = "Please enter an integer from 0 to 1000."
                     }
                 }
                 else {
                     draft.x_0.error = false
-                    console.log("3NO layer missmatch error!!!!")
+                    // console.log("3NO layer missmatch error!!!!")
                     draft.x_0.helper = "Please enter an integer from 0 to 1000."
                 }
             })
@@ -91,7 +91,7 @@ const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFun
             })
         });
     };
-    console.log(localLayer.padding)
+    // console.log(localLayer.padding)
     return (
         <Paper variant='outlined' >
             <Tooltip title="Move up."><IconButton color='primary' onClick={() => moveFunction(index, -1)}><VerticalAlignTopIcon /></IconButton></Tooltip>

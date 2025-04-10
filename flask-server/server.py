@@ -145,6 +145,7 @@ def submit_model():
     # con.close()
 
     model_to_save = json.loads(request.data.decode('utf-8'))
+    print(model_to_save)
     ind, model = next(
         ((ind, model) for ind, model in enumerate(MODELS_LIST)
         if (model["value"] == model_to_save["value"])), 
