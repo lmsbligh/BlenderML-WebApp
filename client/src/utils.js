@@ -2,13 +2,13 @@ import produce from "immer";
 export const fetchData = (endpoint, setState) => {
     fetch(endpoint)
         .then(response => response.json())
-        .then (data => {
+        .then(data => {
             setState(data)
         })
         .catch(error => console.error('Error fetching data:', error))
 }
 
-export const pushData = (endpoint, data) => {
+export const pushData = async (endpoint, data) => {
     try {
         fetch(endpoint, {
             method: 'POST',
@@ -24,9 +24,10 @@ export const pushData = (endpoint, data) => {
         console.error('Error:', error);
     }
 }
-export const handleSelectorFormChange = ({eve, setSelector, setForm, options}) => {
+
+export const handleSelectorFormChange = ({ eve, setSelector, setForm, options }) => {
     if (options) {
-        const option = options.find((option) => option.value === eve.target.value )
+        const option = options.find((option) => option.value === eve.target.value)
         setSelector(option)
     }
     else {
@@ -40,7 +41,7 @@ export const handleSelectorFormChange = ({eve, setSelector, setForm, options}) =
     })
 }
 
-export const handleTextFieldChange = ({eve, setState}) => {
+export const handleTextFieldChange = ({ eve, setState }) => {
     setState((prevVals) => {
         return produce(prevVals, (draft) => {
             draft[eve.target.name].value = eve.target.value;
@@ -53,6 +54,7 @@ export const validateForm = (setForm) => {
     setForm((prevForm) => {
         return produce(prevForm, (draft) => {
             for (var key in draft) {
+
                 if (draft[key].required && draft[key].value == "") {
                     draft[key].error = true
                     formError = true
@@ -68,13 +70,13 @@ export const validateForm = (setForm) => {
                 }
             }
         })
-    
+
     })
     console.log("formError: ", formError)
     return formError
 }
 
-export const validateField = ({key, setFormState}) => {
+export const validateField = ({ key, setFormState }) => {
     setFormState((prevForm) => {
         return produce(prevForm, (draft) => {
             if (draft[key].required && draft[key].value == "") {
@@ -93,11 +95,26 @@ export const validateField = ({key, setFormState}) => {
 }
 
 export class Validation {
-    constructor({value="", error=false, regex="", required=false, helper=""}={}) {
+    constructor({ value = "", error = false, regex = "", required = false, helper = "" } = {}) {
         this.value = value;
         this.error = error;
         this.regex = regex;
         this.required = required;
         this.helper = helper;
+    }
+
+    validate() {
+        if (this.required && this.value == "") {
+            this.error = true
+        }
+        else {
+            this.error = false
+        }
+        if (this.regex && this.value) {
+            if (!this.regex.test(this.value)) {
+                this.error = true
+            }
+        }
+        return this.error
     }
 }

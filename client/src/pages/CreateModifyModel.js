@@ -28,7 +28,15 @@ class Layer {
         this.padding = new Validation({ value: padding, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 to 1000." });
         this.activation = activation
     }
+    validateLayer() {
+        this.x_0.validate();
+        this.x_1.validate();
+        this.x_2.validate();
+        this.x_3.validate();
+        this.padding.validate();
+    }
 }
+
 function CreateModifyModel() {
     const defaultModel = {
         "modelName": '',
@@ -61,9 +69,10 @@ function CreateModifyModel() {
             return produce(modelForm, (draft) => {
                 draft['modelName'].value = selectedModel.modelName
                 draft['description'].value = selectedModel.description
+                var new_layers = []
                 selectedModel.layers.forEach(layer => {
                     // console.log("layer: ", layer)
-                    draft['layers'].push(
+                    new_layers.push(
                         new Layer({
                             layer_type: layer.layer_type,
                             x_0: layer.x_0,
@@ -74,6 +83,7 @@ function CreateModifyModel() {
                             activation: layer.activation,
                         }))
                 });
+                draft['layers'] = new_layers;
             })
         })
     }
@@ -134,6 +144,7 @@ function CreateModifyModel() {
                 }
             })
         });
+        
     };
 
     const handleLayerMove = (index, direction) => {
@@ -167,133 +178,125 @@ function CreateModifyModel() {
                 }
             })
         })
-        setSelectedModel({ ...defaultModel, value: val });
+        // setSelectedModel({ ...defaultModel, value: val });
+        setSelectedModel(null)
         pushData('delete_model', selectedModel)
     }
 
     const handleModelSave = () => {
-        // var err = ""
-        // for (var key in defaultModel) {
-        //     if (!Boolean(defaultModel[key])) {
-        //         err = err.concat(`${key}, `)
-        //     }
-        // }
-        // if (err) {
-        //     alert(`the following required fields are empty: ${err}`)
-        //     return
-        // }
-        const updatedLayers = layerCallbacks.map((callback, index) => {
-            return layerCallbacks[index](); // Collect state from each child
-        });
-        const updatedTextFields = handleTextFieldSave();
-        setModelForm((prevData) => {
-            return produce(prevData, (draft) => {
-                draft.layers = updatedLayers;
-                draft.modelName.value = updatedTextFields.modelName.value;
-                draft.description.value = updatedTextFields.description.value;
-            })
-        })
-        
-        // const updatedModel = {
-        //     ...selectedModel,
-        //     modelName: updatedTextFields.modelName,
-        //     description: updatedTextFields.description,
-        //     layers: updatedLayers,
-        // };
-        fillObject();
-        console.log("pre setModelData: ", selectedModel)
-        setModelData((prevModelData) => {
-            return produce(prevModelData, (draft) => {
-                const ind = prevModelData.findIndex((option) => option.value === selectedModel.value);
-                if (ind != -1) {
-                    draft[ind] = selectedModel;
-                }
-                else {
-                    draft.push(selectedModel);
-                }
-            })
-        });
+                    const updatedLayers = layerCallbacks.map((callback, index) => {
+                        var layer_form = layerCallbacks[index]();
+                        var layer_obj = {
+                            "id": layer_form.id,
+                            "activation": layer_form.activation,
+                            "layer_type": layer_form.layer_type,
+                            "padding": layer_form.padding.value,
+                            "x_0": layer_form.x_0.value,
+                            "x_1": layer_form.x_1.value,
+                            "x_2": layer_form.x_2.value,
+                            "x_3": layer_form.x_3.value
+                        }
+                        return layer_obj 
+                    });
 
-        const modelToPush = {
-            value: selectedModel.value,
-            modelName: updatedTextFields.modelName.value,
-            description: updatedTextFields.description.value,
-            layers: [updatedLayers]
-        }
-        console.log("pushing: ", modelToPush)
-        pushData('submit_model', modelToPush);
-    }
+                    const updatedTextFields = handleTextFieldSave();
+                    
+                    const modelToPush = {
+                        value: selectedModel.value,
+                        input: '',
+                        output: '',
+                        modelName: updatedTextFields.modelName.value,
+                        description: updatedTextFields.description.value,
+                        layers: updatedLayers
+                    }
+
+                    setModelData((prevModelData) => {
+                        return produce(prevModelData, (draft) => {
+                            const ind = prevModelData.findIndex((option) => option.value === modelToPush.value);
+                            if (ind != -1) {
+                                draft[ind] = modelToPush;
+                            }
+                            else {
+                                draft.push(modelToPush);
+                            }
+                        })
+                    });
+
+                    setSelectedModel(modelToPush)
+                    pushData('submit_model', modelToPush)
+                }
     const textFieldUnblur = (newModelForm) => {
-        console.log(newModelForm)
-        setModelForm((prevModelForm) => {
-            return produce(prevModelForm, (draft) => {
-                
-                draft.modelName.value = newModelForm.modelName.value;
-                
-                draft.description.value = newModelForm.description.value;
-            });
-        })
-    }
-    React.useEffect(() => {
-        console.log(modelForm)
-    }, [modelForm])
-    React.useEffect(() => {
-        console.log(selectedModel)
-    }, [selectedModel])
-    const updateLayer = (newLayer) => {
-        console.log("updateLayer ran")
-        setModelForm((prevModelForm) => {
-            return produce(prevModelForm, (draft) => {
-                const ind = draft.layers.findIndex((option) => option.id === newLayer.id) 
-                draft.layers[ind] = newLayer;
-            })
-        })
-    }
-    return (
-        <ThemeProvider theme={defaultTheme}>
-            <Box sx={{ display: 'flex' }}>
-                <Grid container>
-                    <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column" }}>
-                        <CssBaseline />
-                        <FormControl fullWidth>
-                            {modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleModelSelectorChange} modelOptions={modelData} isModify={true} /> : null}
-                            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px', paddingTop: '10px' }}>
-                                {
-                                    // selectedModel ? console.log("selectedModel.value:", selectedModel.value) : console.log("selectedModel is null")
-                                }
-                                {selectedModel ? <ModelPropertiesModifier 
-                                                    updateTextField={textFieldUnblur} 
-                                                    modelForm={modelForm} 
-                                                    saveCallback={(saveFunction) => (handleTextFieldSave = saveFunction)} />
-                                                : null}
-                                {
-                                    modelForm ? modelForm.layers.map((option, ind) => {
+                    console.log(newModelForm)
+                    setModelForm((prevModelForm) => {
+                        return produce(prevModelForm, (draft) => {
 
-                                        // console.log("LayerCard about to be run");
-                                        // console.log("LayerCard from layer: ", option)
-                                        return <LayerCard
-                                            key={option.id}
-                                            layerUpdater={updateLayer}
-                                            layer={option}
-                                            prevLayer={ind > 0 ? modelForm.layers[ind - 1] : null}
-                                            index={ind}
-                                            saveCallback={(callback) => (layerCallbacks[ind] = callback)}
-                                            delFunction={handleLayerDelete}
-                                            moveFunction={handleLayerMove}
-                                            addLayerFunction={handleLayerAdd}
-                                        />
-                                    }
-                                    ) : ''
-                                }
-                            </Box>
-                            <Button variant="contained" style={{ width: '150px' }} onClick={handleModelSave}>Save</Button>
-                            <Button variant="contained" color='error' style={{ width: '150px' }} onClick={handleModelDelete}>Delete</Button>
-                        </FormControl>
-                    </Grid>
-                </Grid>
-            </Box>
+                            draft.modelName.value = newModelForm.modelName.value;
+
+                            draft.description.value = newModelForm.description.value;
+                        });
+                    })
+                }
+    React.useEffect(() => {
+                    console.log(modelForm)
+                }, [modelForm])
+    React.useEffect(() => {
+                    console.log(selectedModel)
+                }, [selectedModel])
+    const updateLayer = (newLayer) => {
+                    console.log("updateLayer ran")
+                    setModelForm((prevModelForm) => {
+                        return produce(prevModelForm, (draft) => {
+                            const ind = draft.layers.findIndex((option) => option.id === newLayer.id)
+                            draft.layers[ind] = newLayer;
+                        })
+                    })
+                }
+    return(
+        <ThemeProvider theme = { defaultTheme } >
+                        <Box sx={{ display: 'flex' }}>
+                            <Grid container>
+                                <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column" }}>
+                                    <CssBaseline />
+                                    <FormControl fullWidth>
+                                        {modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleModelSelectorChange} modelOptions={modelData} isModify={true} /> : null}
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px', paddingTop: '10px' }}>
+                                            {
+                                                // selectedModel ? console.log("selectedModel.value:", selectedModel.value) : console.log("selectedModel is null")
+                                            }
+                                            {selectedModel ? <ModelPropertiesModifier
+                                                updateTextField={textFieldUnblur}
+                                                modelForm={modelForm}
+                                                saveCallback={(saveFunction) => (handleTextFieldSave = saveFunction)} />
+                                                : null}
+                                            {
+                                               
+                                                modelForm && selectedModel ? modelForm.layers.map((option, ind) => {
+
+                                                    // console.log("LayerCard about to be run");
+                                                    // console.log("LayerCard from layer: ", option)
+                                                    return <LayerCard
+                                                        key={option.id}
+                                                        layerUpdater={updateLayer}
+                                                        layer={option}
+                                                        prevLayer={ind > 0 ? modelForm.layers[ind - 1] : null}
+                                                        index={ind}
+                                                        saveCallback={(callback) => (layerCallbacks[ind] = callback)}
+                                                        delFunction={handleLayerDelete}
+                                                        moveFunction={handleLayerMove}
+                                                        addLayerFunction={handleLayerAdd}
+                                                    />
+                                                }
+                                                ) : ''
+                                            }
+                                        </Box>
+                                        <Button variant="contained" style={{ width: '150px' }} onClick={handleModelSave}>Save</Button>
+                                        <Button variant="contained" color='error' style={{ width: '150px' }} onClick={handleModelDelete}>Delete</Button>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+                        </Box>
         </ThemeProvider>
     )
-}
+        }
 
 export default CreateModifyModel

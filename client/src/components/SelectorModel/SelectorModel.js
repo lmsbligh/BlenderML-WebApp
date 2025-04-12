@@ -17,7 +17,7 @@ function SelectorModel({ helperText, error, selectedModel, handleChange, modelOp
                 id="simple-select"
                 name="model"
                 error={error}
-                value={selectedModel.value ? selectedModel.value : ''}
+                value={selectedModel ? selectedModel.value : ''}
                 onChange={handleChange}
                 renderValue={() => selectedModel ? selectedModel.modelName : "Select a model" // Show the label as the selected text
                   }
