@@ -1,4 +1,5 @@
 import produce from "immer";
+import { v4 as uuidv4 } from 'uuid';
 export const fetchData = (endpoint, setState) => {
     fetch(endpoint)
         .then(response => response.json())
@@ -75,7 +76,42 @@ export const validateForm = (setForm) => {
     console.log("formError: ", formError)
     return formError
 }
+export const isFormInvalid = (formElement) => {
 
+    console.log("isFormValid: ")
+    var formError = false
+    console.log(formElement)
+    console.log(formElement.constructor.name)
+    switch (formElement.constructor.name) {
+        case "Array":
+            var errorArray = []
+            formElement.forEach(element => {
+                errorArray.push(isFormInvalid(element))
+            });
+            return errorArray.includes(true)
+        case "Object":
+            if ("type" in formElement) {
+                switch (formElement.type) {
+                    case "Validation":
+                        return formElement.error
+                    case "Layer":
+                        const rehydratedLayer = Object.assign(new Layer({}, formElement))
+                        return rehydratedLayer.validateLayer()
+                }
+            }
+            else {
+                var errorArray = []
+                for (var key in formElement) {
+                    errorArray.push(isFormInvalid(formElement[key]))
+                }
+                return errorArray.includes(true)
+            }
+        default:
+            //console.log("Error: Invalid formElement.")
+            console.log("default: formElement.constructor.name: ", formElement.constructor.name)
+            break;
+    }
+}
 export const validateField = ({ key, setFormState }) => {
     setFormState((prevForm) => {
         return produce(prevForm, (draft) => {
@@ -93,7 +129,27 @@ export const validateField = ({ key, setFormState }) => {
         })
     })
 }
-
+export class Layer {
+    constructor({ layer_type = 'Dense', activation = 'Linear', x_0 = '', x_1 = '', x_2 = '', x_3 = '', padding = '' } = {}) {
+        this.id = uuidv4().slice(0, 8);
+        this.layer_type = layer_type;
+        this.x_0 = new Validation({ value: x_0, required: true, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 to 1000." });
+        this.x_1 = new Validation({ value: x_1, required: true, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 to 1000." });
+        this.x_2 = new Validation({ value: x_2, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 to 1000." });
+        this.x_3 = new Validation({ value: x_3, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 to 1000." });
+        this.padding = new Validation({ value: padding, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 to 1000." });
+        this.activation = activation
+        this.type = "Layer"
+    }
+    validateLayer() {
+        var layerValidation = [this.x_0.error,
+        this.x_1.error,
+        this.x_2.error,
+        this.x_3.error,
+        this.padding.error].includes(true);
+        return layerValidation
+    }
+}
 export class Validation {
     constructor({ value = "", error = false, regex = "", required = false, helper = "" } = {}) {
         this.value = value;
@@ -101,6 +157,7 @@ export class Validation {
         this.regex = regex;
         this.required = required;
         this.helper = helper;
+        this.type = "Validation";
     }
 
     validate() {

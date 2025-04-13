@@ -29,6 +29,7 @@ function ModelPropertiesModifier({ updateTextField, modelForm, saveCallback }) {
                     }}
                     onBlur={() => {
                         updateTextField(draftModelForm)
+                        validateField({ key: 'modelName', setFormState: setDraftModel })
                     }}
                     value={draftModelForm.modelName.value}
                     sx={{ width: "100%" }} />
@@ -43,6 +44,7 @@ function ModelPropertiesModifier({ updateTextField, modelForm, saveCallback }) {
                     }}
                     onBlur={() => {
                         updateTextField(draftModelForm)
+                        validateField({ key: 'description', setFormState: setDraftModel })
                     }}
                     value={draftModelForm.description.value}
                     sx={{ width: "100%" }}></TextField>

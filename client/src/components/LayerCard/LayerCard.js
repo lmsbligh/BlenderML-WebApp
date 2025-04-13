@@ -19,7 +19,7 @@ import { handleTextFieldChange, validateField } from '../../utils.js';
 const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFunction, moveFunction, addLayerFunction }) => {
     //console.log("LayerCard ran with props:", layer, index, delFunction);
 
-    const [localLayer, setLocalLayer] = useImmer({
+    const [blocalLayer, bsetLocalLayer] = useImmer({
         "activation": layer.activation,
         "id": layer.id,
         "layer_type": layer.layer_type,
@@ -29,6 +29,7 @@ const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFun
         "x_2": structuredClone(layer.x_2),
         "x_3": structuredClone(layer.x_3)
     });
+    const [localLayer, setLocalLayer] = useImmer(structuredClone(layer));
 
     React.useEffect(() => {
         //console.log("saveCallback, localLayer: ", localLayer)
@@ -74,8 +75,6 @@ const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFun
                 }
             })
         })
-        
-        
     }
     const handleLayerTypeChange = (newLayerType) => {
         setLocalLayer((localLayerData) => {
