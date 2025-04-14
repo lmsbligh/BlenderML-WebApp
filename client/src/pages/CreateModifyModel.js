@@ -14,7 +14,7 @@ import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import LayerCard from '../components/LayerCard/LayerCard.js';
 import ModelPropertiesModifier from '../components/ModelPropertiesModifier/ModelPropertiesModifier.js';
 
-import { fetchData, isFormInvalid, pushData, Validation, Layer } from '../utils.js'
+import { fetchData, validateForm, pushData, Validation, Layer } from '../utils.js'
 const defaultTheme = createTheme();
 
 
@@ -187,12 +187,12 @@ function CreateModifyModel() {
 
         const updatedTextFields = handleTextFieldSave();
 
-        var formInvalid = isFormInvalid({
+        var formInvalid = validateForm({
             modelName: updatedTextFields.modelName,
             description: updatedTextFields.description,
             layers: updatedLayersForm
         })
-
+        console.log("formInvalid ? : ", formInvalid)
         if (!formInvalid) {
             const modelToPush = {
                 value: selectedModel.value,
@@ -202,7 +202,7 @@ function CreateModifyModel() {
                 description: updatedTextFields.description.value,
                 layers: updatedLayersObject
             }
-
+        
             setModelData((prevModelData) => {
                 return produce(prevModelData, (draft) => {
                     const ind = prevModelData.findIndex((option) => option.value === modelToPush.value);

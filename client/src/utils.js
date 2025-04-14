@@ -45,64 +45,68 @@ export const handleSelectorFormChange = ({ eve, setSelector, setForm, options })
 export const handleTextFieldChange = ({ eve, setState }) => {
     setState((prevVals) => {
         return produce(prevVals, (draft) => {
+            console.log(draft[eve.target.name])
+            console.log(eve.target.value)
             draft[eve.target.name].value = eve.target.value;
         })
     })
 }
 
-export const validateForm = (setForm) => {
-    var formError = false
-    setForm((prevForm) => {
-        return produce(prevForm, (draft) => {
-            for (var key in draft) {
+// export const validateForm = (setForm) => {
+//     var formError = false
+//     setForm((prevForm) => {
+//         return produce(prevForm, (draft) => {
+//             for (var key in draft) {
 
-                if (draft[key].required && draft[key].value == "") {
-                    draft[key].error = true
-                    formError = true
-                }
-                else {
-                    draft[key].error = false
-                }
-                if (draft[key].regex && draft[key].value) {
-                    if (!draft[key].regex.test(draft[key].value)) {
-                        draft[key].error = true
-                        formError = true
-                    }
-                }
-            }
-        })
+//                 if (draft[key].required && draft[key].value == "") {
+//                     draft[key].error = true
+//                     formError = true
+//                 }
+//                 else {
+//                     draft[key].error = false
+//                 }
+//                 if (draft[key].regex && draft[key].value) {
+//                     if (!draft[key].regex.test(draft[key].value)) {
+//                         draft[key].error = true
+//                         formError = true
+//                     }
+//                 }
+//             }
+//         })
 
-    })
-    console.log("formError: ", formError)
-    return formError
-}
-export const isFormInvalid = (formElement) => {
+//     })
+//     console.log("formError: ", formError)
+//     return formError
+// }
+export const validateForm = (formElement) => {
 
     console.log("isFormValid: ")
-    var formError = false
     console.log(formElement)
-    console.log(formElement.constructor.name)
+    //console.log(formElement.constructor.name)
     switch (formElement.constructor.name) {
         case "Array":
             var errorArray = []
             formElement.forEach(element => {
-                errorArray.push(isFormInvalid(element))
+                errorArray.push(validateForm(element))
             });
             return errorArray.includes(true)
         case "Object":
             if ("type" in formElement) {
                 switch (formElement.type) {
                     case "Validation":
-                        return formElement.error
+                        console.log("Validation: ", formElement)
+                        console.log("Validation evaluation: ", validateValidator(formElement));
+                        return validateValidator(formElement);
                     case "Layer":
-                        const rehydratedLayer = Object.assign(new Layer({}, formElement))
-                        return rehydratedLayer.validateLayer()
+                        console.log("Layer evaluation: ", validateLayer(formElement));
+                        console.log("Rehydrated layer")
+                        return validateLayer(formElement)
                 }
             }
             else {
                 var errorArray = []
                 for (var key in formElement) {
-                    errorArray.push(isFormInvalid(formElement[key]))
+                    errorArray.push(validateForm(formElement[key]))
                 }
                 return errorArray.includes(true)
             }
@@ -141,14 +145,32 @@ export class Layer {
         this.activation = activation
         this.type = "Layer"
     }
-    validateLayer() {
-        var layerValidation = [this.x_0.error,
-        this.x_1.error,
-        this.x_2.error,
-        this.x_3.error,
-        this.padding.error].includes(true);
-        return layerValidation
+
+}
+
+export const validateLayer = (layer) => {
+    console.log("validateLayer(): ", layer)
+    var layerValidation = [layer.x_0.error,
+    layer.x_1.error,
+    layer.x_2.error,
+    layer.x_3.error,
+    layer.padding.error].includes(true);
+    return layerValidation
+}
+export const validateValidator = (validator) => {
+    let validatorError = false
+    if (validator.required && validator.value == "") {
+        validatorError = true
     }
+    else {
+        validatorError = false
+    }
+    if (validator.regex && validator.value) {
+        if (!validator.regex.test(validator.value)) {
+            validatorError = true
+        }
+    }
+    return validatorError
 }
 export class Validation {
     constructor({ value = "", error = false, regex = "", required = false, helper = "" } = {}) {
@@ -158,20 +180,5 @@ export class Validation {
         this.required = required;
         this.helper = helper;
         this.type = "Validation";
-    }
-
-    validate() {
-        if (this.required && this.value == "") {
-            this.error = true
-        }
-        else {
-            this.error = false
-        }
-        if (this.regex && this.value) {
-            if (!this.regex.test(this.value)) {
-                this.error = true
-            }
-        }
-        return this.error
     }
 }

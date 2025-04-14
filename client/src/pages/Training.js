@@ -21,68 +21,124 @@ import SelectedModel from '../components/SelectedModel/SelectedModel.js'
 import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import SelectorDataset from '../components/SelectorDataset/SelectorDataset.js'
 import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpoint.js';
-import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, validateField, validateForm } from '../utils.js'
+import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, validateField, validateForm, Validation } from '../utils.js'
 import SelectorOptimizer from '../components/SelectorOptimizer/SelectorOptimizer.js';
 import SelectorLoss from '../components/SelectorLoss/SelectorLoss.js';
 
 export default function Training() {
 
-    const [trainingForm, setTrainingForm] = useImmer({
-        "model": { 
+    // const [trainingForm, setTrainingForm] = useImmer({
+    //     "model": { 
+    //         value: "", 
+    //         error: false, 
+    //         regex: "", 
+    //         required: true,
+    //         helper: "Please select a model."
+    //     },
+    //     "checkpoint": { 
+    //         value: "", 
+    //         error: false, 
+    //         regex: "", 
+    //         required: true,
+    //         helper: "Please select a checkpoint."
+    //     },
+    //     "dataset": { 
+    //         value: "", 
+    //         error: false, 
+    //         regex: "", 
+    //         required: true,
+    //         helper: "Please select a dataset."
+    //     },
+    //     "epochs": { 
+    //         value: 100, 
+    //         error: false, 
+    //         regex: /^(?:[1-9]\d{0,2}|1000)$/, 
+    //         required: true,
+    //         helper: "Please enter an integer between 1 and 1000." 
+    //     },
+    //     "learningRate": { 
+    //         value: 0.001, 
+    //         error: false, 
+    //         regex: /^0.(?:1|(?:0[1-9]|10)|(?:00[1-9]|0[1-9]\d|100)|(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|1000))$/, 
+    //         required: true,
+    //         helper: "Please enter a number between 0.1 and 0.0001, with up to 4 decimal places." 
+    //     },
+    //     "optimizer": { 
+    //         value: "ADAM", 
+    //         error: false, 
+    //         regex: "", 
+    //         required: true, 
+    //     },
+    //     "lossFunction": { 
+    //         value: "MSE", 
+    //         error: false, 
+    //         regex: "", 
+    //         required: true 
+    //     },
+    //     "xVal": { 
+    //         value: 20, 
+    //         error: false, 
+    //         regex: /^(?:[0-9]\d?|99)$/, 
+    //         required: true,
+    //         helper: "Please enter an integer between 1 and 99" 
+    //     },
+    // })
+    const [trainingForm, setTrainingForm] = useImmer(structuredClone({
+        "model": new Validation ({ 
             value: "", 
             error: false, 
             regex: "", 
             required: true,
             helper: "Please select a model."
-        },
-        "checkpoint": { 
+        }),
+        "checkpoint": new Validation ({ 
             value: "", 
             error: false, 
             regex: "", 
             required: true,
             helper: "Please select a checkpoint."
-        },
-        "dataset": { 
+        }),
+        "dataset": new Validation ({ 
             value: "", 
             error: false, 
             regex: "", 
             required: true,
             helper: "Please select a dataset."
-        },
-        "epochs": { 
+        }),
+        "epochs": new Validation ({ 
             value: 100, 
             error: false, 
             regex: /^(?:[1-9]\d{0,2}|1000)$/, 
             required: true,
             helper: "Please enter an integer between 1 and 1000." 
-        },
-        "learningRate": { 
+        }),
+        "learningRate": new Validation ({ 
             value: 0.001, 
             error: false, 
             regex: /^0.(?:1|(?:0[1-9]|10)|(?:00[1-9]|0[1-9]\d|100)|(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|1000))$/, 
             required: true,
             helper: "Please enter a number between 0.1 and 0.0001, with up to 4 decimal places." 
-        },
-        "optimizer": { 
+        }),
+        "optimizer": new Validation ({ 
             value: "ADAM", 
             error: false, 
             regex: "", 
             required: true, 
-        },
-        "lossFunction": { 
+        }),
+        "lossFunction": new Validation ({ 
             value: "MSE", 
             error: false, 
             regex: "", 
             required: true 
-        },
-        "xVal": { 
+        }),
+        "xVal": new Validation ({ 
             value: 20, 
             error: false, 
             regex: /^(?:[0-9]\d?|99)$/, 
             required: true,
             helper: "Please enter an integer between 1 and 99" 
-        },
-    })
+        }),
+    }))
 
     const [modelData, setModelData] = useImmer([]);
     const [selectedModel, setSelectedModel] = React.useState('');
@@ -112,8 +168,19 @@ export default function Training() {
 
 
     const handleTrain = (event) => {
-        validateForm(setTrainingForm)
-        pushData('submit_training', trainingForm)
+        console.log("Training validateForm(trainingForm): ", validateForm(trainingForm));
+        setTrainingForm((prevForm) => {
+            return produce(prevForm, (draft) => {
+                var formValid = validateForm(trainingForm)
+                if(!formValid) {
+                    pushData('submit_training', trainingForm)
+                }
+                else {
+                    alert("Training form invalid")
+                }
+            })
+        })
+        
     }
     
     return (
