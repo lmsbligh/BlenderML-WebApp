@@ -181,17 +181,19 @@ function CreateModifyModel() {
                 "x_2": layerForm.x_2.value,
                 "x_3": layerForm.x_3.value
             })
-
-
         });
 
         const updatedTextFields = handleTextFieldSave();
-
-        var formInvalid = validateForm({
+        console.log("constructed form: ",{
             modelName: updatedTextFields.modelName,
             description: updatedTextFields.description,
             layers: updatedLayersForm
         })
+        var formInvalid = validateForm({formElement: {
+            modelName: updatedTextFields.modelName,
+            description: updatedTextFields.description,
+            layers: updatedLayersForm
+        }})
         console.log("formInvalid ? : ", formInvalid)
         if (!formInvalid) {
             const modelToPush = {
@@ -216,7 +218,7 @@ function CreateModifyModel() {
             });
 
             setSelectedModel(modelToPush)
-            pushData('submit_model', modelToPush)
+            pushData('submit_model', modelToPush).then((response) => {alert(response)})
         }
         else {
             alert("!!!!!Form error")

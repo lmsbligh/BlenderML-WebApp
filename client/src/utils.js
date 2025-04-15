@@ -8,18 +8,17 @@ export const fetchData = (endpoint, setState) => {
         })
         .catch(error => console.error('Error fetching data:', error))
 }
-
 export const pushData = async (endpoint, data) => {
     try {
-        fetch(endpoint, {
+        const response = fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             title: 'title',
             body: JSON.stringify(data),
-        })
-
+        });
+        return (await response).text();
     }
     catch (error) {
         console.error('Error:', error);
@@ -78,7 +77,7 @@ export const handleTextFieldChange = ({ eve, setState }) => {
 //     console.log("formError: ", formError)
 //     return formError
 // }
-export const validateForm = (formElement) => {
+export const validateForm = ({ formElement, elementParent = null }) => {
 
     console.log("isFormValid: ")
     console.log(formElement)
@@ -87,7 +86,7 @@ export const validateForm = (formElement) => {
         case "Array":
             var errorArray = []
             formElement.forEach(element => {
-                errorArray.push(validateForm(element))
+                errorArray.push(validateForm({ formElement: element, elementParent: formElement }))
             });
             return errorArray.includes(true)
         case "Object":
@@ -100,13 +99,22 @@ export const validateForm = (formElement) => {
                     case "Layer":
                         console.log("Layer evaluation: ", validateLayer(formElement));
                         console.log("Rehydrated layer")
-                        return validateLayer(formElement)
+                        var layerIndex = elementParent.findIndex((option) => option.id === formElement.id)
+                        if (layerIndex > 0) {
+                            const [x_0_error, x_0_helper] = validateLayerDimensions({ layer: formElement, layers: elementParent[layerIndex - 1] });
+                            if (x_0_error || validateLayer(formElement)) {
+                                return true;
+                            }
+                            else {
+                                return false;
+                            }
+                        }
                 }
             }
             else {
                 var errorArray = []
                 for (var key in formElement) {
-                    errorArray.push(validateForm(formElement[key]))
+                    errorArray.push(validateForm({ formElement: formElement[key] }))
                 }
                 return errorArray.includes(true)
             }
@@ -147,6 +155,38 @@ export class Layer {
     }
 
 }
+export const validateLayerDimensions = (layer, prevLayer) => {
+    var layer_error = layer.error;
+    var layer_helper = layer.helper;
+    if (prevLayer) {
+        // console.log("prevLayer.x_1",prevLayer.x_1)
+        // console.log("localLayer.x_0",localLayer.x_0)
+        if (layer.layer_type != 'Pooling' && prevLayer.layer_type != 'Pooling') {
+            if (layer.x_0.value != prevLayer.x_1.value) {
+                // console.log("layer missmatch error!!!!")
+                // console.log("localLayer.x_0: ", localLayer.x_0)
+                layer_error = true
+                layer_helper = "Input size must match output size of previous layer."
+            }
+            else {
+                layer_error = false
+                // console.log("1NO layer missmatch error!!!!")
+                // draft.x_0.helper = "Please enter an integer from 0 to 1000."
+            }
+        }
+        else {
+            layer_error = false
+            // console.log("2NO layer missmatch error!!!!")
+            layer_helper = "Please enter an integer from 0 to 1000."
+        }
+    }
+    else {
+        layer_error = false
+        // console.log("3NO layer missmatch error!!!!")
+        layer_helper = "Please enter an integer from 0 to 1000."
+    }
+    return [layer_error, layer_helper];
+}
 
 export const validateLayer = (layer) => {
     console.log("validateLayer(): ", layer)
@@ -155,6 +195,7 @@ export const validateLayer = (layer) => {
     layer.x_2.error,
     layer.x_3.error,
     layer.padding.error].includes(true);
+
     return layerValidation
 }
 export const validateValidator = (validator) => {

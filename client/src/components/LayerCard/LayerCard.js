@@ -14,21 +14,21 @@ import AddIcon from '@mui/icons-material/Add';
 
 import SelectorLayerType from '../SelectorLayerType/SelectorLayerType.js'
 import SelectorLayerActivation from '../SelectorLayerActivation/SelectorLayerActivation.js'
-import { handleTextFieldChange, validateField } from '../../utils.js';
+import { handleTextFieldChange, validateField, validateLayerDimensions } from '../../utils.js';
 
 const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFunction, moveFunction, addLayerFunction }) => {
     //console.log("LayerCard ran with props:", layer, index, delFunction);
 
-    const [blocalLayer, bsetLocalLayer] = useImmer({
-        "activation": layer.activation,
-        "id": layer.id,
-        "layer_type": layer.layer_type,
-        "padding": structuredClone(layer.padding),
-        "x_0": structuredClone(layer.x_0),
-        "x_1": structuredClone(layer.x_1),
-        "x_2": structuredClone(layer.x_2),
-        "x_3": structuredClone(layer.x_3)
-    });
+    // const [blocalLayer, bsetLocalLayer] = useImmer({
+    //     "activation": layer.activation,
+    //     "id": layer.id,
+    //     "layer_type": layer.layer_type,
+    //     "padding": structuredClone(layer.padding),
+    //     "x_0": structuredClone(layer.x_0),
+    //     "x_1": structuredClone(layer.x_1),
+    //     "x_2": structuredClone(layer.x_2),
+    //     "x_3": structuredClone(layer.x_3)
+    // });
     const [localLayer, setLocalLayer] = useImmer(structuredClone(layer));
 
     React.useEffect(() => {
@@ -38,44 +38,8 @@ const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFun
     // React.useEffect(() => {
     //     layerUpdater(localLayer)
     // }, [localLayer])
-    React.useEffect(() => {
-        validateLayer()
-    }, [prevLayer])
-    const validateLayer = () => {
-        setLocalLayer((prevLocalLayer) => {
-            return produce (prevLocalLayer, (draft) => {
-                
-                if (prevLayer) {
-                    // console.log("prevLayer.x_1",prevLayer.x_1)
-                    // console.log("localLayer.x_0",localLayer.x_0)
-                    
-                    if ( draft.layer_type != 'Pooling' && prevLayer.layer_type != 'Pooling' ) {
-                        if ( draft.x_0.value != prevLayer.x_1.value) {
-                            // console.log("layer missmatch error!!!!")
-                            // console.log("localLayer.x_0: ", localLayer.x_0)
-                            draft.x_0.error = true
-                            // draft.x_0.helper = "Input size must match output size of previous layer."
-                        }
-                        else {
-                            draft.x_0.error = false
-                            // console.log("1NO layer missmatch error!!!!")
-                            // draft.x_0.helper = "Please enter an integer from 0 to 1000."
-                        }
-                    }
-                    else {
-                        draft.x_0.error = false
-                        // console.log("2NO layer missmatch error!!!!")
-                        draft.x_0.helper = "Please enter an integer from 0 to 1000."
-                    }
-                }
-                else {
-                    draft.x_0.error = false
-                    // console.log("3NO layer missmatch error!!!!")
-                    draft.x_0.helper = "Please enter an integer from 0 to 1000."
-                }
-            })
-        })
-    }
+    
+    
     const handleLayerTypeChange = (newLayerType) => {
         setLocalLayer((localLayerData) => {
             return produce(localLayerData, (draft) => {
@@ -90,6 +54,23 @@ const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFun
             })
         });
     };
+
+    const updateLayerError = (error, helper)  => {
+        setLocalLayer((localLayerData) => {
+            return produce(localLayerData, (draft) => {
+                draft.x_0.error = error;
+                draft.x_0.conditionalHelper = helper;
+            })
+        })
+    }
+
+    React.useEffect(() => {
+        if(localLayer && prevLayer) {
+            const [x_0_error, x_0_helper] = validateLayerDimensions(localLayer, prevLayer);
+            console.log("x_0_error: ", x_0_error)
+            updateLayerError(x_0_error, x_0_helper);
+        }
+    }, [prevLayer])
     // console.log(localLayer.padding)
     return (
         <Paper variant='outlined' >
@@ -108,11 +89,13 @@ const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFun
                     name="x_0" 
                     label="x_0" 
                     error={localLayer.x_0.error}
-                    helperText={localLayer.x_0.error ? localLayer.x_0.helper : ''}
+                    helperText={localLayer.x_0.error ? (localLayer.x_0.conditionalHelper ? localLayer.x_0.conditionalHelper : localLayer.x_0.helper) : ''}
                     value={localLayer.x_0.value}
                     onBlur={() => {
                         layerUpdater(localLayer);
-                        validateLayer();
+                        const [x_0_error, x_0_helper] = validateLayerDimensions(localLayer, prevLayer);
+                        console.log("x_0_error: ", x_0_error)
+                        updateLayerError(x_0_error, x_0_helper);
                     }} 
                     onChange={
                         (event) => {
@@ -130,7 +113,7 @@ const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFun
                         (event) => { 
                             handleTextFieldChange({ eve: event, setState: setLocalLayer });
                             validateField({ key: 'x_1', setFormState: setLocalLayer });
-                            validateLayer()
+                            validateLayerDimensions(localLayer, prevLayer)
                             }}/>
                 <TextField 
                     name="x_2" 
