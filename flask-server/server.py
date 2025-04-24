@@ -299,8 +299,12 @@ def serve_uploaded_file(filename):
 
 @app.route('/checkpoints/<string:model_id>')
 def get_checkpoints(model_id):
-    checkpoints = os.listdir(os.path.join("MLApp", "data", "w_and_b", model_id))
-    return checkpoints
+    checkpoint_dir = os.path.join("MLApp", "data", "w_and_b", model_id)
+    if os.path.isdir(checkpoint_dir):
+        checkpoints = os.listdir(checkpoint_dir)
+        return checkpoints
+    else:
+        return []
 
 @app.route('/upload_file', methods=['POST'])
 def upload_file():

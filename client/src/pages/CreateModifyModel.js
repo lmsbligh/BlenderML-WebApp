@@ -166,7 +166,12 @@ function CreateModifyModel() {
     }
 
     const handleModelSave = () => {
-        var updatedLayersForm = []
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
+        
+        setTimeout(() => {
+            var updatedLayersForm = []
         var updatedLayersObject = []
         layerCallbacks.map((callback, index) => {
             var layerForm = layerCallbacks[index]()
@@ -224,6 +229,8 @@ function CreateModifyModel() {
             alert("!!!!!Form error")
         }
 
+        }, 0)
+        
 
 
 

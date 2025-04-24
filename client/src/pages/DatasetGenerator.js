@@ -12,7 +12,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, validateField, validateForm } from '../utils.js'
+import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, validateField, validateForm, Validation } from '../utils.js'
 
 export default function DatasetGenerator() {
     const defaultProfile = {
@@ -35,51 +35,51 @@ export default function DatasetGenerator() {
     const [selectedDatasetProfile, setSelectedDatasetProfile] = useImmer({});
     const [sampleImages, setSampleImages] = useImmer([]);
 
-    const [profileForm, setProfileForm] = useImmer(
+    const [profileForm, setProfileForm] = useImmer(structuredClone(
         {
-            "description": {
+            "description": new Validation ({
                 value: "",
                 error: false,
                 regex: "",
                 required: false,
                 helper: ""
-            },
-            "datasetName": {
+            }),
+            "datasetName": new Validation ({
                 value: "",
                 error: false,
-                regex: "",
+                regex: /^[A-Za-z0-9 -]{1,15}$/,
                 required: true,
                 helper: "Please enter a name for this dataset."
-            },
-            "datasetSize": {
+            }),
+            "datasetSize": new Validation ({
                 value: "",
                 error: false,
                 regex: /^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 5000."
-            },
-            "skyboxPath": {
+            }),
+            "skyboxPath": new Validation ({
                 value: "",
                 error: false,
                 regex: "",
                 required: false,
                 helper: ""
-            },
-            "imageWidth": {
+            }),
+            "imageWidth": new Validation ({
                 value: "",
                 error: false,
                 regex: /^(?:[1-9]\d{0,2}|1000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 1000."
-            },
-            "imageHeight": {
+            }),
+            "imageHeight": new Validation ({
                 value: "",
                 error: false,
                 regex: /^(?:[1-9]\d{0,2}|1000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 1000."
-            },
-            "meshes": {
+            }),
+            "meshes": new Validation ({
                 value: {
                     "cube": false,
                     "sphere": false,
@@ -90,15 +90,15 @@ export default function DatasetGenerator() {
                 regex: "",
                 required: false,
                 helper: ""
-            },
-            "randomOrientation": {
+            }),
+            "randomOrientation": new Validation ({
                 value: false,
                 error: false,
                 regex: "",
                 required: false,
                 helper: ""
-            }
-        })
+            })
+        }));
 
 
     React.useEffect(() => {
@@ -172,8 +172,8 @@ export default function DatasetGenerator() {
     }, [profileForm])
 
     const handleProfileSave = (event) => {
-        event.preventDefault();
-        if (!validateForm(setProfileForm)) {
+        //event.preventDefault();
+        if (!validateForm({formElement: profileForm})) {
             setProfileOptions((prevOptions) =>
                 produce(prevOptions, (draft) => {
                     const selected = prevOptions.findIndex((option) => option.value === selectedDatasetProfile.value);
@@ -186,6 +186,9 @@ export default function DatasetGenerator() {
                 })
             );
             pushData('submit_dataset_profile', selectedDatasetProfile)
+        }
+        else {
+            alert("form error")
         }
     }
 

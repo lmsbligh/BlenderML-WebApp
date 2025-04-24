@@ -27,62 +27,6 @@ import SelectorLoss from '../components/SelectorLoss/SelectorLoss.js';
 
 export default function Training() {
 
-    // const [trainingForm, setTrainingForm] = useImmer({
-    //     "model": { 
-    //         value: "", 
-    //         error: false, 
-    //         regex: "", 
-    //         required: true,
-    //         helper: "Please select a model."
-    //     },
-    //     "checkpoint": { 
-    //         value: "", 
-    //         error: false, 
-    //         regex: "", 
-    //         required: true,
-    //         helper: "Please select a checkpoint."
-    //     },
-    //     "dataset": { 
-    //         value: "", 
-    //         error: false, 
-    //         regex: "", 
-    //         required: true,
-    //         helper: "Please select a dataset."
-    //     },
-    //     "epochs": { 
-    //         value: 100, 
-    //         error: false, 
-    //         regex: /^(?:[1-9]\d{0,2}|1000)$/, 
-    //         required: true,
-    //         helper: "Please enter an integer between 1 and 1000." 
-    //     },
-    //     "learningRate": { 
-    //         value: 0.001, 
-    //         error: false, 
-    //         regex: /^0.(?:1|(?:0[1-9]|10)|(?:00[1-9]|0[1-9]\d|100)|(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|1000))$/, 
-    //         required: true,
-    //         helper: "Please enter a number between 0.1 and 0.0001, with up to 4 decimal places." 
-    //     },
-    //     "optimizer": { 
-    //         value: "ADAM", 
-    //         error: false, 
-    //         regex: "", 
-    //         required: true, 
-    //     },
-    //     "lossFunction": { 
-    //         value: "MSE", 
-    //         error: false, 
-    //         regex: "", 
-    //         required: true 
-    //     },
-    //     "xVal": { 
-    //         value: 20, 
-    //         error: false, 
-    //         regex: /^(?:[0-9]\d?|99)$/, 
-    //         required: true,
-    //         helper: "Please enter an integer between 1 and 99" 
-    //     },
-    // })
     const [trainingForm, setTrainingForm] = useImmer(structuredClone({
         "model": new Validation ({ 
             value: "", 
@@ -168,19 +112,13 @@ export default function Training() {
 
 
     const handleTrain = (event) => {
-        console.log("Training validateForm(trainingForm): ", validateForm(trainingForm));
-        setTrainingForm((prevForm) => {
-            return produce(prevForm, (draft) => {
-                var formValid = validateForm(trainingForm)
-                if(!formValid) {
-                    pushData('submit_training', trainingForm)
-                }
-                else {
-                    alert("Training form invalid")
-                }
-            })
-        })
-        
+        var formValid = validateForm({formElement: trainingForm})
+        if(!formValid) {
+            pushData('submit_training', trainingForm)
+        }
+        else {
+            alert("Training form invalid")
+        }
     }
     
     return (
