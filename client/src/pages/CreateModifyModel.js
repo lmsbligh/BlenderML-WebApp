@@ -14,7 +14,7 @@ import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import LayerCard from '../components/LayerCard/LayerCard.js';
 import ModelPropertiesModifier from '../components/ModelPropertiesModifier/ModelPropertiesModifier.js';
 
-import { fetchData, validateForm, pushData, Validation, Layer } from '../utils.js'
+import { fetchData, validateForm, pushData, Validation, Layer, validateField } from '../utils.js'
 const defaultTheme = createTheme();
 
 
@@ -169,68 +169,70 @@ function CreateModifyModel() {
         if (document.activeElement) {
             document.activeElement.blur();
         }
-        
+        validateField({ key: "modelName", setFormState: setModelForm })
+        validateField({ key: "description", setFormState: setModelForm })
         setTimeout(() => {
             var updatedLayersForm = []
-        var updatedLayersObject = []
-        layerCallbacks.map((callback, index) => {
-            var layerForm = layerCallbacks[index]()
-            updatedLayersForm.push(layerForm)
-            updatedLayersObject.push({
-                "id": layerForm.id,
-                "activation": layerForm.activation,
-                "layer_type": layerForm.layer_type,
-                "padding": layerForm.padding.value,
-                "x_0": layerForm.x_0.value,
-                "x_1": layerForm.x_1.value,
-                "x_2": layerForm.x_2.value,
-                "x_3": layerForm.x_3.value
-            })
-        });
-
-        const updatedTextFields = handleTextFieldSave();
-        console.log("constructed form: ",{
-            modelName: updatedTextFields.modelName,
-            description: updatedTextFields.description,
-            layers: updatedLayersForm
-        })
-        var formInvalid = validateForm({formElement: {
-            modelName: updatedTextFields.modelName,
-            description: updatedTextFields.description,
-            layers: updatedLayersForm
-        }})
-        console.log("formInvalid ? : ", formInvalid)
-        if (!formInvalid) {
-            const modelToPush = {
-                value: selectedModel.value,
-                input: '',
-                output: '',
-                modelName: updatedTextFields.modelName.value,
-                description: updatedTextFields.description.value,
-                layers: updatedLayersObject
-            }
-        
-            setModelData((prevModelData) => {
-                return produce(prevModelData, (draft) => {
-                    const ind = prevModelData.findIndex((option) => option.value === modelToPush.value);
-                    if (ind != -1) {
-                        draft[ind] = modelToPush;
-                    }
-                    else {
-                        draft.push(modelToPush);
-                    }
+            var updatedLayersObject = []
+            layerCallbacks.map((callback, index) => {
+                var layerForm = layerCallbacks[index]()
+                updatedLayersForm.push(layerForm)
+                updatedLayersObject.push({
+                    "id": layerForm.id,
+                    "activation": layerForm.activation,
+                    "layer_type": layerForm.layer_type,
+                    "padding": layerForm.padding.value,
+                    "x_0": layerForm.x_0.value,
+                    "x_1": layerForm.x_1.value,
+                    "x_2": layerForm.x_2.value,
+                    "x_3": layerForm.x_3.value
                 })
             });
 
-            setSelectedModel(modelToPush)
-            pushData('submit_model', modelToPush).then((response) => {alert(response)})
-        }
-        else {
-            alert("!!!!!Form error")
-        }
+            const updatedTextFields = handleTextFieldSave();
+            // console.log("constructed form: ",{
+            //     modelName: updatedTextFields.modelName,
+            //     description: updatedTextFields.description,
+            //     layers: updatedLayersForm
+            // })
+            var formInvalid = validateForm({
+                formElement: {
+                    modelName: updatedTextFields.modelName,
+                    description: updatedTextFields.description,
+                    layers: updatedLayersForm
+                }
+            })
+            // console.log("formInvalid ? : ", formInvalid)
+            if (!formInvalid) {
+                const modelToPush = {
+                    value: selectedModel.value,
+                    input: '',
+                    output: '',
+                    modelName: updatedTextFields.modelName.value,
+                    description: updatedTextFields.description.value,
+                    layers: updatedLayersObject
+                }
+
+                setModelData((prevModelData) => {
+                    return produce(prevModelData, (draft) => {
+                        const ind = prevModelData.findIndex((option) => option.value === modelToPush.value);
+                        if (ind != -1) {
+                            draft[ind] = modelToPush;
+                        }
+                        else {
+                            draft.push(modelToPush);
+                        }
+                    })
+                });
+
+                setSelectedModel(modelToPush)
+                pushData('submit_model', modelToPush).then((response) => { alert(response) })
+            }
+            else {
+            }
 
         }, 0)
-        
+
 
 
 
@@ -298,9 +300,11 @@ function CreateModifyModel() {
                                     }
                                     ) : ''
                                 }
-                            </Box>
-                            <Button variant="contained" style={{ width: '150px' }} onClick={handleModelSave}>Save</Button>
-                            <Button variant="contained" color='error' style={{ width: '150px' }} onClick={handleModelDelete}>Delete</Button>
+                            </Box>{
+                                selectedModel ? <><Button variant="contained" style={{ width: '150px' }} onClick={handleModelSave}>Save</Button>
+                                    <Button variant="contained" color='error' style={{ width: '150px' }} onClick={handleModelDelete}>Delete</Button></> : null
+                            }
+
                         </FormControl>
                     </Grid>
                 </Grid>

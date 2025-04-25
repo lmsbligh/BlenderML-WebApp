@@ -28,59 +28,59 @@ import SelectorLoss from '../components/SelectorLoss/SelectorLoss.js';
 export default function Training() {
 
     const [trainingForm, setTrainingForm] = useImmer(structuredClone({
-        "model": new Validation ({ 
-            value: "", 
-            error: false, 
-            regex: "", 
+        "model": new Validation({
+            value: "",
+            error: false,
+            regex: "",
             required: true,
             helper: "Please select a model."
         }),
-        "checkpoint": new Validation ({ 
-            value: "", 
-            error: false, 
-            regex: "", 
+        "checkpoint": new Validation({
+            value: "",
+            error: false,
+            regex: "",
             required: true,
             helper: "Please select a checkpoint."
         }),
-        "dataset": new Validation ({ 
-            value: "", 
-            error: false, 
-            regex: "", 
+        "dataset": new Validation({
+            value: "",
+            error: false,
+            regex: "",
             required: true,
             helper: "Please select a dataset."
         }),
-        "epochs": new Validation ({ 
-            value: 100, 
-            error: false, 
-            regex: /^(?:[1-9]\d{0,2}|1000)$/, 
+        "epochs": new Validation({
+            value: 100,
+            error: false,
+            regex: /^(?:[1-9]\d{0,2}|1000)$/,
             required: true,
-            helper: "Please enter an integer between 1 and 1000." 
+            helper: "Please enter an integer between 1 and 1000."
         }),
-        "learningRate": new Validation ({ 
-            value: 0.001, 
-            error: false, 
-            regex: /^0.(?:1|(?:0[1-9]|10)|(?:00[1-9]|0[1-9]\d|100)|(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|1000))$/, 
+        "learningRate": new Validation({
+            value: 0.001,
+            error: false,
+            regex: /^0.(?:1|(?:0[1-9]|10)|(?:00[1-9]|0[1-9]\d|100)|(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|1000))$/,
             required: true,
-            helper: "Please enter a number between 0.1 and 0.0001, with up to 4 decimal places." 
+            helper: "Please enter a number between 0.1 and 0.0001, with up to 4 decimal places."
         }),
-        "optimizer": new Validation ({ 
-            value: "ADAM", 
-            error: false, 
-            regex: "", 
-            required: true, 
-        }),
-        "lossFunction": new Validation ({ 
-            value: "MSE", 
-            error: false, 
-            regex: "", 
-            required: true 
-        }),
-        "xVal": new Validation ({ 
-            value: 20, 
-            error: false, 
-            regex: /^(?:[0-9]\d?|99)$/, 
+        "optimizer": new Validation({
+            value: "ADAM",
+            error: false,
+            regex: "",
             required: true,
-            helper: "Please enter an integer between 1 and 99" 
+        }),
+        "lossFunction": new Validation({
+            value: "MSE",
+            error: false,
+            regex: "",
+            required: true
+        }),
+        "xVal": new Validation({
+            value: 20,
+            error: false,
+            regex: /^(?:[0-9]\d?|99)$/,
+            required: true,
+            helper: "Please enter an integer between 1 and 99"
         }),
     }))
 
@@ -112,15 +112,17 @@ export default function Training() {
 
 
     const handleTrain = (event) => {
-        var formValid = validateForm({formElement: trainingForm})
-        if(!formValid) {
-            pushData('submit_training', trainingForm)
+        for (let key in trainingForm) {
+            validateField({key: key, setFormState: setTrainingForm})
         }
-        else {
-            alert("Training form invalid")
-        }
+        setTimeout(() => {
+            var formValid = validateForm({ formElement: trainingForm })
+            if (!formValid) {
+                pushData('submit_training', trainingForm)
+            }
+        }, 0)
     }
-    
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}><Grid container>
             <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
@@ -137,7 +139,7 @@ export default function Training() {
                             setForm: setTrainingForm,
                             options: modelData
                         })
-                        validateField({key: 'model', setFormState: setTrainingForm})
+                        validateField({ key: 'model', setFormState: setTrainingForm })
                     }}
 
                 /> : null}
@@ -180,7 +182,7 @@ export default function Training() {
                             setSelector: setSelectedCheckpoint,
                             setForm: setTrainingForm
                         })
-                        validateField({key: 'checkpoint', setFormState: setTrainingForm})
+                        validateField({ key: 'checkpoint', setFormState: setTrainingForm })
                     }}
                     checkpointOptions={checkpointOptions}
                 /> : null}
@@ -195,7 +197,7 @@ export default function Training() {
                             setForm: setTrainingForm,
                             options: datasetOptions
                         })
-                        validateField({key: 'dataset', setFormState: setTrainingForm})
+                        validateField({ key: 'dataset', setFormState: setTrainingForm })
 
                     }}
                     datasetOptions={datasetOptions} />
@@ -207,7 +209,7 @@ export default function Training() {
                     value={trainingForm.epochs.value}
                     onChange={(event) => {
                         handleTextFieldChange({ eve: event, setState: setTrainingForm })
-                        validateField({key: 'epochs', setFormState: setTrainingForm})
+                        validateField({ key: 'epochs', setFormState: setTrainingForm })
                     }}
                 />
                 <TextField
@@ -218,7 +220,7 @@ export default function Training() {
                     value={trainingForm.learningRate.value}
                     onChange={(event) => {
                         handleTextFieldChange({ eve: event, setState: setTrainingForm })
-                        validateField({key: 'learningRate', setFormState: setTrainingForm})
+                        validateField({ key: 'learningRate', setFormState: setTrainingForm })
                     }}
                 />
                 <SelectorOptimizer
@@ -231,7 +233,7 @@ export default function Training() {
                             setForm: setTrainingForm,
                             options: optimizerOptions
                         })
-                        validateField({key: 'optimizer', setFormState: setTrainingForm})
+                        validateField({ key: 'optimizer', setFormState: setTrainingForm })
                     }}
                     optimizerOptions={optimizerOptions}
                 />
@@ -255,15 +257,15 @@ export default function Training() {
                     name="xVal"
                     label="Cross validation set %"
                     value={trainingForm.xVal.value}
-                    onChange={(event) => { 
+                    onChange={(event) => {
                         handleTextFieldChange({ eve: event, setState: setTrainingForm })
-                        validateField({ key: 'xVal', setFormState: setTrainingForm }) 
-                        }} />
-                <Button 
-                    variant='contained' 
-                    style={{ alignSelf: 'center', width: '150px' }} 
+                        validateField({ key: 'xVal', setFormState: setTrainingForm })
+                    }} />
+                <Button
+                    variant='contained'
+                    style={{ alignSelf: 'center', width: '150px' }}
                     onClick={handleTrain}
-                    >
+                >
                     Train
                 </Button>
             </Grid>

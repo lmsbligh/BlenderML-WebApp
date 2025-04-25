@@ -37,49 +37,49 @@ export default function DatasetGenerator() {
 
     const [profileForm, setProfileForm] = useImmer(structuredClone(
         {
-            "description": new Validation ({
+            "description": new Validation({
                 value: "",
                 error: false,
                 regex: "",
                 required: false,
                 helper: ""
             }),
-            "datasetName": new Validation ({
+            "datasetName": new Validation({
                 value: "",
                 error: false,
                 regex: /^[A-Za-z0-9 -]{1,15}$/,
                 required: true,
                 helper: "Please enter a name for this dataset."
             }),
-            "datasetSize": new Validation ({
+            "datasetSize": new Validation({
                 value: "",
                 error: false,
                 regex: /^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 5000."
             }),
-            "skyboxPath": new Validation ({
+            "skyboxPath": new Validation({
                 value: "",
                 error: false,
                 regex: "",
                 required: false,
                 helper: ""
             }),
-            "imageWidth": new Validation ({
+            "imageWidth": new Validation({
                 value: "",
                 error: false,
                 regex: /^(?:[1-9]\d{0,2}|1000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 1000."
             }),
-            "imageHeight": new Validation ({
+            "imageHeight": new Validation({
                 value: "",
                 error: false,
                 regex: /^(?:[1-9]\d{0,2}|1000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 1000."
             }),
-            "meshes": new Validation ({
+            "meshes": new Validation({
                 value: {
                     "cube": false,
                     "sphere": false,
@@ -91,7 +91,7 @@ export default function DatasetGenerator() {
                 required: false,
                 helper: ""
             }),
-            "randomOrientation": new Validation ({
+            "randomOrientation": new Validation({
                 value: false,
                 error: false,
                 regex: "",
@@ -173,28 +173,31 @@ export default function DatasetGenerator() {
 
     const handleProfileSave = (event) => {
         //event.preventDefault();
-        if (!validateForm({formElement: profileForm})) {
-            setProfileOptions((prevOptions) =>
-                produce(prevOptions, (draft) => {
-                    const selected = prevOptions.findIndex((option) => option.value === selectedDatasetProfile.value);
-                    if (selected == -1) {
-                        draft.push(selectedDatasetProfile)
-                    }
-                    else {
-                        draft[selected] = structuredClone(selectedDatasetProfile);
-                    }
-                })
-            );
-            pushData('submit_dataset_profile', selectedDatasetProfile)
+        for (let key in profileForm) {
+            validateField({ key: key, setFormState: setProfileForm })
         }
-        else {
-            alert("form error")
-        }
+        setTimeout(() => {
+            if (!validateForm({ formElement: profileForm })) {
+                setProfileOptions((prevOptions) =>
+                    produce(prevOptions, (draft) => {
+                        const selected = prevOptions.findIndex((option) => option.value === selectedDatasetProfile.value);
+                        if (selected == -1) {
+                            draft.push(selectedDatasetProfile)
+                        }
+                        else {
+                            draft[selected] = structuredClone(selectedDatasetProfile);
+                        }
+                    })
+                );
+                pushData('submit_dataset_profile', selectedDatasetProfile)
+            }
+        }, 0)
+
     }
 
     const handleGenerateDataset = (event) => {
-        if (!validateForm(setProfileForm)) {
             handleProfileSave(event)
+            if (!validateForm({ formElement: profileForm })) {
             try {
                 fetch('submit_generate_dataset', {
                     method: 'POST',
@@ -217,8 +220,6 @@ export default function DatasetGenerator() {
                 console.error('Error:', error);
             }
         }
-
-
     }
 
     return (
