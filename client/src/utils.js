@@ -79,7 +79,7 @@ export const handleTextFieldChange = ({ eve, setState }) => {
 // }
 export const validateForm = ({ formElement, elementParent = null }) => {
 
-    console.log("isFormValid: ")
+    console.log("validateForm(): ")
     console.log(formElement)
     //console.log(formElement.constructor.name)
     switch (formElement.constructor.name) {
