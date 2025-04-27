@@ -54,7 +54,8 @@ export default function DatasetGenerator() {
             "datasetSize": new Validation({
                 value: "",
                 error: false,
-                regex: /^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$/,
+                regex: "",
+                //regex: /^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 5000."
             }),
@@ -190,6 +191,9 @@ export default function DatasetGenerator() {
                     })
                 );
                 pushData('submit_dataset_profile', selectedDatasetProfile)
+                .then(data => {
+                    console.log(data)
+                })
             }
         }, 0)
 

@@ -3,6 +3,7 @@ import os
 import time
 import json
 import uuid
+import re
 from flask import Flask
 from flask import request, jsonify, send_from_directory, flash, redirect, url_for
 from werkzeug.utils import secure_filename
@@ -110,6 +111,28 @@ def get_activation_types():
         {"value": 3, "activation": 'Heaviside'},
         {"value": 4, "activation": 'Sigmoid'},
         {"value": 5, "activation": 'None'}]
+                
+def validate_dataset_profile(data):
+    required_fields = {
+        "datasetName": str,
+        "datasetSize": str,
+        "description": str,
+        "imageHeight": str,
+        "imageWidth": str,
+        "meshes": dict,
+        "randomOrientation": str,
+        "skyboxPath": str,
+    }
+    for field, field_type in required_fields.items():
+        if field not in data:
+            raise ValueError(f"Missing field: {field}")
+        if not isinstance(data[field], field_type):
+            raise ValueError(f"Field {field} must be of type {field_type}")
+        
+    # Additional sanity checks
+    if not (re.match(r"^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$", data["datasetSize"])):
+        raise ValueError(f"Dataset size must be between 1 and 5000, given: {data['datasetSize']}")
+    return True
 
 @app.route('/submit_dataset_profile', methods=["POST"])
 def submit_dataset_profile():
@@ -120,6 +143,10 @@ def submit_dataset_profile():
     cur = con.cursor()
     
     profile_to_save = json.loads(request.data.decode('utf-8'))
+    try:
+        validate_dataset_profile(profile_to_save)
+    except ValueError as ve:
+        return jsonify({"error": str(ve)}), 400
     if ("value" not in profile_to_save):
         profile_to_save["value"] = str(uuid.uuid4())[:8]
     ind, profile = next(
