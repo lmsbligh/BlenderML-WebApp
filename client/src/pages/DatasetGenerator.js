@@ -40,22 +40,21 @@ export default function DatasetGenerator() {
             "description": new Validation({
                 value: "",
                 error: false,
-                regex: "",
+                regex: "", ///^[A-Za-z0-9 -]{1,100}$/,
                 required: false,
                 helper: ""
             }),
             "datasetName": new Validation({
                 value: "",
                 error: false,
-                regex: /^[A-Za-z0-9 -]{1,15}$/,
+                regex: "",///^[A-Za-z0-9 -]{1,15}$/,
                 required: true,
                 helper: "Please enter a name for this dataset."
             }),
             "datasetSize": new Validation({
                 value: "",
                 error: false,
-                regex: "",
-                //regex: /^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$/,
+                regex: "",///^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 5000."
             }),
@@ -69,14 +68,14 @@ export default function DatasetGenerator() {
             "imageWidth": new Validation({
                 value: "",
                 error: false,
-                regex: /^(?:[1-9]\d{0,2}|1000)$/,
+                regex: "",///^(?:[1-9]\d{0,2}|1000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 1000."
             }),
             "imageHeight": new Validation({
                 value: "",
                 error: false,
-                regex: /^(?:[1-9]\d{0,2}|1000)$/,
+                regex: "",///^(?:[1-9]\d{0,2}|1000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 1000."
             }),
@@ -179,20 +178,28 @@ export default function DatasetGenerator() {
         }
         setTimeout(() => {
             if (!validateForm({ formElement: profileForm })) {
-                setProfileOptions((prevOptions) =>
-                    produce(prevOptions, (draft) => {
-                        const selected = prevOptions.findIndex((option) => option.value === selectedDatasetProfile.value);
-                        if (selected == -1) {
-                            draft.push(selectedDatasetProfile)
-                        }
-                        else {
-                            draft[selected] = structuredClone(selectedDatasetProfile);
-                        }
-                    })
-                );
                 pushData('submit_dataset_profile', selectedDatasetProfile)
-                .then(data => {
-                    console.log(data)
+                .then(async (response) => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.error);
+                    }
+                    else {
+                        setProfileOptions((prevOptions) =>
+                            produce(prevOptions, (draft) => {
+                                const selected = prevOptions.findIndex((option) => option.value === selectedDatasetProfile.value);
+                                if (selected == -1) {
+                                    draft.push(selectedDatasetProfile)
+                                }
+                                else {
+                                    draft[selected] = structuredClone(selectedDatasetProfile);
+                                }
+                            })
+                        );
+                    }
+                })
+                .catch(error => {
+                    alert(`Server error: ${error.message}`);
                 })
             }
         }, 0)

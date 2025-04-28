@@ -114,25 +114,80 @@ def get_activation_types():
                 
 def validate_dataset_profile(data):
     required_fields = {
-        "datasetName": str,
-        "datasetSize": str,
-        "description": str,
-        "imageHeight": str,
-        "imageWidth": str,
-        "meshes": dict,
-        "randomOrientation": str,
-        "skyboxPath": str,
+        "value" : {"data_type": str,
+                        "regex": r"^[A-Za-z0-9 -]{8}$",
+                        "required": True,
+                        "helper": "No ID value was provided."
+                        },
+        "datasetName": {"data_type": str,
+                        "regex": r"^[A-Za-z0-9 -]{1,15}$",
+                        "required": True,
+                        "helper": "Please enter a name for this dataset."
+                        },
+        "datasetSize": {"data_type": int,
+                        "regex": r"^[A-Za-z0-9 -]{1,15}$",
+                        "required": True,
+                        "helper": "Please enter a number between 1 and 5000."
+                        },
+        "description": {"data_type": str,
+                        "regex": r"^[A-Za-z0-9 -]{1,150}$",
+                        "required": False,
+                        "helper": "Descriptions are limited to 150 characters."
+                        },
+        "imageHeight": {"data_type": int,
+                        "regex": r"^(?:[1-9]\d{0,2}|1000)$",
+                        "required": True,
+                        "helper": "Please enter a number between 1 and 1000."
+                        },
+        "imageWidth": {"data_type": int,
+                        "regex": r"^(?:[1-9]\d{0,2}|1000)$",
+                        "required": True,
+                        "helper": "Please enter a number between 1 and 1000."
+                        },
+        "meshes": {"data_type": dict,
+                        "regex": "",
+                        "required": False,
+                        "helper": "Meshes are not required"
+                        },
+        "randomOrientation": {"data_type": bool,
+                        "regex": "",
+                        "required": False,
+                        "helper": "Random orientation is not required"
+                        },
+        "skyboxPath": {"data_type": str,
+                        "regex": "",
+                        "required": False,
+                        "helper": "Skybox paths are not required"
+                        },
     }
-    for field, field_type in required_fields.items():
+    for field, field_vals in required_fields.items():
         if field not in data:
             raise ValueError(f"Missing field: {field}")
-        if not isinstance(data[field], field_type):
-            raise ValueError(f"Field {field} must be of type {field_type}")
-        
+        if not isinstance(data[field], field_vals["data_type"]):
+            try:
+                if field_vals["data_type"] == int:
+                    data[field] = int(data[field])
+            except:
+                raise ValueError(f"Field {field} must be of type {field_vals['data_type']}")
+            
+    def val_entry(entry, val):
+        print(f"entry: {entry}, val: {val}")
+        if (entry not in required_fields):
+            raise ValueError(f"Error {entry} is not a valid field.")
+        if (val):
+            if not (re.match(required_fields[entry]["regex"], str(val))):
+                raise ValueError(f"Error: {required_fields[entry]['helper']}")
+        elif (required_fields[entry]["required"]):
+            raise ValueError(f"Error: {entry} is a required field: {required_fields[entry]['helper']}")
     # Additional sanity checks
-    if not (re.match(r"^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$", data["datasetSize"])):
-        raise ValueError(f"Dataset size must be between 1 and 5000, given: {data['datasetSize']}")
-    return True
+    for entry, val in data.items():
+        val_entry(entry=entry, val=val)
+        
+    #if not (re.match(required_fields["datasetSize"]["regex"], str(data["datasetSize"]))):
+    #    raise ValueError(f"Dataset size must be between 1 and 5000, given: {data['datasetSize']}")
+    
+    #if not (re.match(r"^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$", str(data["datasetSize"]))):
+    #   raise ValueError(f"Dataset size must be between 1 and 5000, given: {data['datasetSize']}")
 
 @app.route('/submit_dataset_profile', methods=["POST"])
 def submit_dataset_profile():
@@ -146,6 +201,7 @@ def submit_dataset_profile():
     try:
         validate_dataset_profile(profile_to_save)
     except ValueError as ve:
+        print(jsonify({"error": str(ve)}), 400)
         return jsonify({"error": str(ve)}), 400
     if ("value" not in profile_to_save):
         profile_to_save["value"] = str(uuid.uuid4())[:8]
@@ -160,7 +216,7 @@ def submit_dataset_profile():
     cur.execute('INSERT INTO profiles (value, datasetName, datasetSize, description, imageHeight, imageWidth, meshes, randomOrientation, skyboxPath) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(value) DO UPDATE SET datasetName = excluded.datasetName, datasetSize = excluded.datasetSize, description = excluded.description, imageHeight = excluded.imageHeight, imageWidth = excluded.imageWidth, meshes = excluded.meshes, randomOrientation = excluded.randomOrientation, skyboxPath = excluded.skyboxPath;', (profile_to_save['value'], profile_to_save['datasetName'], profile_to_save['datasetSize'], profile_to_save['description'], profile_to_save['imageHeight'], profile_to_save['imageWidth'], json.dumps(profile_to_save['meshes']), profile_to_save['randomOrientation'], profile_to_save['skyboxPath']))
     con.commit()
     con.close()
-        
+    print(jsonify({"value": profile_to_save['value'], "body": "success!"}), 200)  
     return jsonify({"value": profile_to_save['value'], "body": "success!"}), 200
 
 @app.route('/submit_model', methods=["POST"])

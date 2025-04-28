@@ -9,8 +9,7 @@ export const fetchData = (endpoint, setState) => {
         .catch(error => console.error('Error fetching data:', error))
 }
 export const pushData = async (endpoint, data) => {
-    try {
-        const response = fetch(endpoint, {
+        return fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -18,12 +17,7 @@ export const pushData = async (endpoint, data) => {
             title: 'title',
             body: JSON.stringify(data),
         });
-        return (await response).text();
     }
-    catch (error) {
-        console.error('Error:', error);
-    }
-}
 
 export const handleSelectorFormChange = ({ eve, setSelector, setForm, options }) => {
     if (options) {
