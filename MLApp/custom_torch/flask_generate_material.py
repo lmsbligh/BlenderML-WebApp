@@ -19,10 +19,9 @@ def flask_generate_material(test_form, upload_folder):
         Allows for a subset of specific size to be tested, will also
         allow the image or image path itself to be returned.
     """
-    image_path = test_form['image_path']['value']
-    model_id = test_form['model']['value']
-    model_checkpoint = test_form['checkpoint']['value']
-    
+    image_path = test_form['image_path']
+    model_id = test_form['model']
+    model_checkpoint = test_form['checkpoint']
     transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))])
     
     image = Image.open(image_path).convert("RGB")

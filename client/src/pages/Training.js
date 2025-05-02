@@ -118,7 +118,17 @@ export default function Training() {
         setTimeout(() => {
             var formValid = validateForm({ formElement: trainingForm })
             if (!formValid) {
-                pushData('submit_training', trainingForm)
+                const formToPush = {
+                    "model": trainingForm.model.value,
+                    "checkpoint": trainingForm.checkpoint.value,
+                    "datatset": trainingForm.dataset.value,
+                    "epochs": trainingForm.epochs.value,
+                    "learningRate": trainingForm.learningRate.value,
+                    "optimizer": trainingForm.optimizer.value,
+                    "lossFunction": trainingForm.lossFunction.value,
+                    "xVal": trainingForm.xVal.value  
+                }
+                pushData('submit_training', formToPush)
             }
         }, 0)
     }

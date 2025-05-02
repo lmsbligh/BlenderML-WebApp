@@ -118,7 +118,12 @@ export default function GenerateMaterials() {
             if (validateForm({ formElement: generateMaterialForm })) {
                 return
             }
-
+            const formToPush = {
+                "model": generateMaterialForm.model.value,
+                "image_url": generateMaterialForm.image_url.value,
+                "image_path": generateMaterialForm.image_path.value,
+                "checkpoint": generateMaterialForm.checkpoint.value
+                }
             try {
                 fetch('generate_material', {
                     method: 'POST',
@@ -126,7 +131,7 @@ export default function GenerateMaterials() {
                         'Content-Type': 'application/json',
                     },
                     title: 'title',
-                    body: JSON.stringify(generateMaterialForm),
+                    body: JSON.stringify(formToPush),
                 })
                     .then(response => {
                         if (!response.ok) {

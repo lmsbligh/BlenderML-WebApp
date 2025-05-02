@@ -40,21 +40,21 @@ export default function DatasetGenerator() {
             "description": new Validation({
                 value: "",
                 error: false,
-                regex: "", ///^[A-Za-z0-9 -]{1,100}$/,
+                regex: /^[A-Za-z0-9 -]{1,150}$/,
                 required: false,
-                helper: ""
+                helper: "Descriptions are limited to 150 characters."
             }),
             "datasetName": new Validation({
                 value: "",
                 error: false,
-                regex: "",///^[A-Za-z0-9 -]{1,15}$/,
+                regex: /^[A-Za-z0-9 -]{1,15}$/,
                 required: true,
                 helper: "Please enter a name for this dataset."
             }),
             "datasetSize": new Validation({
                 value: "",
                 error: false,
-                regex: "",///^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$/,
+                regex: /^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 5000."
             }),
@@ -68,14 +68,14 @@ export default function DatasetGenerator() {
             "imageWidth": new Validation({
                 value: "",
                 error: false,
-                regex: "",///^(?:[1-9]\d{0,2}|1000)$/,
+                regex: /^(?:[1-9]\d{0,2}|1000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 1000."
             }),
             "imageHeight": new Validation({
                 value: "",
                 error: false,
-                regex: "",///^(?:[1-9]\d{0,2}|1000)$/,
+                regex: /^(?:[1-9]\d{0,2}|1000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 1000."
             }),

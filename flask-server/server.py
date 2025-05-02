@@ -4,6 +4,7 @@ import time
 import json
 import uuid
 import re
+import ast
 from flask import Flask
 from flask import request, jsonify, send_from_directory, flash, redirect, url_for
 from werkzeug.utils import secure_filename
@@ -38,11 +39,229 @@ HYPER_PARAMS = {
     "lossFunction": "MSE",
     "xVal": 20
 }
+DATASET_PROFILE_FORM = {
+        "value" : {"data_type": str,
+                        "regex": r"^[A-Za-z0-9 -]{8}$",
+                        "required": True,
+                        "helper": "No ID value was provided."
+                        },
+        "datasetName": {"data_type": str,
+                        "regex": r"^[A-Za-z0-9 -]{1,15}$",
+                        "required": True,
+                        "helper": "Please enter an alphanumeric name for this dataset, maximum 15 chars."
+                        },
+        "datasetSize": {"data_type": int,
+                        "regex": r"^[A-Za-z0-9 -]{1,15}$",
+                        "required": True,
+                        "helper": "Please enter a number between 1 and 5000."
+                        },
+        "description": {"data_type": str,
+                        "regex": r"^[A-Za-z0-9 -]{1,150}$",
+                        "required": False,
+                        "helper": "Descriptions are limited to 150 characters."
+                        },
+        "imageHeight": {"data_type": int,
+                        "regex": r"^(?:[1-9]\d{0,2}|1000)$",
+                        "required": True,
+                        "helper": "Please enter a number between 1 and 1000."
+                        },
+        "imageWidth": {"data_type": int,
+                        "regex": r"^(?:[1-9]\d{0,2}|1000)$",
+                        "required": True,
+                        "helper": "Please enter a number between 1 and 1000."
+                        },
+        "meshes": {"data_type": dict,
+                        "regex": "",
+                        "required": False,
+                        "helper": "Meshes are not required"
+                        },
+        "randomOrientation": {"data_type": bool,
+                        "regex": "",
+                        "required": False,
+                        "helper": "Random orientation is not required"
+                        },
+        "skyboxPath": {"data_type": str,
+                        "regex": r"^[a-zA-Z0-9/:.\-]{1,150}$",#this is a quick fix to check it's not malicious.
+                        "required": False,
+                        "helper": "Skybox paths are not required"
+                        },
+    }
 
+TRAINING_FORM = {
+        "model": {
+            "data_type": str,
+            "regex": r"^[A-Za-z0-9 -]{1,15}$",
+            "required": True,
+            "helper": "Please select a model."
+        },
+        "checkpoint": {
+            "data_type": str,
+            "regex": r"^[A-Za-z0-9 -.]{1,30}$",
+            "required": True,
+            "helper": "Please select a checkpoint."
+        },
+        "dataset": {
+            "data_type": str,
+            "regex": r"^[A-Za-z0-9 -]{1,30}$",
+            "required": True,
+            "helper": "Please select a dataset."
+        },
+        "epochs": {
+            "data_type": int,
+            "regex": r"^(?:[1-9]\d{0,2}|1000)$",
+            "required": True,
+            "helper": "Please enter an integer between 1 and 1000."
+        },
+        "learningRate": {
+            "data_type": float,
+            "regex": r"^0.(?:1|(?:0[1-9]|10)|(?:00[1-9]|0[1-9]\d|100)|(?:000[1-9]|00[1-9]\d|0[1-9]\d{2}|1000))$",
+            "required": True,
+            "helper": "Please enter a number between 0.1 and 0.0001, with up to 4 decimal places."
+        },
+        "optimizer": {
+            "data_type": str,
+            "regex": "",
+            "required": True,
+            "helper": "Please select an optimizer"
+        },
+        "lossFunction": {
+            "data_type": str,
+            "regex": "",
+            "required": True,
+            "helper": "Please select a loss function"
+
+        },
+        "xVal": {
+            "data_type": int,
+            "regex": r"^(?:[0-9]\d?|99)$",
+            "required": True,
+            "helper": "Please enter an integer between 1 and 99"
+        },
+    }
+
+MODEL_FORM = {
+    "value":  {
+        "data_type": str,
+        "regex": r"^[A-Za-z0-9 -]{8}$",
+        "required": True,
+        "helper": "No ID value was provided."
+    },
+    "modelName": {
+        "data_type": str,
+        "regex": r"^[A-Za-z0-9 -]{1,15}$",
+        "required": True,
+        "helper": "Please enter an alphanumeric name of up to 15 characters."
+    },
+    "description": {
+        "data_type": str,
+        "regex": r"^[A-Za-z0-9 -]{1,150}$",
+        "required": False,
+        "helper": "Please enter an alphanumeric description of up to 150 characters."
+    },
+    "input": {
+            "data_type": int,
+            "regex": r"^(?:[0-9]\d?|1000)$",
+            "required": False,
+            "helper": "Please enter an integer between 1 and 1000"
+        },
+    "output": {
+            "data_type": int,
+            "regex": r"^(?:[0-9]\d?|1000)$",
+            "required": False,
+            "helper": "Please enter an integer between 1 and 1000"
+        },
+    "layers": {
+        "data_type": list,
+        "regex": "",
+        "required": True,
+        "helper": "Please provide a list of layers for the model."
+    }
+}
+LAYER_FORM = {
+    "id": {
+        "data_type": str,
+        "regex": r"^[A-Za-z0-9 -]{8}$",
+        "required": True,
+        "helper": "No ID value was provided."
+    },
+    "activation": {
+        "data_type": str,
+        "regex": r"^[A-Za-z0-9 -]{1,15}$",
+        "required": True,
+        "helper": "No ID value was provided."
+    },
+    "layer_type": {
+        "data_type": str,
+        "regex": r"^[A-Za-z0-9 -]{1,15}$",
+        "required": True,
+        "helper": "No ID value was provided."
+    },
+    "padding": {
+        "data_type": int,
+        "regex": r"^(?:[0-9]\d?|99)$",
+        "required": False,
+        "helper": "Please enter an integer between 1 and 99"
+    },
+    "x_0": {
+        "data_type": int,
+        "regex": r"^(?:0|[1-9]\d{0,2}|1000)$",
+        "required": True,
+        "helper": "Please enter an integer from 0 to 1000."
+    }, 
+    "x_1": {
+        "data_type": int,
+        "regex": r"^(?:0|[1-9]\d{0,2}|1000)$",
+        "required": True,
+        "helper": "Please enter an integer from 0 to 1000."
+    }, 
+    "x_2": {
+        "data_type": int,
+        "regex": r"^(?:0|[1-9]\d{0,2}|1000)$",
+        "required": False,
+        "helper": "Please enter an integer from 0 to 1000."
+    }, 
+    "x_3": {
+        "data_type": int,
+        "regex": r"^(?:0|[1-9]\d{0,2}|1000)$",
+        "required": False,
+        "helper": "Please enter an integer from 0 to 1000."
+    }
+}
+GENERATE_MATERIAL_FORM = {
+    "model": {
+        "data_type": str,
+        "regex": r"^[A-Za-z0-9 -]{8}$",
+        "required": True,
+        "helper": "No ID value was provided."
+    },
+    "image_url": {
+        "data_type": str,
+        "regex": r"^[a-zA-Z0-9/\\:.\-_]{1,150}$",#this is a quick fix to check it's not malicious.
+        "required": True,
+        "helper": "Image url is required"
+    },
+    "image_path": {
+        "data_type": str,
+        "regex": r"^[a-zA-Z0-9/\\:.\-_]{1,150}$",#this is a quick fix to check it's not malicious.
+        "required": True,
+        "helper": "Image path is required"
+    },
+    "checkpoint":{
+        "data_type": str,
+        "regex": r"^[A-Za-z0-9 -.]{1,30}$",
+        "required": True,
+        "helper": "Please select a checkpoint."
+    },
+}
 app = Flask(__name__)
 app.secret_key = 'asdjkfnasdouif2398r'
 app.config['UPLOAD_FOLDER'] = os.path.join('MLApp', 'data', 'user_uploaded_test')
+app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
 DATABASE_PATH = os.path.join(os.getcwd(), "MLApp", "data", "data.db")
+
+@app.errorhandler(413)
+def too_large(e):
+    return jsonify({"error": "File is too large. Maximum allowed size is 20MB."}), 413
 
 @app.route("/models")
 def get_models():
@@ -112,83 +331,45 @@ def get_activation_types():
         {"value": 4, "activation": 'Sigmoid'},
         {"value": 5, "activation": 'None'}]
                 
-def validate_dataset_profile(data):
-    required_fields = {
-        "value" : {"data_type": str,
-                        "regex": r"^[A-Za-z0-9 -]{8}$",
-                        "required": True,
-                        "helper": "No ID value was provided."
-                        },
-        "datasetName": {"data_type": str,
-                        "regex": r"^[A-Za-z0-9 -]{1,15}$",
-                        "required": True,
-                        "helper": "Please enter a name for this dataset."
-                        },
-        "datasetSize": {"data_type": int,
-                        "regex": r"^[A-Za-z0-9 -]{1,15}$",
-                        "required": True,
-                        "helper": "Please enter a number between 1 and 5000."
-                        },
-        "description": {"data_type": str,
-                        "regex": r"^[A-Za-z0-9 -]{1,150}$",
-                        "required": False,
-                        "helper": "Descriptions are limited to 150 characters."
-                        },
-        "imageHeight": {"data_type": int,
-                        "regex": r"^(?:[1-9]\d{0,2}|1000)$",
-                        "required": True,
-                        "helper": "Please enter a number between 1 and 1000."
-                        },
-        "imageWidth": {"data_type": int,
-                        "regex": r"^(?:[1-9]\d{0,2}|1000)$",
-                        "required": True,
-                        "helper": "Please enter a number between 1 and 1000."
-                        },
-        "meshes": {"data_type": dict,
-                        "regex": "",
-                        "required": False,
-                        "helper": "Meshes are not required"
-                        },
-        "randomOrientation": {"data_type": bool,
-                        "regex": "",
-                        "required": False,
-                        "helper": "Random orientation is not required"
-                        },
-        "skyboxPath": {"data_type": str,
-                        "regex": "",
-                        "required": False,
-                        "helper": "Skybox paths are not required"
-                        },
-    }
+def validate_form(data, required_fields):
+    
     for field, field_vals in required_fields.items():
         if field not in data:
             raise ValueError(f"Missing field: {field}")
         if not isinstance(data[field], field_vals["data_type"]):
             try:
-                if field_vals["data_type"] == int:
+                if field_vals["data_type"] == int and data[field]:
                     data[field] = int(data[field])
+                if field_vals["data_type"] == dict:
+                    data[field] = ast.literal_eval(data[field])
             except:
                 raise ValueError(f"Field {field} must be of type {field_vals['data_type']}")
             
     def val_entry(entry, val):
         print(f"entry: {entry}, val: {val}")
+        if (entry == "layers"):
+            print("layers: ", entry)
+            for layer in val: 
+                print("layer: ", layer)
+                validate_form(layer, LAYER_FORM)
+        if (entry == "skyboxPath" or entry == "image_path"):
+            print(os.getcwd())
+            real_base = os.path.realpath(os.getcwd())
+            real_target = os.path.realpath(os.path.join(real_base, val))
+            if not (real_target.startswith(real_base)):
+                raise ValueError(f"Error: {entry} {val} is not within the application.")
         if (entry not in required_fields):
             raise ValueError(f"Error {entry} is not a valid field.")
         if (val):
             if not (re.match(required_fields[entry]["regex"], str(val))):
-                raise ValueError(f"Error: {required_fields[entry]['helper']}")
+                raise ValueError(f"Error: {entry}: regex eval failed {required_fields[entry]['helper']}")
         elif (required_fields[entry]["required"]):
             raise ValueError(f"Error: {entry} is a required field: {required_fields[entry]['helper']}")
+    
     # Additional sanity checks
     for entry, val in data.items():
         val_entry(entry=entry, val=val)
         
-    #if not (re.match(required_fields["datasetSize"]["regex"], str(data["datasetSize"]))):
-    #    raise ValueError(f"Dataset size must be between 1 and 5000, given: {data['datasetSize']}")
-    
-    #if not (re.match(r"^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$", str(data["datasetSize"]))):
-    #   raise ValueError(f"Dataset size must be between 1 and 5000, given: {data['datasetSize']}")
-
 @app.route('/submit_dataset_profile', methods=["POST"])
 def submit_dataset_profile():
     
@@ -198,8 +379,9 @@ def submit_dataset_profile():
     cur = con.cursor()
     
     profile_to_save = json.loads(request.data.decode('utf-8'))
+    print("profile_to_save: ", profile_to_save)
     try:
-        validate_dataset_profile(profile_to_save)
+        validate_form(profile_to_save, DATASET_PROFILE_FORM)
     except ValueError as ve:
         print(jsonify({"error": str(ve)}), 400)
         return jsonify({"error": str(ve)}), 400
@@ -228,6 +410,12 @@ def submit_model():
     # con.close()
 
     model_to_save = json.loads(request.data.decode('utf-8'))
+    try:
+        print("model_to_save: ", model_to_save)
+        validate_form(model_to_save, MODEL_FORM)
+    except ValueError as ve:
+        print(jsonify({"error": str(ve)}), 400)
+        return jsonify({"error": str(ve)}), 400
     print(model_to_save)
     ind, model = next(
         ((ind, model) for ind, model in enumerate(MODELS_LIST)
@@ -281,8 +469,16 @@ def delete_dataset_profile():
     return jsonify({"body": "Profile deleted successfully!"}), 200
 
 @app.route('/submit_training', methods=["POST"])
-def submit_training():    
+def submit_training():
+    
+            
     training_form = json.loads(request.data.decode("utf-8"))
+    print("training_form: ", training_form)
+    try:
+        validate_form(training_form, TRAINING_FORM)
+    except ValueError as ve:
+        print(jsonify({"error": str(ve)}), 400)
+        return jsonify({"error": str(ve)}), 400
     print("!!Training ran but disabled.")
     print(training_form)
     #flask_train(training_form)
@@ -419,8 +615,17 @@ def upload_file():
 @app.route('/generate_material', methods=['POST'])
 def generate_material():    
     generate_mat_form = json.loads(request.data.decode('utf-8'))
-    predicted_props = flask_generate_material(generate_mat_form, app.config['UPLOAD_FOLDER'])
+    print("generate_mat_form: ", generate_mat_form)
+    try:
+        validate_form(generate_mat_form, GENERATE_MATERIAL_FORM)
+        print("Validation passed")
+    except ValueError as ve:
+        # print(jsonify({"error": str(ve)}), 400)
+        print(f"Validation error: {ve}")
+        return jsonify({"error": str(ve)})
     
+    predicted_props = flask_generate_material(generate_mat_form, app.config['UPLOAD_FOLDER'])
+
     if not os.path.isdir(os.path.join(app.config['UPLOAD_FOLDER'], "props")):
         os.mkdir(os.path.join(app.config['UPLOAD_FOLDER'], "props"))   
     with open(os.path.join(app.config['UPLOAD_FOLDER'], "props", "params.json"), 'w+') as file:
