@@ -40,7 +40,7 @@ export default function DatasetGenerator() {
             "description": new Validation({
                 value: "",
                 error: false,
-                regex: /^[A-Za-z0-9 -]{1,150}$/,
+                regex: /^[A-Za-z0-9 -,.]{1,150}$/,
                 required: false,
                 helper: "Descriptions are limited to 150 characters."
             }),

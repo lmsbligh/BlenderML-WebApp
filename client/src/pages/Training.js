@@ -119,14 +119,14 @@ export default function Training() {
             var formValid = validateForm({ formElement: trainingForm })
             if (!formValid) {
                 const formToPush = {
-                    "model": trainingForm.model.value,
-                    "checkpoint": trainingForm.checkpoint.value,
-                    "datatset": trainingForm.dataset.value,
-                    "epochs": trainingForm.epochs.value,
-                    "learningRate": trainingForm.learningRate.value,
-                    "optimizer": trainingForm.optimizer.value,
-                    "lossFunction": trainingForm.lossFunction.value,
-                    "xVal": trainingForm.xVal.value  
+                    model: trainingForm.model.value,
+                    checkpoint: trainingForm.checkpoint.value,
+                    dataset: trainingForm.dataset.value,
+                    epochs: trainingForm.epochs.value,
+                    learningRate: trainingForm.learningRate.value,
+                    optimizer: trainingForm.optimizer.value,
+                    lossFunction: trainingForm.lossFunction.value,
+                    xVal: trainingForm.xVal.value  
                 }
                 pushData('submit_training', formToPush)
             }
