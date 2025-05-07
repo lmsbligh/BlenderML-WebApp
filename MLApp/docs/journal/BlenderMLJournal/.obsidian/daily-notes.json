@@ -1,6 +1,0 @@
-{
-  "folder": "Daily Entries",
-  "format": "YYYY/MMMM/DD-MM-YYYY-dddd",
-  "template": "Templates/Journal Entry",
-  "autorun": true
-}

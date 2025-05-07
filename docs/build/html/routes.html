@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>routes package &mdash; BlenderML WebApp  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="utils Modules" href="utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BlenderML WebApp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="flask-server.html">flask-server package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MLApp.html">MLApp package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="MLApp.html">MLApp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flask-server.html">flask-server package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">utils Modules</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">routes package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#module-api.routes.material_generation">material_generation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#routes-datasets-module">routes.datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#routes-material-generation-module">routes.material_generation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#routes-models-module">routes.models module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#routes-training-module">routes.training module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#routes-utils-module">routes.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-contents">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BlenderML WebApp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">routes package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/routes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="routes-package">
+<h1>routes package<a class="headerlink" href="#routes-package" title="Permalink to this heading">¶</a></h1>
+</section>
+<section id="module-api.routes.material_generation">
+<span id="material-generation"></span><h1>material_generation<a class="headerlink" href="#module-api.routes.material_generation" title="Permalink to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.material_generation.allowed_file">
+<span class="sig-prename descclassname"><span class="pre">api.routes.material_generation.</span></span><span class="sig-name descname"><span class="pre">allowed_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/material_generation.html#allowed_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.material_generation.allowed_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks file is an image file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="api.routes.material_generation.bp">
+<span class="sig-prename descclassname"><span class="pre">api.routes.material_generation.</span></span><span class="sig-name descname"><span class="pre">bp</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Blueprint</span> <span class="pre">'material_generation'&gt;</span></em><a class="headerlink" href="#api.routes.material_generation.bp" title="Permalink to this definition">¶</a></dt>
+<dd><p>This file contains all of the routes required for material generation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.material_generation.generate_material">
+<span class="sig-prename descclassname"><span class="pre">api.routes.material_generation.</span></span><span class="sig-name descname"><span class="pre">generate_material</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/material_generation.html#generate_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.material_generation.generate_material" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles material generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.material_generation.serve_image">
+<span class="sig-prename descclassname"><span class="pre">api.routes.material_generation.</span></span><span class="sig-name descname"><span class="pre">serve_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/material_generation.html#serve_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.material_generation.serve_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serves image files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.material_generation.serve_uploaded_file">
+<span class="sig-prename descclassname"><span class="pre">api.routes.material_generation.</span></span><span class="sig-name descname"><span class="pre">serve_uploaded_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/material_generation.html#serve_uploaded_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.material_generation.serve_uploaded_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serves uploaded files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.material_generation.upload_file">
+<span class="sig-prename descclassname"><span class="pre">api.routes.material_generation.</span></span><span class="sig-name descname"><span class="pre">upload_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/material_generation.html#upload_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.material_generation.upload_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles file upload.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="routes-datasets-module">
+<h2>routes.datasets module<a class="headerlink" href="#routes-datasets-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="routes-material-generation-module">
+<h2>routes.material_generation module<a class="headerlink" href="#routes-material-generation-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="routes-models-module">
+<h2>routes.models module<a class="headerlink" href="#routes-models-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="routes-training-module">
+<h2>routes.training module<a class="headerlink" href="#routes-training-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="routes-utils-module">
+<h2>routes.utils module<a class="headerlink" href="#routes-utils-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="utils.html" class="btn btn-neutral float-left" title="utils Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Liam Bligh.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>api.routes.material_generation &mdash; BlenderML WebApp  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BlenderML WebApp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../flask-server.html">flask-server package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MLApp.html">MLApp package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../MLApp.html">MLApp package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../flask-server.html">flask-server package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">utils Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../routes.html">routes package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../routes.html#module-api.routes.material_generation">material_generation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BlenderML WebApp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">api.routes.material_generation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for api.routes.material_generation</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Blueprint</span><span class="p">,</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">flash</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">send_from_directory</span><span class="p">,</span> <span class="n">url_for</span><span class="p">,</span> <span class="n">abort</span>
+<span class="kn">from</span> <span class="nn">..forms.material_generation_forms</span> <span class="kn">import</span> <span class="n">GENERATE_MATERIAL_FORM</span>
+<span class="kn">from</span> <span class="nn">werkzeug.utils</span> <span class="kn">import</span> <span class="n">secure_filename</span>
+<span class="kn">from</span> <span class="nn">MLApp.blender_scripts.blender_launcher</span> <span class="kn">import</span> <span class="n">launch_blender</span>
+<span class="kn">from</span> <span class="nn">MLApp.custom_torch.flask_generate_material</span> <span class="kn">import</span> <span class="n">flask_generate_material</span>
+<span class="kn">from</span> <span class="nn">MLApp.parameters</span> <span class="kn">import</span> <span class="n">render_data_script</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">validate_form</span>
+
+
+<span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;material_generation&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This file contains all of the routes required for material generation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="upload_file"><a class="viewcode-back" href="../../../routes.html#api.routes.material_generation.upload_file">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/upload_file&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">upload_file</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles file upload.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">UPLOAD_FOLDER</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;UPLOAD_FOLDER&#39;</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="s1">&#39;uploadFile&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;No file part&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+    
+    <span class="n">file</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;uploadFile&#39;</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">filename</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;No selected file&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">file</span> <span class="ow">and</span> <span class="n">allowed_file</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">secure_filename</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">UPLOAD_FOLDER</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">UPLOAD_FOLDER</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+        <span class="n">download_url</span> <span class="o">=</span> <span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;material_generation.serve_uploaded_file&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">_external</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">download_url</span><span class="p">,</span>
+                        <span class="s2">&quot;image_path&quot;</span><span class="p">:</span><span class="n">file_path</span><span class="p">}),</span> <span class="mi">200</span>
+    
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;File not allowed&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="generate_material"><a class="viewcode-back" href="../../../routes.html#api.routes.material_generation.generate_material">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/generate_material&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">generate_material</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles material generation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">UPLOAD_FOLDER</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;UPLOAD_FOLDER&#39;</span><span class="p">]</span>
+
+    <span class="n">generate_mat_form</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generate_mat_form: &quot;</span><span class="p">,</span> <span class="n">generate_mat_form</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">validate_form</span><span class="p">(</span><span class="n">generate_mat_form</span><span class="p">,</span> <span class="n">GENERATE_MATERIAL_FORM</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Validation passed&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">ve</span><span class="p">:</span>
+        <span class="c1"># print(jsonify({&quot;error&quot;: str(ve)}), 400)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation error: </span><span class="si">{</span><span class="n">ve</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ve</span><span class="p">)})</span>
+    
+    <span class="n">predicted_props</span> <span class="o">=</span> <span class="n">flask_generate_material</span><span class="p">(</span><span class="n">generate_mat_form</span><span class="p">,</span> <span class="n">UPLOAD_FOLDER</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">UPLOAD_FOLDER</span><span class="p">,</span> <span class="s2">&quot;props&quot;</span><span class="p">)):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">UPLOAD_FOLDER</span><span class="p">,</span> <span class="s2">&quot;props&quot;</span><span class="p">))</span>   
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">UPLOAD_FOLDER</span><span class="p">,</span> <span class="s2">&quot;props&quot;</span><span class="p">,</span> <span class="s2">&quot;params.json&quot;</span><span class="p">),</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">predicted_props</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;writing to params.json&quot;</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">UPLOAD_FOLDER</span><span class="p">,</span> <span class="s2">&quot;props&quot;</span><span class="p">,</span> <span class="s2">&quot;scene_props.json&quot;</span><span class="p">),</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">generate_mat_form</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;writing to scene_props.json&quot;</span><span class="p">)</span>
+        
+    <span class="n">sample_URLs</span> <span class="o">=</span> <span class="n">launch_blender</span><span class="p">(</span>
+                                    <span class="n">data</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">UPLOAD_FOLDER</span><span class="p">,</span><span class="s2">&quot;props&quot;</span><span class="p">),</span> 
+                                    <span class="n">script</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;MLApp&quot;</span><span class="p">,</span> <span class="n">render_data_script</span><span class="p">),</span>
+                                    <span class="n">render_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">UPLOAD_FOLDER</span><span class="p">)</span>
+                                <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generate materials returning: &quot;</span><span class="p">,</span> <span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;material_generation.serve_uploaded_file&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">predicted_props</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.jpg&quot;</span><span class="p">,</span> <span class="n">_external</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;predicted_props&quot;</span><span class="p">:</span> <span class="n">predicted_props</span><span class="p">,</span>
+                    <span class="s2">&quot;render_url&quot;</span><span class="p">:</span> <span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;material_generation.serve_uploaded_file&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">predicted_props</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.jpg&quot;</span><span class="p">,</span> <span class="n">_external</span><span class="o">=</span><span class="kc">True</span><span class="p">)})</span></div>
+    
+<div class="viewcode-block" id="serve_image"><a class="viewcode-back" href="../../../routes.html#api.routes.material_generation.serve_image">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&lt;path:filename&gt;&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">serve_image</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Serves image files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SAFE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;MLApp&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span> 
+    <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SAFE_DIR</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">full_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">SAFE_DIR</span><span class="p">):</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">full_path</span><span class="p">):</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="s2">&quot;../&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="allowed_file"><a class="viewcode-back" href="../../../routes.html#api.routes.material_generation.allowed_file">[docs]</a><span class="k">def</span> <span class="nf">allowed_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks file is an image file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ALLOWED_EXTENSIONS</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ALLOWED_EXTENSIONS&#39;</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">filename</span> <span class="ow">and</span> \
+           <span class="n">filename</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">ALLOWED_EXTENSIONS</span></div>
+           
+<div class="viewcode-block" id="serve_uploaded_file"><a class="viewcode-back" href="../../../routes.html#api.routes.material_generation.serve_uploaded_file">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/MLApp/data/user_uploaded_test/&lt;path:filename&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">serve_uploaded_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Serves uploaded files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SAFE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;MLApp&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;user_uploaded_test&#39;</span><span class="p">)</span> 
+    <span class="n">UPLOAD_FOLDER</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;UPLOAD_FOLDER&#39;</span><span class="p">]</span>
+    <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SAFE_DIR</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">full_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">SAFE_DIR</span><span class="p">):</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">403</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">full_path</span><span class="p">):</span>
+        <span class="n">abort</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="o">+</span><span class="n">UPLOAD_FOLDER</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Liam Bligh.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

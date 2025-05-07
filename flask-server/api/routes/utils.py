@@ -4,7 +4,16 @@ import re
 from ..forms.model_forms import LAYER_FORM
 
 def validate_form(data, required_fields):
-    
+    """
+    Validates a submitted form against a schema.
+
+    Args:
+        data (dict): The form data.
+        required_fields (dict): Schema to validate against.
+
+    Raises:
+        ValueError: If validation fails.
+    """
     for field, field_vals in required_fields.items():
         if field not in data:
             raise ValueError(f"Missing field: {field}")

@@ -1,6 +1,7 @@
 import json
 import os
-from flask import Blueprint, current_app, flash, jsonify, redirect, request, send_from_directory, url_for
+from flask import Blueprint, current_app, flash, jsonify, redirect, request, send_from_directory, url_for, abort
+from ..forms.material_generation_forms import GENERATE_MATERIAL_FORM
 from werkzeug.utils import secure_filename
 from MLApp.blender_scripts.blender_launcher import launch_blender
 from MLApp.custom_torch.flask_generate_material import flask_generate_material
@@ -9,8 +10,19 @@ from .utils import validate_form
 
 
 bp = Blueprint('material_generation', __name__)
+"""
+This file contains all of the routes required for material generation.
+"""
+
 @bp.route('/upload_file', methods=['POST'])
 def upload_file():
+    """
+    Handles file upload.
+
+    Args:
+        request.
+        
+    """
     UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
     
     if 'uploadFile' not in request.files:
@@ -30,7 +42,7 @@ def upload_file():
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         file.save(file_path)
 
-        download_url = url_for('serve_uploaded_file', filename=filename, _external=True)
+        download_url = url_for('material_generation.serve_uploaded_file', filename=filename, _external=True)
         return jsonify({"url": download_url,
                         "image_path":file_path}), 200
     
@@ -40,8 +52,14 @@ def upload_file():
 
 @bp.route('/generate_material', methods=['POST'])
 def generate_material():
+    """
+    Handles material generation.
+
+    Args:
+        request.
+        
+    """
     UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
-    GENERATE_MATERIAL_FORM = current_app.config['GENERATE_MATERIAL_FORM']
 
     generate_mat_form = json.loads(request.data.decode('utf-8'))
     print("generate_mat_form: ", generate_mat_form)
@@ -70,15 +88,36 @@ def generate_material():
                                     script=os.path.join("MLApp", render_data_script),
                                     render_dir=os.path.join(os.getcwd(), UPLOAD_FOLDER)
                                 )
-    print("generate materials returning: ", url_for('serve_uploaded_file', filename=f"{predicted_props['name']}.jpg", _external=True))
+    print("generate materials returning: ", url_for('material_generation.serve_uploaded_file', filename=f"{predicted_props['name']}.jpg", _external=True))
     return jsonify({"predicted_props": predicted_props,
-                    "render_url": url_for('serve_uploaded_file', filename=f"{predicted_props['name']}.jpg", _external=True)})
+                    "render_url": url_for('material_generation.serve_uploaded_file', filename=f"{predicted_props['name']}.jpg", _external=True)})
     
 @bp.route('/<path:filename>')
 def serve_image(filename):
+    """
+    Serves image files.
+
+    Args:
+        request.
+        
+    """
+    SAFE_DIR = os.path.join(os.getcwd(), 'MLApp', 'data') 
+    full_path = os.path.realpath(os.path.join(SAFE_DIR, filename))
+    if not full_path.startswith(SAFE_DIR):
+        abort(403)
+    if not os.path.isfile(full_path):
+        abort(404)
+    
     return send_from_directory("../", filename)
 
 def allowed_file(filename):
+    """
+    Checks file is an image file.
+
+    Args:
+        filename.
+        
+    """
     ALLOWED_EXTENSIONS = current_app.config['ALLOWED_EXTENSIONS']
     
     return '.' in filename and \
@@ -86,5 +125,18 @@ def allowed_file(filename):
            
 @bp.route('/MLApp/data/user_uploaded_test/<path:filename>', methods=['GET'])
 def serve_uploaded_file(filename):
+    """
+    Serves uploaded files.
+
+    Args:
+        filename.
+        
+    """
+    SAFE_DIR = os.path.join(os.getcwd(), 'MLApp', 'data', 'user_uploaded_test') 
     UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
+    full_path = os.path.realpath(os.path.join(SAFE_DIR, filename))
+    if not full_path.startswith(SAFE_DIR):
+        abort(403)
+    if not os.path.isfile(full_path):
+        abort(404)
     return send_from_directory('../'+UPLOAD_FOLDER, filename)
