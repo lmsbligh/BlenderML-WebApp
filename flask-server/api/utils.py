@@ -1,7 +1,7 @@
 import ast
 import os
 import re
-from ..forms.model_forms import LAYER_FORM
+from api.forms.model_forms import LAYER_FORM
 
 def validate_form(data, required_fields):
     """

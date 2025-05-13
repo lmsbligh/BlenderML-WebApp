@@ -6,6 +6,7 @@
   <title>Index &mdash; BlenderML WebApp  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
       <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -16,6 +17,11 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -44,14 +50,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="flask-server.html">flask-server package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MLApp.html">MLApp package</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="MLApp.html">MLApp package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="flask-server.html">flask-server package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">utils Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routes.html">routes package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routes.html#module-api.routes.material_generation">material_generation</a></li>
 </ul>
 
         </div>
@@ -82,9 +80,11 @@
 
 <div class="genindex-jumpbox">
  <a href="#A"><strong>A</strong></a>
- | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
@@ -93,31 +93,77 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="routes.html#api.routes.material_generation.allowed_file">allowed_file() (in module api.routes.material_generation)</a>
+      <li><a href="flask-server.html#config.Config.ALLOWED_EXTENSIONS">ALLOWED_EXTENSIONS (config.Config attribute)</a>
 </li>
+      <li><a href="flask-server.html#api.routes.material_generation.allowed_file">allowed_file() (in module api.routes.material_generation)</a>, <a href="routes.html#api.routes.material_generation.allowed_file">[1]</a>
+</li>
+      <li>
+    api.routes.datasets
+
+      <ul>
+        <li><a href="flask-server.html#module-api.routes.datasets">module</a>
+</li>
+      </ul></li>
       <li>
     api.routes.material_generation
 
       <ul>
-        <li><a href="routes.html#module-api.routes.material_generation">module</a>
+        <li><a href="flask-server.html#module-api.routes.material_generation">module</a>, <a href="routes.html#module-api.routes.material_generation">[1]</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    api.routes.utils
+    api.routes.models
 
       <ul>
-        <li><a href="utils.html#module-api.routes.utils">module</a>
+        <li><a href="flask-server.html#module-api.routes.models">module</a>
+</li>
+      </ul></li>
+      <li>
+    api.routes.training
+
+      <ul>
+        <li><a href="flask-server.html#module-api.routes.training">module</a>
+</li>
+      </ul></li>
+      <li>
+    api.utils
+
+      <ul>
+        <li><a href="flask-server.html#module-api.utils">module</a>
 </li>
       </ul></li>
   </ul></td>
 </tr></table>
 
-<h2 id="B">B</h2>
+<h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="routes.html#api.routes.material_generation.bp">bp (in module api.routes.material_generation)</a>
+      <li>
+    config
+
+      <ul>
+        <li><a href="flask-server.html#module-config">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flask-server.html#config.Config">Config (class in config)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flask-server.html#config.Config.DATABASE_PATH">DATABASE_PATH (config.Config attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flask-server.html#api.routes.datasets.delete_dataset_profile">delete_dataset_profile() (in module api.routes.datasets)</a>
+</li>
+      <li><a href="flask-server.html#api.routes.models.delete_model">delete_model() (in module api.routes.models)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -125,7 +171,21 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="routes.html#api.routes.material_generation.generate_material">generate_material() (in module api.routes.material_generation)</a>
+      <li><a href="flask-server.html#api.routes.material_generation.generate_material">generate_material() (in module api.routes.material_generation)</a>, <a href="routes.html#api.routes.material_generation.generate_material">[1]</a>
+</li>
+      <li><a href="flask-server.html#api.routes.models.get_activation_types">get_activation_types() (in module api.routes.models)</a>
+</li>
+      <li><a href="flask-server.html#api.routes.models.get_checkpoints">get_checkpoints() (in module api.routes.models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flask-server.html#api.routes.datasets.get_dataset_profiles">get_dataset_profiles() (in module api.routes.datasets)</a>
+</li>
+      <li><a href="flask-server.html#api.routes.datasets.get_datasets">get_datasets() (in module api.routes.datasets)</a>
+</li>
+      <li><a href="flask-server.html#api.routes.models.get_layer_types">get_layer_types() (in module api.routes.models)</a>
+</li>
+      <li><a href="flask-server.html#api.routes.models.get_models">get_models() (in module api.routes.models)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -133,6 +193,8 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flask-server.html#config.Config.MAX_CONTENT_LENGTH">MAX_CONTENT_LENGTH (config.Config attribute)</a>
+</li>
       <li>
     MLApp
 
@@ -147,15 +209,21 @@
         <li><a href="MLApp.html#module-MLApp.parameters">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
       <ul>
-        <li><a href="routes.html#module-api.routes.material_generation">api.routes.material_generation</a>
+        <li><a href="flask-server.html#module-api.routes.datasets">api.routes.datasets</a>
 </li>
-        <li><a href="utils.html#module-api.routes.utils">api.routes.utils</a>
+        <li><a href="flask-server.html#module-api.routes.material_generation">api.routes.material_generation</a>, <a href="routes.html#module-api.routes.material_generation">[1]</a>
+</li>
+        <li><a href="flask-server.html#module-api.routes.models">api.routes.models</a>
+</li>
+        <li><a href="flask-server.html#module-api.routes.training">api.routes.training</a>
+</li>
+        <li><a href="flask-server.html#module-api.utils">api.utils</a>
+</li>
+        <li><a href="flask-server.html#module-config">config</a>
 </li>
         <li><a href="MLApp.html#module-MLApp">MLApp</a>
 </li>
@@ -165,14 +233,30 @@
   </ul></td>
 </tr></table>
 
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flask-server.html#api.routes.datasets.return_sample">return_sample() (in module api.routes.datasets)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="routes.html#api.routes.material_generation.serve_image">serve_image() (in module api.routes.material_generation)</a>
+      <li><a href="flask-server.html#api.routes.material_generation.serve_image">serve_image() (in module api.routes.material_generation)</a>, <a href="routes.html#api.routes.material_generation.serve_image">[1]</a>
+</li>
+      <li><a href="flask-server.html#api.routes.material_generation.serve_uploaded_file">serve_uploaded_file() (in module api.routes.material_generation)</a>, <a href="routes.html#api.routes.material_generation.serve_uploaded_file">[1]</a>
+</li>
+      <li><a href="flask-server.html#api.routes.datasets.submit_dataset_profile">submit_dataset_profile() (in module api.routes.datasets)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="routes.html#api.routes.material_generation.serve_uploaded_file">serve_uploaded_file() (in module api.routes.material_generation)</a>
+      <li><a href="flask-server.html#api.routes.datasets.submit_generate_dataset">submit_generate_dataset() (in module api.routes.datasets)</a>
+</li>
+      <li><a href="flask-server.html#api.routes.models.submit_model">submit_model() (in module api.routes.models)</a>
+</li>
+      <li><a href="flask-server.html#api.routes.training.submit_training">submit_training() (in module api.routes.training)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -180,7 +264,11 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="routes.html#api.routes.material_generation.upload_file">upload_file() (in module api.routes.material_generation)</a>
+      <li><a href="flask-server.html#api.routes.material_generation.upload_file">upload_file() (in module api.routes.material_generation)</a>, <a href="routes.html#api.routes.material_generation.upload_file">[1]</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flask-server.html#config.Config.UPLOAD_FOLDER">UPLOAD_FOLDER (config.Config attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -188,7 +276,7 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="utils.html#api.routes.utils.validate_form">validate_form() (in module api.routes.utils)</a>
+      <li><a href="flask-server.html#api.utils.validate_form">validate_form() (in module api.utils)</a>
 </li>
   </ul></td>
 </tr></table>

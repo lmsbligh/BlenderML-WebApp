@@ -26,14 +26,3 @@ Welcome to BlenderML WebApp's documentation
 
 
 
-Toctree
-=======
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Modules:
-
-   MLApp
-   flask-server
-   utils
-   routes

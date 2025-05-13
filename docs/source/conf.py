@@ -24,6 +24,8 @@ import os
 import sys
 import sphinx_rtd_theme
 # Get the path to the root of your project (assuming conf.py is in the "docs" directory)
+sys.path.insert(0, os.path.abspath('..'))
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, os.path.abspath('../../flask-server'))
 sys.path.insert(0, os.path.abspath('../../MLApp'))
@@ -36,6 +38,7 @@ extensions = [
     'sphinx.ext.autodoc',        
     'sphinx.ext.napoleon',       
     'sphinx.ext.viewcode',
+    'sphinx_togglebutton',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

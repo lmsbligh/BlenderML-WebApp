@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>api.routes.datasets &mdash; BlenderML WebApp  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BlenderML WebApp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../flask-server.html">flask-server package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../MLApp.html">MLApp package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BlenderML WebApp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">api.routes.datasets</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for api.routes.datasets</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Blueprint</span><span class="p">,</span> <span class="n">current_app</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">send_from_directory</span>
+<span class="kn">from</span> <span class="nn">MLApp.parameters</span> <span class="kn">import</span> <span class="n">render_data_script</span>
+<span class="kn">from</span> <span class="nn">MLApp.blender_scripts.blender_launcher</span> <span class="kn">import</span> <span class="n">launch_blender</span>
+<span class="kn">from</span> <span class="nn">MLApp.data_generator.prop_generator</span> <span class="kn">import</span> <span class="n">gen_props_json</span>
+<span class="kn">from</span> <span class="nn">..forms.dataset_forms</span> <span class="kn">import</span> <span class="n">DATASET_PROFILE_FORM</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">validate_form</span>
+
+<span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;datasets&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_dataset_profiles"><a class="viewcode-back" href="../../../flask-server.html#api.routes.datasets.get_dataset_profiles">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/dataset_profiles&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_dataset_profiles</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetches available dataset profiles.</span>
+<span class="sd">    </span>
+<span class="sd">    Route: /dataset_profiles.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns: List of profile in JSON.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DATABASE_PATH</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;DATABASE_PATH&quot;</span><span class="p">]</span>
+    <span class="k">global</span> <span class="n">DATASET_PROFILES_LIST</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DATABASE_PATH</span><span class="p">)</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Row</span>  <span class="c1"># Allows row to be treated as a dictionary</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM profiles&quot;</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">row_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;meshes&#39;</span> <span class="ow">in</span> <span class="n">row_dict</span> <span class="ow">and</span> <span class="n">row_dict</span><span class="p">[</span><span class="s1">&#39;meshes&#39;</span><span class="p">]:</span>
+                <span class="n">row_dict</span><span class="p">[</span><span class="s1">&#39;meshes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">row_dict</span><span class="p">[</span><span class="s1">&#39;meshes&#39;</span><span class="p">])</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_dict</span><span class="p">)</span>
+        <span class="n">DATASET_PROFILES_LIST</span> <span class="o">=</span> <span class="n">data</span>
+        
+        <span class="k">return</span> <span class="n">data</span>
+    <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Database error:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the connection</span>
+        <span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="get_datasets"><a class="viewcode-back" href="../../../flask-server.html#api.routes.datasets.get_datasets">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/datasets&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_datasets</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetches all available datasets.</span>
+<span class="sd">    </span>
+<span class="sd">    Route: /datasets.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns: List of datasets in JSON.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DATABASE_PATH</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;DATABASE_PATH&quot;</span><span class="p">]</span>    
+    <span class="k">global</span> <span class="n">DATASET_LIST</span>
+
+    <span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DATABASE_PATH</span><span class="p">)</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Row</span>  <span class="c1"># Allows row to be treated as a dictionary</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM datasets&quot;</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">row_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;meshes&#39;</span> <span class="ow">in</span> <span class="n">row_dict</span> <span class="ow">and</span> <span class="n">row_dict</span><span class="p">[</span><span class="s1">&#39;meshes&#39;</span><span class="p">]:</span>
+                <span class="n">row_dict</span><span class="p">[</span><span class="s1">&#39;meshes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">row_dict</span><span class="p">[</span><span class="s1">&#39;meshes&#39;</span><span class="p">])</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_dict</span><span class="p">)</span>
+        <span class="n">DATASET_LIST</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">data</span>
+    <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Database error:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the connection</span>
+        <span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+                
+<div class="viewcode-block" id="submit_dataset_profile"><a class="viewcode-back" href="../../../flask-server.html#api.routes.datasets.submit_dataset_profile">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/submit_dataset_profile&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">submit_dataset_profile</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    POSTs dataset profile to server.</span>
+<span class="sd">    </span>
+<span class="sd">    Route: /submit_dataset_profile</span>
+<span class="sd">    </span>
+<span class="sd">    returns:</span>
+<span class="sd">        - 200 - Success</span>
+<span class="sd">        - 400 - Error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DATABASE_PATH</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;DATABASE_PATH&quot;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;POST req received, dataset profile submission&quot;</span><span class="p">)</span>
+    
+    <span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DATABASE_PATH</span><span class="p">)</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    
+    <span class="n">profile_to_save</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;profile_to_save: &quot;</span><span class="p">,</span> <span class="n">profile_to_save</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">validate_form</span><span class="p">(</span><span class="n">profile_to_save</span><span class="p">,</span> <span class="n">DATASET_PROFILE_FORM</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">ve</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ve</span><span class="p">)}),</span> <span class="mi">400</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ve</span><span class="p">)}),</span> <span class="mi">400</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;value&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">profile_to_save</span><span class="p">):</span>
+        <span class="n">profile_to_save</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())[:</span><span class="mi">8</span><span class="p">]</span>
+    <span class="n">ind</span><span class="p">,</span> <span class="n">profile</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+        <span class="p">((</span><span class="n">ind</span><span class="p">,</span> <span class="n">prof</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">prof</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">DATASET_PROFILES_LIST</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">profile_to_save</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">prof</span><span class="p">[</span><span class="s2">&quot;datasetName&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">profile_to_save</span><span class="p">[</span><span class="s2">&quot;datasetName&quot;</span><span class="p">]</span> <span class="p">)),</span>
+        <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ind</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">DATASET_PROFILES_LIST</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">==</span> <span class="n">profile_to_save</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">DATASET_PROFILES_LIST</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">profile_to_save</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;INSERT INTO profiles (value, datasetName, datasetSize, description, imageHeight, imageWidth, meshes, randomOrientation, skyboxPath) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(value) DO UPDATE SET datasetName = excluded.datasetName, datasetSize = excluded.datasetSize, description = excluded.description, imageHeight = excluded.imageHeight, imageWidth = excluded.imageWidth, meshes = excluded.meshes, randomOrientation = excluded.randomOrientation, skyboxPath = excluded.skyboxPath;&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">profile_to_save</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="n">profile_to_save</span><span class="p">[</span><span class="s1">&#39;datasetName&#39;</span><span class="p">],</span> <span class="n">profile_to_save</span><span class="p">[</span><span class="s1">&#39;datasetSize&#39;</span><span class="p">],</span> <span class="n">profile_to_save</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span> <span class="n">profile_to_save</span><span class="p">[</span><span class="s1">&#39;imageHeight&#39;</span><span class="p">],</span> <span class="n">profile_to_save</span><span class="p">[</span><span class="s1">&#39;imageWidth&#39;</span><span class="p">],</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">profile_to_save</span><span class="p">[</span><span class="s1">&#39;meshes&#39;</span><span class="p">]),</span> <span class="n">profile_to_save</span><span class="p">[</span><span class="s1">&#39;randomOrientation&#39;</span><span class="p">],</span> <span class="n">profile_to_save</span><span class="p">[</span><span class="s1">&#39;skyboxPath&#39;</span><span class="p">]))</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">profile_to_save</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="s2">&quot;success!&quot;</span><span class="p">}),</span> <span class="mi">200</span><span class="p">)</span>  
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">profile_to_save</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="s2">&quot;success!&quot;</span><span class="p">}),</span> <span class="mi">200</span></div>
+
+<div class="viewcode-block" id="delete_dataset_profile"><a class="viewcode-back" href="../../../flask-server.html#api.routes.datasets.delete_dataset_profile">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/delete_dataset_profile&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">delete_dataset_profile</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    POSTs profile JSON for deletion to server.</span>
+<span class="sd">    </span>
+<span class="sd">    Route: /delete_dataset_profile</span>
+<span class="sd">    </span>
+<span class="sd">    returns:</span>
+<span class="sd">        - 200 - Success</span>
+<span class="sd">        - 400 - Error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DATABASE_PATH</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;DATABASE_PATH&quot;</span><span class="p">]</span>
+    <span class="n">profile_to_del</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+    <span class="n">ind</span><span class="p">,</span> <span class="n">profile</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+        <span class="p">((</span><span class="n">ind</span><span class="p">,</span> <span class="n">prof</span><span class="p">)</span> <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">prof</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">DATASET_PROFILES_LIST</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="p">(</span><span class="n">prof</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">profile_to_del</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])),</span>
+        <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ind</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DATABASE_PATH</span><span class="p">)</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;DELETE FROM profiles WHERE value = ?&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">profile_to_del</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">],))</span>
+        <span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">DATASET_PROFILES_LIST</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;no deletion necessary&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="s2">&quot;success, but no model existed with this value&quot;</span><span class="p">}),</span> <span class="mi">200</span>
+
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="s2">&quot;Profile deleted successfully!&quot;</span><span class="p">}),</span> <span class="mi">200</span></div>
+
+<div class="viewcode-block" id="submit_generate_dataset"><a class="viewcode-back" href="../../../flask-server.html#api.routes.datasets.submit_generate_dataset">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/submit_generate_dataset&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">submit_generate_dataset</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    POSTs dataset profile JSON form to server to initiate the generation of a dataset as well as saving the submitted profile.</span>
+<span class="sd">    </span>
+<span class="sd">    Route: /submit_generate_dataset</span>
+<span class="sd">    </span>
+<span class="sd">    returns:</span>
+<span class="sd">        - 200 - Success</span>
+<span class="sd">        - 400 - Error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DATABASE_PATH</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;DATABASE_PATH&quot;</span><span class="p">]</span>    
+    <span class="n">generate_profile</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+    <span class="n">time_stamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">-%m-%Y-%H%M-%S&#39;</span><span class="p">)</span>
+    <span class="n">dataset_value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">time_stamp</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">prof_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;MLApp&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;training_datasets&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]),</span> <span class="n">time_stamp</span><span class="p">)</span>
+    <span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;renderDir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prof_dir</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;datasetSize&#39;</span><span class="p">]</span>
+        
+    <span class="n">gen_props_json</span><span class="p">(</span><span class="n">prof_dir</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prof_dir</span><span class="p">,</span> <span class="s2">&quot;props&quot;</span><span class="p">,</span> <span class="s2">&quot;scene_props.json&quot;</span><span class="p">),</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>    
+        <span class="c1"># try:</span>
+        <span class="c1">#     file_data = json.load(file) if file_exists and file.read().strip() else []</span>
+        <span class="c1"># except json.JSONDecodeError:</span>
+        <span class="c1">#     file_data = []  # If there&#39;s an error, just use an empty dictionary</span>
+        
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">generate_profile</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+    <span class="n">sample_URLs</span> <span class="o">=</span> <span class="n">launch_blender</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prof_dir</span><span class="p">,</span> <span class="s2">&quot;props&quot;</span><span class="p">),</span> <span class="n">script</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;MLApp&quot;</span><span class="p">,</span> <span class="n">render_data_script</span><span class="p">),</span> <span class="n">scene_props</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prof_dir</span><span class="p">,</span> <span class="s2">&quot;props&quot;</span><span class="p">,</span><span class="s2">&quot;scene_props.json&quot;</span><span class="p">))</span>
+    
+    <span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">DATABASE_PATH</span><span class="p">)</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="c1">#cur.execute(&quot;DROP TABLE datasets&quot;)</span>
+    <span class="c1">#cur.execute(&quot;CREATE TABLE datasets (value TEXT UNIQUE, datasetName TEXT, datasetSize INTEGER, description TEXT, imageHeight INTEGER, imageWidth INTEGER, meshes TEXT, randomOrientation TEXT, skyboxPath TEXT)&quot;)</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;INSERT INTO datasets (value, datasetName, datasetSize, description, imageHeight, imageWidth, meshes, randomOrientation, skyboxPath) &quot;</span>
+           <span class="s2">&quot;VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) &quot;</span>
+           <span class="s2">&quot;ON CONFLICT(value) DO UPDATE SET &quot;</span> 
+           <span class="s2">&quot;datasetName = excluded.datasetName, &quot;</span>
+           <span class="s2">&quot;datasetSize = excluded.datasetSize, &quot;</span>
+           <span class="s2">&quot;description = excluded.description, &quot;</span>
+           <span class="s2">&quot;imageHeight = excluded.imageHeight, &quot;</span>
+           <span class="s2">&quot;imageWidth = excluded.imageWidth, &quot;</span>
+           <span class="s2">&quot;meshes = excluded.meshes, &quot;</span> 
+           <span class="s2">&quot;randomOrientation = excluded.randomOrientation, &quot;</span>
+           <span class="s2">&quot;skyboxPath = excluded.skyboxPath;&quot;</span><span class="p">)</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="p">(</span><span class="n">dataset_value</span><span class="p">,</span> 
+                      <span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;datasetName&#39;</span><span class="p">],</span> 
+                      <span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;datasetSize&#39;</span><span class="p">],</span> 
+                      <span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span> 
+                      <span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;imageHeight&#39;</span><span class="p">],</span> 
+                      <span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;imageWidth&#39;</span><span class="p">],</span> 
+                      <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;meshes&#39;</span><span class="p">]),</span> 
+                      <span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;randomOrientation&#39;</span><span class="p">],</span> 
+                      <span class="n">generate_profile</span><span class="p">[</span><span class="s1">&#39;skyboxPath&#39;</span><span class="p">]))</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;sample_URLs&quot;</span><span class="p">:</span> <span class="n">sample_URLs</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="s2">&quot;success!&quot;</span><span class="p">}),</span> <span class="mi">200</span></div>
+
+<div class="viewcode-block" id="return_sample"><a class="viewcode-back" href="../../../flask-server.html#api.routes.datasets.return_sample">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/MLApp/data/training_datasets/&lt;string:profile_id&gt;/&lt;path:dataset_render_date&gt;/&lt;path:dataset_filename&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">return_sample</span><span class="p">(</span><span class="n">profile_id</span><span class="p">,</span> <span class="n">dataset_render_date</span><span class="p">,</span> <span class="n">dataset_filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Requests a sample of images from a generated datset.</span>
+<span class="sd">    </span>
+<span class="sd">    Route: /MLApp/data/training_datasets/&lt;string:profile_id&gt;/&lt;path:dataset_render_date&gt;/&lt;path:dataset_filename&gt;</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        - profile_id</span>
+<span class="sd">        - dataset_render_date</span>
+<span class="sd">        - dataset_filename</span>
+<span class="sd">    returns:</span>
+<span class="sd">        - 200 - Success</span>
+<span class="sd">        - 400 - Error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;../MLApp/data/training_datasets/</span><span class="si">{</span><span class="n">profile_id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">dataset_render_date</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">,</span> <span class="n">dataset_filename</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Liam Bligh.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

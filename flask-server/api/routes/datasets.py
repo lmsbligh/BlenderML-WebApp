@@ -8,13 +8,20 @@ from MLApp.parameters import render_data_script
 from MLApp.blender_scripts.blender_launcher import launch_blender
 from MLApp.data_generator.prop_generator import gen_props_json
 from ..forms.dataset_forms import DATASET_PROFILE_FORM
-from .utils import validate_form
+from ..utils import validate_form
 
 bp = Blueprint('datasets', __name__)
 
 
 @bp.route("/dataset_profiles")
 def get_dataset_profiles():
+    """
+    Fetches available dataset profiles.
+    
+    Route: /dataset_profiles.
+    
+    Returns: List of profile in JSON.
+    """
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
     global DATASET_PROFILES_LIST
     con = sqlite3.connect(DATABASE_PATH)
@@ -42,6 +49,13 @@ def get_dataset_profiles():
         
 @bp.route('/datasets')
 def get_datasets():
+    """
+    Fetches all available datasets.
+    
+    Route: /datasets.
+    
+    Returns: List of datasets in JSON.
+    """
     DATABASE_PATH = current_app.config["DATABASE_PATH"]    
     global DATASET_LIST
 
@@ -69,6 +83,15 @@ def get_datasets():
                 
 @bp.route('/submit_dataset_profile', methods=["POST"])
 def submit_dataset_profile():
+    """
+    POSTs dataset profile to server.
+    
+    Route: /submit_dataset_profile
+    
+    returns:
+        - 200 - Success
+        - 400 - Error
+    """
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
     print("POST req received, dataset profile submission")
     
@@ -100,6 +123,15 @@ def submit_dataset_profile():
 
 @bp.route('/delete_dataset_profile', methods=["POST"])
 def delete_dataset_profile():
+    """
+    POSTs profile JSON for deletion to server.
+    
+    Route: /delete_dataset_profile
+    
+    returns:
+        - 200 - Success
+        - 400 - Error
+    """
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
     profile_to_del = json.loads(request.data.decode('utf-8'))
     ind, profile = next(
@@ -121,6 +153,15 @@ def delete_dataset_profile():
 
 @bp.route('/submit_generate_dataset', methods=["POST"])
 def submit_generate_dataset():
+    """
+    POSTs dataset profile JSON form to server to initiate the generation of a dataset as well as saving the submitted profile.
+    
+    Route: /submit_generate_dataset
+    
+    returns:
+        - 200 - Success
+        - 400 - Error
+    """
     DATABASE_PATH = current_app.config["DATABASE_PATH"]    
     generate_profile = json.loads(request.data.decode('utf-8'))
     time_stamp = time.strftime('%d-%m-%Y-%H%M-%S')
@@ -170,4 +211,17 @@ def submit_generate_dataset():
 
 @bp.route('/MLApp/data/training_datasets/<string:profile_id>/<path:dataset_render_date>/<path:dataset_filename>', methods=['GET'])
 def return_sample(profile_id, dataset_render_date, dataset_filename):
+    """
+    Requests a sample of images from a generated datset.
+    
+    Route: /MLApp/data/training_datasets/<string:profile_id>/<path:dataset_render_date>/<path:dataset_filename>
+    
+    Args:
+        - profile_id
+        - dataset_render_date
+        - dataset_filename
+    returns:
+        - 200 - Success
+        - 400 - Error
+    """
     return send_from_directory(f"../MLApp/data/training_datasets/{profile_id}/{dataset_render_date}/", dataset_filename)

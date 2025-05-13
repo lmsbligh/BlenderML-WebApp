@@ -31,13 +31,13 @@ TRAINING_FORM = {
         },
         "optimizer": {
             "data_type": str,
-            "regex": "",
+            "regex": r"^[A-Za-z0-9 -]{1,30}$",
             "required": True,
             "helper": "Please select an optimizer"
         },
         "lossFunction": {
             "data_type": str,
-            "regex": "",
+            "regex": r"^[A-Za-z0-9 -]{1,30}$",
             "required": True,
             "helper": "Please select a loss function"
 

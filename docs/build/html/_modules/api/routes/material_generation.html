@@ -6,6 +6,7 @@
   <title>api.routes.material_generation &mdash; BlenderML WebApp  documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/togglebutton.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -16,6 +17,11 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -44,14 +50,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../flask-server.html">flask-server package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../MLApp.html">MLApp package</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../MLApp.html">MLApp package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../flask-server.html">flask-server package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">utils Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../routes.html">routes package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../routes.html#module-api.routes.material_generation">material_generation</a></li>
 </ul>
 
         </div>
@@ -87,21 +85,21 @@
 <span class="kn">from</span> <span class="nn">MLApp.blender_scripts.blender_launcher</span> <span class="kn">import</span> <span class="n">launch_blender</span>
 <span class="kn">from</span> <span class="nn">MLApp.custom_torch.flask_generate_material</span> <span class="kn">import</span> <span class="n">flask_generate_material</span>
 <span class="kn">from</span> <span class="nn">MLApp.parameters</span> <span class="kn">import</span> <span class="n">render_data_script</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">validate_form</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">validate_form</span>
 
 
 <span class="n">bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;material_generation&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This file contains all of the routes required for material generation.</span>
-<span class="sd">&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="upload_file"><a class="viewcode-back" href="../../../routes.html#api.routes.material_generation.upload_file">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/upload_file&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">upload_file</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Handles file upload.</span>
+<span class="sd">    POST request that handles file upload.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        request.</span>
+<span class="sd">    Route: /upload_file</span>
+<span class="sd">    </span>
+<span class="sd">    Args: request.files</span>
+<span class="sd">    </span>
+<span class="sd">    Returns: JSON containing download_url and file_path.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">UPLOAD_FOLDER</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;UPLOAD_FOLDER&#39;</span><span class="p">]</span>
@@ -134,11 +132,13 @@
 <div class="viewcode-block" id="generate_material"><a class="viewcode-back" href="../../../routes.html#api.routes.material_generation.generate_material">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/generate_material&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">generate_material</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Handles material generation.</span>
+<span class="sd">    POST request containing the material generation form, instructing the server to predict and render material properties from the image provided.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        request.</span>
-<span class="sd">        </span>
+<span class="sd">    Route: /generate_material</span>
+<span class="sd">    </span>
+<span class="sd">    Args: request/form</span>
+<span class="sd">    </span>
+<span class="sd">    Returns: JSON containing predicted_props of the material as well as the render_url.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">UPLOAD_FOLDER</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;UPLOAD_FOLDER&#39;</span><span class="p">]</span>
 
@@ -176,10 +176,11 @@
 <div class="viewcode-block" id="serve_image"><a class="viewcode-back" href="../../../routes.html#api.routes.material_generation.serve_image">[docs]</a><span class="nd">@bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&lt;path:filename&gt;&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">serve_image</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Serves image files.</span>
+<span class="sd">    Serves requested image file.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        request.</span>
+<span class="sd">    Args: filename.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns: send_from_directory(&quot;../&quot;, filename)</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">SAFE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;MLApp&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span> 
@@ -193,10 +194,11 @@
 
 <div class="viewcode-block" id="allowed_file"><a class="viewcode-back" href="../../../routes.html#api.routes.material_generation.allowed_file">[docs]</a><span class="k">def</span> <span class="nf">allowed_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Checks file is an image file.</span>
+<span class="sd">    Checks that file extension is a valid image file extension.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        filename.</span>
+<span class="sd">    Args: filename.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns: bool</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ALLOWED_EXTENSIONS</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;ALLOWED_EXTENSIONS&#39;</span><span class="p">]</span>
@@ -209,9 +211,9 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Serves uploaded files.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        filename.</span>
-<span class="sd">        </span>
+<span class="sd">    Args: filename.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns: send_from_directory(&#39;../&#39;+UPLOAD_FOLDER, filename)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">SAFE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;MLApp&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;user_uploaded_test&#39;</span><span class="p">)</span> 
     <span class="n">UPLOAD_FOLDER</span> <span class="o">=</span> <span class="n">current_app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;UPLOAD_FOLDER&#39;</span><span class="p">]</span>

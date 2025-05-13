@@ -7,6 +7,7 @@
   <title>flask-server package &mdash; BlenderML WebApp  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
       <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -17,6 +18,11 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -46,25 +52,25 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">flask-server package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#flask-server-server">flask-server.server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-contents">Module contents</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#flask-server-config">flask-server.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#routes">Routes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#models">Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#datasets">Datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-api.routes.training">Training</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-api.routes.material_generation">Material Generation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#forms-criteria-validation-dictionaries">Forms Criteria/Validation Dictionaries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Training</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset-profiles">Dataset Profiles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Material Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#model-submission">Model Submission</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-api.utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-config">Configuration</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="MLApp.html">MLApp package</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="MLApp.html">MLApp package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">flask-server package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#flask-server-server">flask-server.server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-contents">Module contents</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#flask-server-config">flask-server.config</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">utils Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routes.html">routes package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routes.html#module-api.routes.material_generation">material_generation</a></li>
 </ul>
 
         </div>
@@ -93,14 +99,583 @@
              
   <section id="flask-server-package">
 <h1>flask-server package<a class="headerlink" href="#flask-server-package" title="Permalink to this heading">¶</a></h1>
-<section id="flask-server-server">
-<h2>flask-server.server<a class="headerlink" href="#flask-server-server" title="Permalink to this heading">¶</a></h2>
+<p>This is the documentation for the Flask server. Each route is saved in its own file and ran as a Flask Blueprint.
+The configuration for the server is stored in conf.py.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#routes" id="id3">Routes</a></p>
+<ul>
+<li><p><a class="reference internal" href="#models" id="id4">Models</a></p></li>
+<li><p><a class="reference internal" href="#datasets" id="id5">Datasets</a></p></li>
+<li><p><a class="reference internal" href="#module-api.routes.training" id="id6">Training</a></p></li>
+<li><p><a class="reference internal" href="#module-api.routes.material_generation" id="id7">Material Generation</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#forms-criteria-validation-dictionaries" id="id8">Forms Criteria/Validation Dictionaries</a></p>
+<ul>
+<li><p><a class="reference internal" href="#id1" id="id9">Training</a></p></li>
+<li><p><a class="reference internal" href="#dataset-profiles" id="id10">Dataset Profiles</a></p></li>
+<li><p><a class="reference internal" href="#id2" id="id11">Material Generation</a></p></li>
+<li><p><a class="reference internal" href="#model-submission" id="id12">Model Submission</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#module-api.utils" id="id13">Utils</a></p></li>
+<li><p><a class="reference internal" href="#module-config" id="id14">Configuration</a></p></li>
+</ul>
+</nav>
+<section id="routes">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Routes</a><a class="headerlink" href="#routes" title="Permalink to this heading">¶</a></h2>
+<section id="models">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Models</a><a class="headerlink" href="#models" title="Permalink to this heading">¶</a></h3>
+<p>The endpoints in <cite>models</cite> allow users to create, retrieve, update, and delete neural network models. These include routes for managing model architecture,
+and retrieving activation types, layer types, as well as checkpoint listings for existing models.</p>
+<span class="target" id="module-api.routes.models"></span><dl class="py function">
+<dt class="sig sig-object py" id="api.routes.models.delete_model">
+<span class="sig-prename descclassname"><span class="pre">api.routes.models.</span></span><span class="sig-name descname"><span class="pre">delete_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/models.html#delete_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.models.delete_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>POSTs model JSON for deletion to server.</p>
+<p>Route: /delete_model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>200 - Success</p></li>
+<li><p>400 - Error</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.models.get_activation_types">
+<span class="sig-prename descclassname"><span class="pre">api.routes.models.</span></span><span class="sig-name descname"><span class="pre">get_activation_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/models.html#get_activation_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.models.get_activation_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches activation types.</p>
+<p>Route: /activation_types.</p>
+<p>Returns: List of activation type JSONs.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.models.get_checkpoints">
+<span class="sig-prename descclassname"><span class="pre">api.routes.models.</span></span><span class="sig-name descname"><span class="pre">get_checkpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/models.html#get_checkpoints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.models.get_checkpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches available checkpoints for a given model.</p>
+<p>Route: /model_id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>model_id.</strong> – </p>
+</dd>
+</dl>
+<p>Returns: List of checkpoints.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.models.get_layer_types">
+<span class="sig-prename descclassname"><span class="pre">api.routes.models.</span></span><span class="sig-name descname"><span class="pre">get_layer_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/models.html#get_layer_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.models.get_layer_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches layer_types.</p>
+<p>Route: /layer_types.</p>
+<p>Returns: List of layer type JSONs.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.models.get_models">
+<span class="sig-prename descclassname"><span class="pre">api.routes.models.</span></span><span class="sig-name descname"><span class="pre">get_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/models.html#get_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.models.get_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches available models.</p>
+<p>Route: /models.</p>
+<p>Returns: List model in JSONs.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.models.submit_model">
+<span class="sig-prename descclassname"><span class="pre">api.routes.models.</span></span><span class="sig-name descname"><span class="pre">submit_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/models.html#submit_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.models.submit_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>POSTs model to server.</p>
+<p>Route: /submit_model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>200 - Success</p></li>
+<li><p>400 - Error</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">¶</a></h2>
+<section id="datasets">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this heading">¶</a></h3>
+<p>The endpoints in <cite>datasets</cite> allow users to create, retrieve, update and delete dataset profiles, as well as retrieving a subset of images from the dataset.</p>
+<span class="target" id="module-api.routes.datasets"></span><dl class="py function">
+<dt class="sig sig-object py" id="api.routes.datasets.delete_dataset_profile">
+<span class="sig-prename descclassname"><span class="pre">api.routes.datasets.</span></span><span class="sig-name descname"><span class="pre">delete_dataset_profile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/datasets.html#delete_dataset_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.datasets.delete_dataset_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>POSTs profile JSON for deletion to server.</p>
+<p>Route: /delete_dataset_profile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>200 - Success</p></li>
+<li><p>400 - Error</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.datasets.get_dataset_profiles">
+<span class="sig-prename descclassname"><span class="pre">api.routes.datasets.</span></span><span class="sig-name descname"><span class="pre">get_dataset_profiles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/datasets.html#get_dataset_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.datasets.get_dataset_profiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches available dataset profiles.</p>
+<p>Route: /dataset_profiles.</p>
+<p>Returns: List of profile in JSON.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.datasets.get_datasets">
+<span class="sig-prename descclassname"><span class="pre">api.routes.datasets.</span></span><span class="sig-name descname"><span class="pre">get_datasets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/datasets.html#get_datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.datasets.get_datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches all available datasets.</p>
+<p>Route: /datasets.</p>
+<p>Returns: List of datasets in JSON.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.datasets.return_sample">
+<span class="sig-prename descclassname"><span class="pre">api.routes.datasets.</span></span><span class="sig-name descname"><span class="pre">return_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_render_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/datasets.html#return_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.datasets.return_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Requests a sample of images from a generated datset.</p>
+<p>Route: /MLApp/data/training_datasets/&lt;string:profile_id&gt;/&lt;path:dataset_render_date&gt;/&lt;path:dataset_filename&gt;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>profile_id</strong> (<em>-</em>) – </p></li>
+<li><p><strong>dataset_render_date</strong> (<em>-</em>) – </p></li>
+<li><p><strong>dataset_filename</strong> (<em>-</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>200 - Success</p></li>
+<li><p>400 - Error</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.datasets.submit_dataset_profile">
+<span class="sig-prename descclassname"><span class="pre">api.routes.datasets.</span></span><span class="sig-name descname"><span class="pre">submit_dataset_profile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/datasets.html#submit_dataset_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.datasets.submit_dataset_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>POSTs dataset profile to server.</p>
+<p>Route: /submit_dataset_profile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>200 - Success</p></li>
+<li><p>400 - Error</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.datasets.submit_generate_dataset">
+<span class="sig-prename descclassname"><span class="pre">api.routes.datasets.</span></span><span class="sig-name descname"><span class="pre">submit_generate_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/datasets.html#submit_generate_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.datasets.submit_generate_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>POSTs dataset profile JSON form to server to initiate the generation of a dataset as well as saving the submitted profile.</p>
+<p>Route: /submit_generate_dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>200 - Success</p></li>
+<li><p>400 - Error</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="flask-server-config">
-<h2>flask-server.config<a class="headerlink" href="#flask-server-config" title="Permalink to this heading">¶</a></h2>
+<section id="module-api.routes.training">
+<span id="training"></span><h3><a class="toc-backref" href="#id6" role="doc-backlink">Training</a><a class="headerlink" href="#module-api.routes.training" title="Permalink to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.training.submit_training">
+<span class="sig-prename descclassname"><span class="pre">api.routes.training.</span></span><span class="sig-name descname"><span class="pre">submit_training</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/training.html#submit_training"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.training.submit_training" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits training form to the server.</p>
+<p>Route: /submit_training</p>
+<p>Args: request/JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>200 - Success</p></li>
+<li><p>400 - Error</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-api.routes.material_generation">
+<span id="material-generation"></span><h3><a class="toc-backref" href="#id7" role="doc-backlink">Material Generation</a><a class="headerlink" href="#module-api.routes.material_generation" title="Permalink to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.material_generation.allowed_file">
+<span class="sig-prename descclassname"><span class="pre">api.routes.material_generation.</span></span><span class="sig-name descname"><span class="pre">allowed_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/material_generation.html#allowed_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.material_generation.allowed_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that file extension is a valid image file extension.</p>
+<p>Args: filename.</p>
+<p>Returns: bool</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.material_generation.generate_material">
+<span class="sig-prename descclassname"><span class="pre">api.routes.material_generation.</span></span><span class="sig-name descname"><span class="pre">generate_material</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/material_generation.html#generate_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.material_generation.generate_material" title="Permalink to this definition">¶</a></dt>
+<dd><p>POST request containing the material generation form, instructing the server to predict and render material properties from the image provided.</p>
+<p>Route: /generate_material</p>
+<p>Args: request/form</p>
+<p>Returns: JSON containing predicted_props of the material as well as the render_url.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.material_generation.serve_image">
+<span class="sig-prename descclassname"><span class="pre">api.routes.material_generation.</span></span><span class="sig-name descname"><span class="pre">serve_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/material_generation.html#serve_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.material_generation.serve_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serves requested image file.</p>
+<p>Args: filename.</p>
+<p>Returns: send_from_directory(“../”, filename)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.material_generation.serve_uploaded_file">
+<span class="sig-prename descclassname"><span class="pre">api.routes.material_generation.</span></span><span class="sig-name descname"><span class="pre">serve_uploaded_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/material_generation.html#serve_uploaded_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.material_generation.serve_uploaded_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serves uploaded files.</p>
+<p>Args: filename.</p>
+<p>Returns: send_from_directory(‘../’+UPLOAD_FOLDER, filename)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="api.routes.material_generation.upload_file">
+<span class="sig-prename descclassname"><span class="pre">api.routes.material_generation.</span></span><span class="sig-name descname"><span class="pre">upload_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/routes/material_generation.html#upload_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.routes.material_generation.upload_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>POST request that handles file upload.</p>
+<p>Route: /upload_file</p>
+<p>Args: request.files</p>
+<p>Returns: JSON containing download_url and file_path.</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="forms-criteria-validation-dictionaries">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Forms Criteria/Validation Dictionaries</a><a class="headerlink" href="#forms-criteria-validation-dictionaries" title="Permalink to this heading">¶</a></h2>
+<p>The following dictionaries contain the validiation/criteria for their respective forms.</p>
+<section id="id1">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Training</a><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>Required fields:</dt><dd><ul class="simple">
+<li><p>model: Alphanumeric string of up to 8 characters.</p></li>
+<li><p>checkpoint: Alphanumeric string, maximum length of 30 characters. Can also include - and . characters.</p></li>
+<li><p>dataset: Alphanumeric string, maximum of 30 characters. Can also include -</p></li>
+<li><p>epochs: Positive integer less than 1000.</p></li>
+<li><p>learningRate: Float of up to 4 decimal places between 0.1 and 0.0001.</p></li>
+<li><p>optimizer: Alphanumeric string of up to 30 characters. Can also include -</p></li>
+<li><p>lossFunction: Alphanumeric string of up to 30 characters. Can also include -</p></li>
+<li><p>xVal: Integer between 1 and 99.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="toggle docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">TRAINING_FORM</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -]{1,15}$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please select a model.&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;checkpoint&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -.]{1,30}$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please select a checkpoint.&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -]{1,30}$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please select a dataset.&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;epochs&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^(?:[1-9]\d{0,2}|1000)$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please enter an integer between 1 and 1000.&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;learningRate&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^0.(?:1|(?:0[1-9]|10)|(?:00[1-9]|0[1-9]\d|100)|(?:000[1-9]|00[1-9]\d|0[1-9]\d</span><span class="si">{2}</span><span class="s2">|1000))$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please enter a number between 0.1 and 0.0001, with up to 4 decimal places.&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -]{1,30}$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please select an optimizer&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;lossFunction&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -]{1,30}$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please select a loss function&quot;</span>
+
+        <span class="p">},</span>
+        <span class="s2">&quot;xVal&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^(?:[0-9]\d?|99)$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please enter an integer between 1 and 99&quot;</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>—</p>
+</section>
+<section id="dataset-profiles">
+<h3><a class="toc-backref" href="#id10" role="doc-backlink">Dataset Profiles</a><a class="headerlink" href="#dataset-profiles" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>Required fields:</dt><dd><ul class="simple">
+<li><p>value: Eight character alphanumeric string.</p></li>
+<li><p>datasetName: Alphanumeric string of up to 15 characters. Can also include -</p></li>
+<li><p>datasetSize: Integer between 1 and 5000</p></li>
+<li><p>imageHeight: Integer between 1 and 1000</p></li>
+<li><p>imageWidth: Integer between 1 and 1000</p></li>
+</ul>
+</dd>
+<dt>Optional fields:</dt><dd><ul class="simple">
+<li><p>description: Alphanumeric string of up to 150 characters. Can also include -,.</p></li>
+<li><p>meshes: Dictionary.</p></li>
+<li><p>randomOrientation: Boolean.</p></li>
+<li><p>skyboxPath: String of up to 150 characters. Can also include /:.-</p></li>
+</ul>
+</dd>
+</dl>
+<div class="toggle docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DATASET_PROFILE_FORM</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;value&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -]</span><span class="si">{8}</span><span class="s2">$&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;No ID value was provided.&quot;</span>
+                        <span class="p">},</span>
+        <span class="s2">&quot;datasetName&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -]{1,15}$&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please enter an alphanumeric name for this dataset, maximum 15 chars.&quot;</span>
+                        <span class="p">},</span>
+        <span class="s2">&quot;datasetSize&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -]{1,15}$&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please enter a number between 1 and 5000.&quot;</span>
+                        <span class="p">},</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -,.]{1,150}$&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Descriptions are limited to 150 characters.&quot;</span>
+                        <span class="p">},</span>
+        <span class="s2">&quot;imageHeight&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^(?:[1-9]\d{0,2}|1000)$&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please enter a number between 1 and 1000.&quot;</span>
+                        <span class="p">},</span>
+        <span class="s2">&quot;imageWidth&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^(?:[1-9]\d{0,2}|1000)$&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please enter a number between 1 and 1000.&quot;</span>
+                        <span class="p">},</span>
+        <span class="s2">&quot;meshes&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+                        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Meshes are not required&quot;</span>
+                        <span class="p">},</span>
+        <span class="s2">&quot;randomOrientation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Random orientation is not required&quot;</span>
+                        <span class="p">},</span>
+        <span class="s2">&quot;skyboxPath&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9/:.\-]{1,150}$&quot;</span><span class="p">,</span><span class="c1">#this is a quick fix to check it&#39;s not malicious.</span>
+                        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Skybox paths are not required&quot;</span>
+                        <span class="p">},</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>—</p>
+</section>
+<section id="id2">
+<h3><a class="toc-backref" href="#id11" role="doc-backlink">Material Generation</a><a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
+<dl class="simple">
+<dt>Required fields:</dt><dd><ul class="simple">
+<li><p>model: Alphanumeric string of up to 8 characters.</p></li>
+<li><p>image_url: Alphanumeric string of up to 150 characters. Can also include :./-_</p></li>
+<li><p>image_path: Alphanumeric string of up to 150 characters. Can also include :./-_</p></li>
+<li><p>checkpoint: Alphanumeric string, maximum length of 30 characters. Can also include - and . characters.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="toggle docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">GENERATE_MATERIAL_FORM</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -]</span><span class="si">{8}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;No ID value was provided.&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9/</span><span class="se">\\</span><span class="s2">:.\-_]{1,150}$&quot;</span><span class="p">,</span><span class="c1">#this is a quick fix to check it&#39;s not malicious.</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Image url is required&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;image_path&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9/</span><span class="se">\\</span><span class="s2">:.\-_]{1,150}$&quot;</span><span class="p">,</span><span class="c1">#this is a quick fix to check it&#39;s not malicious.</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Image path is required&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;checkpoint&quot;</span><span class="p">:{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -.]{1,30}$&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please select a checkpoint.&quot;</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>—</p>
+</section>
+<section id="model-submission">
+<h3><a class="toc-backref" href="#id12" role="doc-backlink">Model Submission</a><a class="headerlink" href="#model-submission" title="Permalink to this heading">¶</a></h3>
+<p>The model form itself has the following criteria:</p>
+<dl class="simple">
+<dt>Required fields:</dt><dd><ul class="simple">
+<li><p>value: Eight character alphanumeric string.</p></li>
+<li><p>modelName: Alphanumeric string of up to 15 characters. Can also include -</p></li>
+<li><p>layers: List.</p></li>
+</ul>
+</dd>
+<dt>Optional fields:</dt><dd><ul class="simple">
+<li><p>description: Alphanumeric string of up to 150 characters. Can also include -,.:/</p></li>
+<li><p>input: Integer between 1 and 1000. Not yet implemented.</p></li>
+<li><p>output: Integer between 1 and 1000. Not yet implemented.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="toggle docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="s2">&quot;value&quot;</span><span class="p">:</span>  <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -]</span><span class="si">{8}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;No ID value was provided.&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;modelName&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -]{1,15}$&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please enter an alphanumeric name of up to 15 characters.&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^[A-Za-z0-9 -,.:/]{1,150}$&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please enter an alphanumeric description of up to 150 characters.&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^(?:[0-9]\d?|1000)$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please enter an integer between 1 and 1000&quot;</span>
+        <span class="p">},</span>
+    <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;^(?:[0-9]\d?|1000)$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please enter an integer between 1 and 1000&quot;</span>
+        <span class="p">},</span>
+    <span class="s2">&quot;layers&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;helper&quot;</span><span class="p">:</span> <span class="s2">&quot;Please provide a list of layers for the model.&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>—</p>
+<p>Individual layers must also conform to the following criteria:</p>
+<dl class="simple">
+<dt>Required fields:</dt><dd><ul class="simple">
+<li><p>id: Alphanumeric string of up to 8 characters.</p></li>
+<li><p>activation: Alphanumeric string of up to 15 characters. Can also include -.</p></li>
+<li><p>layer_type: Alphanumeric string of up to 15 characters. Can also include -.</p></li>
+<li><p>x_0: Integer between 0 and 1000.</p></li>
+<li><p>x_1: Integer between 0 and 1000.</p></li>
+</ul>
+</dd>
+<dt>Optional fields:</dt><dd><ul class="simple">
+<li><p>description: Alphanumeric string of up to 150 characters. Can also include -,.:/</p></li>
+<li><p>x_2: Integer between 0 and 1000. Not yet implemented.</p></li>
+<li><p>x_3: Integer between 0 and 1000. Not yet implemented.</p></li>
+<li><p>padding: Integer between 0 and 99. Not yet implemented.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="toggle docutils container">
+</div>
+<p>—</p>
+</section>
+</section>
+<section id="module-api.utils">
+<span id="utils"></span><h2><a class="toc-backref" href="#id13" role="doc-backlink">Utils</a><a class="headerlink" href="#module-api.utils" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="api.utils.validate_form">
+<span class="sig-prename descclassname"><span class="pre">api.utils.</span></span><span class="sig-name descname"><span class="pre">validate_form</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required_fields</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/api/utils.html#validate_form"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#api.utils.validate_form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates a submitted form against a schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em>) – The form data.</p></li>
+<li><p><strong>required_fields</strong> (<em>dict</em>) – Schema to validate against.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If validation fails.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-config">
+<span id="configuration"></span><h2><a class="toc-backref" href="#id14" role="doc-backlink">Configuration</a><a class="headerlink" href="#module-config" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="config.Config">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">config.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><a class="reference internal" href="_modules/config.html#Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.Config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.ALLOWED_EXTENSIONS">
+<span class="sig-name descname"><span class="pre">ALLOWED_EXTENSIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'jpeg',</span> <span class="pre">'jpg',</span> <span class="pre">'png'}</span></em><a class="headerlink" href="#config.Config.ALLOWED_EXTENSIONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.DATABASE_PATH">
+<span class="sig-name descname"><span class="pre">DATABASE_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'C:\\Users\\liom1\\Documents\\projects\\BlenderML-WebApp\\WebApp\\docs\\MLApp\\data\\data.db'</span></em><a class="headerlink" href="#config.Config.DATABASE_PATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.MAX_CONTENT_LENGTH">
+<span class="sig-name descname"><span class="pre">MAX_CONTENT_LENGTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20971520</span></em><a class="headerlink" href="#config.Config.MAX_CONTENT_LENGTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.UPLOAD_FOLDER">
+<span class="sig-name descname"><span class="pre">UPLOAD_FOLDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MLApp\\data\\user_uploaded_test'</span></em><a class="headerlink" href="#config.Config.UPLOAD_FOLDER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 

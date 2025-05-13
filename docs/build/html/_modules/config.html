@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview: module code &mdash; BlenderML WebApp  documentation</title>
+  <title>config &mdash; BlenderML WebApp  documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
@@ -66,7 +66,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Overview: module code</li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">config</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -75,14 +76,20 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="api/routes/datasets.html">api.routes.datasets</a></li>
-<li><a href="api/routes/material_generation.html">api.routes.material_generation</a></li>
-<li><a href="api/routes/models.html">api.routes.models</a></li>
-<li><a href="api/routes/training.html">api.routes.training</a></li>
-<li><a href="api/utils.html">api.utils</a></li>
-<li><a href="config.html">config</a></li>
-</ul>
+  <h1>Source code for config</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Server config file, defines a Config class that stores various variables for the server.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">BASE_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+<span class="n">DATABASE_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE_DIR</span><span class="p">,</span> <span class="s2">&quot;MLApp&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;data.db&quot;</span><span class="p">)</span>
+<span class="n">UPLOAD_FOLDER</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;MLApp&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;user_uploaded_test&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Config"><a class="viewcode-back" href="../flask-server.html#config.Config">[docs]</a><span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+    <span class="n">ALLOWED_EXTENSIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="s1">&#39;jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;jpeg&#39;</span><span class="p">}</span>
+    <span class="n">UPLOAD_FOLDER</span> <span class="o">=</span> <span class="n">UPLOAD_FOLDER</span>
+    <span class="n">DATABASE_PATH</span> <span class="o">=</span> <span class="n">DATABASE_PATH</span>
+    <span class="n">MAX_CONTENT_LENGTH</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span></div>
+</pre></div>
 
            </div>
           </div>

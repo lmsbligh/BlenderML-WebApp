@@ -6,21 +6,21 @@ from werkzeug.utils import secure_filename
 from MLApp.blender_scripts.blender_launcher import launch_blender
 from MLApp.custom_torch.flask_generate_material import flask_generate_material
 from MLApp.parameters import render_data_script
-from .utils import validate_form
+from ..utils import validate_form
 
 
 bp = Blueprint('material_generation', __name__)
-"""
-This file contains all of the routes required for material generation.
-"""
 
 @bp.route('/upload_file', methods=['POST'])
 def upload_file():
     """
-    Handles file upload.
+    POST request that handles file upload.
 
-    Args:
-        request.
+    Route: /upload_file
+    
+    Args: request.files
+    
+    Returns: JSON containing download_url and file_path.
         
     """
     UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
@@ -53,11 +53,13 @@ def upload_file():
 @bp.route('/generate_material', methods=['POST'])
 def generate_material():
     """
-    Handles material generation.
+    POST request containing the material generation form, instructing the server to predict and render material properties from the image provided.
 
-    Args:
-        request.
-        
+    Route: /generate_material
+    
+    Args: request/form
+    
+    Returns: JSON containing predicted_props of the material as well as the render_url.
     """
     UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']
 
@@ -95,10 +97,11 @@ def generate_material():
 @bp.route('/<path:filename>')
 def serve_image(filename):
     """
-    Serves image files.
+    Serves requested image file.
 
-    Args:
-        request.
+    Args: filename.
+    
+    Returns: send_from_directory("../", filename)
         
     """
     SAFE_DIR = os.path.join(os.getcwd(), 'MLApp', 'data') 
@@ -112,10 +115,11 @@ def serve_image(filename):
 
 def allowed_file(filename):
     """
-    Checks file is an image file.
+    Checks that file extension is a valid image file extension.
 
-    Args:
-        filename.
+    Args: filename.
+    
+    Returns: bool
         
     """
     ALLOWED_EXTENSIONS = current_app.config['ALLOWED_EXTENSIONS']
@@ -128,9 +132,9 @@ def serve_uploaded_file(filename):
     """
     Serves uploaded files.
 
-    Args:
-        filename.
-        
+    Args: filename.
+    
+    Returns: send_from_directory('../'+UPLOAD_FOLDER, filename)
     """
     SAFE_DIR = os.path.join(os.getcwd(), 'MLApp', 'data', 'user_uploaded_test') 
     UPLOAD_FOLDER = current_app.config['UPLOAD_FOLDER']

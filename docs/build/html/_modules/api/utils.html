@@ -3,22 +3,28 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>api.routes.utils &mdash; BlenderML WebApp  documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <title>api.utils &mdash; BlenderML WebApp  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
+    <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -29,11 +35,11 @@
 
           
           
-          <a href="../../../index.html" class="icon icon-home">
+          <a href="../../index.html" class="icon icon-home">
             BlenderML WebApp
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -42,16 +48,8 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../flask-server.html">flask-server package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../MLApp.html">MLApp package</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../MLApp.html">MLApp package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../flask-server.html">flask-server package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">utils Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../routes.html">routes package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../routes.html#module-api.routes.material_generation">material_generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../flask-server.html">flask-server package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MLApp.html">MLApp package</a></li>
 </ul>
 
         </div>
@@ -60,16 +58,16 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">BlenderML WebApp</a>
+          <a href="../../index.html">BlenderML WebApp</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">api.routes.utils</li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">api.utils</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -78,13 +76,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for api.routes.utils</h1><div class="highlight"><pre>
+  <h1>Source code for api.utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">..forms.model_forms</span> <span class="kn">import</span> <span class="n">LAYER_FORM</span>
+<span class="kn">from</span> <span class="nn">api.forms.model_forms</span> <span class="kn">import</span> <span class="n">LAYER_FORM</span>
 
-<div class="viewcode-block" id="validate_form"><a class="viewcode-back" href="../../../utils.html#api.routes.utils.validate_form">[docs]</a><span class="k">def</span> <span class="nf">validate_form</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">required_fields</span><span class="p">):</span>
+<div class="viewcode-block" id="validate_form"><a class="viewcode-back" href="../../flask-server.html#api.utils.validate_form">[docs]</a><span class="k">def</span> <span class="nf">validate_form</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">required_fields</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Validates a submitted form against a schema.</span>
 

@@ -7,6 +7,7 @@
   <title>Welcome to BlenderML WebApp’s documentation &mdash; BlenderML WebApp  documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
       <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -17,6 +18,11 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -46,14 +52,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="flask-server.html">flask-server package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MLApp.html">MLApp package</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="MLApp.html">MLApp package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="flask-server.html">flask-server package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">utils Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routes.html">routes package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routes.html#module-api.routes.material_generation">material_generation</a></li>
 </ul>
 
         </div>
@@ -86,47 +84,16 @@
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="flask-server.html">flask-server package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="flask-server.html#flask-server-server">flask-server.server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flask-server.html#module-contents">Module contents</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flask-server.html#flask-server-config">flask-server.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flask-server.html#routes">Routes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flask-server.html#forms-criteria-validation-dictionaries">Forms Criteria/Validation Dictionaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flask-server.html#module-api.utils">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flask-server.html#module-config">Configuration</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="MLApp.html">MLApp package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="MLApp.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MLApp.html#module-MLApp.parameters">MLApp.parameters module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MLApp.html#module-MLApp">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="toctree">
-<h1>Toctree<a class="headerlink" href="#toctree" title="Permalink to this heading">¶</a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="MLApp.html">MLApp package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="MLApp.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="MLApp.html#module-MLApp.parameters">MLApp.parameters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="MLApp.html#module-MLApp">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="flask-server.html">flask-server package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="flask-server.html#flask-server-server">flask-server.server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flask-server.html#module-contents">Module contents</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flask-server.html#flask-server-config">flask-server.config</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">utils Modules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routes.html">routes package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routes.html#module-api.routes.material_generation">material_generation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="routes.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="routes.html#routes-datasets-module">routes.datasets module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="routes.html#routes-material-generation-module">routes.material_generation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="routes.html#routes-models-module">routes.models module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="routes.html#routes-training-module">routes.training module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="routes.html#routes-utils-module">routes.utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="routes.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>

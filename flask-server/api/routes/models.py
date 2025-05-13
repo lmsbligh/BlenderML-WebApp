@@ -2,7 +2,7 @@ import json
 import os
 from flask import Blueprint, current_app, jsonify, request
 from ..forms.model_forms import MODEL_FORM, LAYER_FORM
-from .utils import validate_form
+from ..utils import validate_form
 import sqlite3
 
 
@@ -11,13 +11,28 @@ bp = Blueprint('models', __name__)
 
 @bp.route("/layer_types")
 def get_layer_types():
-                return [{"value": 1, "layer_type": 'Dense'},
+    """
+    Fetches layer_types.
+    
+    Route: /layer_types.
+    
+    Returns: List of layer type JSONs.
+        
+    """
+    return [{"value": 1, "layer_type": 'Dense'},
         {"value": 2, "layer_type": 'CNN'},
         {"value": 3, "layer_type": 'Pooling'}]
                 
 @bp.route("/activation_types")
 def get_activation_types():
-                return [{"value": 1, "activation": 'Linear'},
+    """
+    Fetches activation types.
+    
+    Route: /activation_types.
+    
+    Returns: List of activation type JSONs.
+    """
+    return [{"value": 1, "activation": 'Linear'},
         {"value": 2, "activation": 'ReLU'},
         {"value": 3, "activation": 'Heaviside'},
         {"value": 4, "activation": 'Sigmoid'},
@@ -25,6 +40,13 @@ def get_activation_types():
                 
 @bp.route("/models")
 def get_models():
+    """
+    Fetches available models.
+    
+    Route: /models.
+    
+    Returns: List model in JSONs.
+    """
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
     global MODELS_LIST
     
@@ -53,6 +75,15 @@ def get_models():
         
 @bp.route('/submit_model', methods=["POST"])
 def submit_model():
+    """
+    POSTs model to server.
+    
+    Route: /submit_model
+    
+    returns:
+        - 200 - Success
+        - 400 - Error
+    """
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
     con = sqlite3.connect(DATABASE_PATH)
     cur = con.cursor()
@@ -83,6 +114,15 @@ def submit_model():
 
 @bp.route('/delete_model', methods=["POST"])
 def delete_model():
+    """
+    POSTs model JSON for deletion to server.
+    
+    Route: /delete_model
+    
+    returns:
+        - 200 - Success
+        - 400 - Error
+    """
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
     model_to_del = json.loads(request.data.decode('utf-8'))
     ind, model = next(
@@ -97,11 +137,21 @@ def delete_model():
         con.close()
         del MODELS_LIST[ind]
     else:
-        return jsonify({"body": "success, but no model existed with this value"}), 200
+        return jsonify({"body": "Error: no model existed with this ID"}), 400
     return jsonify({"body": "success!"}), 200
 
 @bp.route('/checkpoints/<string:model_id>')
 def get_checkpoints(model_id):
+    """
+    Fetches available checkpoints for a given model.
+    
+    Route: /model_id
+    
+    Args:
+        model_id.
+    
+    Returns: List of checkpoints.
+    """
     checkpoint_dir = os.path.join("MLApp", "data", "w_and_b", model_id)
     if os.path.isdir(checkpoint_dir):
         checkpoints = os.listdir(checkpoint_dir)
