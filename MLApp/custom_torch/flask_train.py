@@ -16,23 +16,24 @@ from MLApp.parameters import device
 
 from MLApp.custom_torch.target_loader import target_loader
 
-def flask_train(training_form):
+def train(training_form):
     """
+    Simple training loop using parameters from the training_form, saves a checkpoint.
     """
-    print("Training Form: ", training_form)
-    print("Training Form Type:", type(training_form))
-    dataset = training_form['dataset']['value']
-    epochs = int(training_form['epochs']['value'])
-    learning_rate = float(training_form['learningRate']['value'])
-    x_val = training_form['xVal']['value']
-    optimiser = training_form['optimizer']['value']
+    print(training_form)
+    dataset = training_form['dataset']
+    epochs = int(training_form['epochs'])
+    learning_rate = float(training_form['learningRate'])
+    x_val = training_form['xVal']
+    optimiser = training_form['optimizer']
     
-    model_id = training_form['model']['value']
-    model_checkpoint = training_form['checkpoint']['value']
+    model_id = training_form['model']
+    model_checkpoint = training_form['checkpoint']
     dataset_profile = dataset[:dataset.find('-')]
     dataset_date_time = dataset[dataset.find('-')+1:]
     #dataset_dir = f'MLApp\\data\\training_datasets\\{dataset_profile}\\{dataset_date_time}'
-    dataset_dir = os.path.join("MLApp", "data", "training_datasets", dataset_profile, dataset_date_time)
+    dataset_dir = os.path.join(os.getcwd(),"MLApp", "data", "training_datasets", dataset_profile, dataset_date_time)
+    
     transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))])
     
     targets = target_loader(dataset_dir) 

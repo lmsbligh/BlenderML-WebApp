@@ -179,7 +179,7 @@ def submit_generate_dataset():
         #     file_data = []  # If there's an error, just use an empty dictionary
         
         json.dump(generate_profile, file)
-    sample_URLs = launch_blender(data=os.path.join(prof_dir, "props"), script=os.path.join("MLApp", render_data_script), scene_props=os.path.join(prof_dir, "props","scene_props.json"))
+    sample_URLs = launch_blender(data=os.path.join(prof_dir, "props"), script=os.path.join("MLApp", render_data_script), scene_props=os.path.join(prof_dir, "props","scene_props.json"), render_dir=prof_dir)
     
     con = sqlite3.connect(DATABASE_PATH)
     cur = con.cursor()

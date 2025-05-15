@@ -2,14 +2,23 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import os
 def numpy_max_min(image):
+    """
+    Normalises the image for display in Matplotlib.
+    """
     #image = image.cpu().numpy().transpose((1,2,0))
     return ((image - image.min()) / (image.max() - image.min()))
 
 def numpy_max_min_tf(image):
+    """
+    Normalises the image when stored on GPU for display in Matplotlib.
+    """
     image = image.cpu().numpy().transpose((1,2,0))
     return ((image - image.min()) / (image.max() - image.min()))
 
 def select_image_dir(dir):
+    """
+    Allows the user to choose an image directory.
+    """
     dir_list = {}
     with os.scandir(dir) as dir_contents:
         for ind, entry in enumerate(dir_contents):
@@ -20,6 +29,9 @@ def select_image_dir(dir):
     return f"{dir}\\{selected_dir}"
 
 def compare_images(pred_render_imgs, dataset_renders):
+    """
+    Displays a comparison of the input dataset to the prediction with Matplotlib.
+    """
     print("running compare_images")
     fig, axes = plt.subplots(len(pred_render_imgs), 2, figsize=(10, 2 * len(pred_render_imgs)))
 

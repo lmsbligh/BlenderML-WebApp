@@ -1,5 +1,7 @@
 import json
 from flask import Blueprint, current_app, jsonify, request
+
+from MLApp.custom_torch.flask_train import train
 from ..utils import validate_form
 from ..forms.training_forms import TRAINING_FORM
 
@@ -25,8 +27,7 @@ def submit_training():
     except ValueError as ve:
         print(jsonify({"error": str(ve)}), 400)
         return jsonify({"error": str(ve)}), 400
-    print("!!Training ran but disabled.")
+
     print(training_form)
-    #flask_train(training_form)
-    
+    train(training_form)
     return jsonify({"body": "Training request received successfully."}), 200

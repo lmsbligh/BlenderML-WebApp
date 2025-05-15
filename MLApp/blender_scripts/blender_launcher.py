@@ -4,7 +4,8 @@ import os
 import time
 
 def launch_blender(data="train", script="", scene_props="", render_dir=""):
-    """Simple function to launch blender passing in data_dir and a script
+    """
+    Simple function to launch blender passing in data_dir and a script
     as argv.
 
     data_dir : str
@@ -18,10 +19,11 @@ def launch_blender(data="train", script="", scene_props="", render_dir=""):
     print("script_path:", script_path)
     data_path = os.path.join(os.getcwd(), data)
     print("data_path:", data_path)
+    print("!!!render_dir: ", render_dir)
 
     command = []
     if (scene_props):    
-        command = [blender_executable, "-P", script_path] + ["--data_path", data_path] + ["--scene_props", scene_props]
+        command = [blender_executable, "-P", script_path] + ["--data_path", data_path] + ["--scene_props", scene_props] + [ "--render_path", render_dir]
             
     else:
         command = [blender_executable, "-P", script_path] + [ "--data_path", data_path] + [ "--render_path", render_dir]
@@ -34,10 +36,10 @@ def launch_blender(data="train", script="", scene_props="", render_dir=""):
     except subprocess.CalledProcessError as e:
         print("Error running Blender script:", e)
           
-    sample_scandir = os.scandir(data)
+    sample_scandir = os.scandir(render_dir)
     sample_URLs = []
     for file in sample_scandir:
-            sample_URLs.append(f"{data}\\{file.name}".replace("\\", "/"))
+            sample_URLs.append(f"{render_dir}\\{file.name}".replace("\\", "/"))
     if len(sample_URLs) > 9:
         return sample_URLs[:9]
     elif len(sample_URLs) >= 1:

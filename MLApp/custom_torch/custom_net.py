@@ -2,18 +2,12 @@ from torch import nn
 from MLApp.parameters import device
 
 class CustomNet(nn.Module):
-    """Simple NN with conv and dense layers.
-
-    attributes
-    ----------
-
-    conv_layers : nn.Sequential
-        Sequential container composed of conv layers.
-        Uses ReLu activation and max pooling.
-    fc_layers : nn.Sequential
-        Sequential container composed of dense layers.
-        Currently using a Relu activation internally,
-        final layer uses Sigmoid activation.
+    """
+    Simple neural net that currently supports nn.Linear, nn.Conv2d and nn.MaxPool2d, nn.ReLU and nn.Sigmoid layers.
+    
+    __init__(self, layers_dict) Runs each layer in layers_dict through a switch statement, appending the corresponding layer to self.layers
+    
+    props: layers_dict (for __init__) 
     """
 
     def __init__(self, layers_dict):

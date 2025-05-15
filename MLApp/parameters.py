@@ -3,8 +3,7 @@ import torch
 import torch.optim as optim
 from torch import nn
 
-"""Contains all constants and paths.
-"""
+
 BATCH_SIZE = 20
 EPOCHS = 1
 LEARNING_RATE = 0.01
