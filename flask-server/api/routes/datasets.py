@@ -48,7 +48,8 @@ def get_dataset_profiles():
         con.close()
         
 @bp.route('/datasets')
-def get_datasets():
+@bp.route('/datasets/<profile_id>')
+def get_datasets(profile_id=None):
     """
     Fetches all available datasets.
     
@@ -64,7 +65,11 @@ def get_datasets():
     cur = con.cursor()
     
     try:
-        cur.execute("SELECT * FROM datasets")
+        if profile_id:
+            query = "SELECT * FROM datasets WHERE value LIKE ?"
+            cur.execute(query, (f"{profile_id}-%",))
+        else: 
+            cur.execute("SELECT * FROM datasets")
         rows = cur.fetchall()
         data = []
         for row in rows:
@@ -121,6 +126,20 @@ def submit_dataset_profile():
     print(jsonify({"value": profile_to_save['value'], "body": "success!"}), 200)  
     return jsonify({"value": profile_to_save['value'], "body": "success!"}), 200
 
+@bp.route('/delete_dataset/<dataset_ID>', methods=["POST"])
+def delete_dataset(dataset_ID):
+    DATABASE_PATH = current_app.config["DATABASE_PATH"]
+
+
+    con = sqlite3.connect(DATABASE_PATH)
+    cur = con.cursor()
+    cur.execute('DELETE FROM datasets WHERE value = ?', (dataset_ID,))
+    con.commit()
+    con.close()
+    #del DATASET_PROFILES_LIST[ind]
+
+    return jsonify({"body": "Profile deleted successfully!"}), 200
+    
 @bp.route('/delete_dataset_profile', methods=["POST"])
 def delete_dataset_profile():
     """

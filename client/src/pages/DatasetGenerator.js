@@ -6,6 +6,9 @@ import Box from '@mui/material/Box';
 import { Button, Card, Paper, Grid, TextField, List, ListItem } from '@mui/material/';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
+
 import SelectorDatasetProfile from '../components/SelectorDatasetProfile/SelectorDatasetProfile.js';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -34,7 +37,7 @@ export default function DatasetGenerator() {
     const [profileOptions, setProfileOptions] = useImmer([]);
     const [selectedDatasetProfile, setSelectedDatasetProfile] = useImmer({});
     const [sampleImages, setSampleImages] = useImmer([]);
-
+    const [profileDatasets, setProfileDatasets] = useImmer([])
     const [profileForm, setProfileForm] = useImmer(structuredClone(
         {
             "description": new Validation({
@@ -104,6 +107,13 @@ export default function DatasetGenerator() {
     React.useEffect(() => {
         fetchData('dataset_profiles', setProfileOptions)
     }, []);
+    React.useEffect(() => {
+        fetchData(`datasets/${selectedDatasetProfile.value}`, setProfileDatasets)
+    }, [selectedDatasetProfile]);
+
+    React.useEffect(() => {
+        console.log(profileDatasets)
+    }, [profileDatasets])
     const fillForm = () => {
         setProfileForm((prevVals) => {
             return produce(prevVals, (draft) => {
@@ -170,6 +180,19 @@ export default function DatasetGenerator() {
     React.useEffect(() => {
         fillObject()
     }, [profileForm])
+
+    const delDataset = (datasetID) => {
+        setProfileDatasets((prevProfileDatasets) => {
+            return produce(prevProfileDatasets, (draft) => {
+                const delIndex = draft.findIndex((option) => 
+                    option.value === datasetID
+                )
+                draft.splice(delIndex, 1)
+            }
+            )
+        })
+        pushData(`delete_dataset/${datasetID}`, datasetID)
+    }
 
     const handleProfileSave = (event) => {
         //event.preventDefault();
@@ -394,6 +417,31 @@ export default function DatasetGenerator() {
                             </Card>
                         })
                             : null}
+                        <List sx={{
+                            padding: "10px",
+                            display: "flex",
+                            flexWrap: "wrap",
+                            flexDirection: "horizontal",
+                            justifyContent: "space-evenly",
+                            gap: "10px"
+                        }}>
+                            { profileDatasets ? profileDatasets.map((option, ind) => {
+                            return <Card key={option.value} sx={{
+                                padding: "10px"
+                            }}>
+                                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
+                                        <Typography sx={{alignSelf: "center"}} color="text.primary">Profile Name: {option.datasetName}</Typography>
+                                        <IconButton aria-label="delete" color="primary" onClick={() => {delDataset(option.value)}}><DeleteIcon /></IconButton>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
+                                        <Typography color="text.secondary">Render Date and Time: {option.value.slice(9)}</Typography>                                    
+                                        <Typography color="text.secondary">Size: {option.datasetSize}</Typography>
+                                        <Typography color="text.secondary">Description: {option.description}</Typography>
+                                    </Box>    
+                                    
+                                </Card>
+                        }) : null }
+                        </List>
                     </Box>
                 </Grid>
             </Grid>

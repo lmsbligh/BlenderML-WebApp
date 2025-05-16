@@ -6,3 +6,7 @@ flask-server/__pycache__
 flask-server/venv
 __pycache__
 client/node_modules
+docs/docs
+docs/source
+docs/make
+docs/Makefile
