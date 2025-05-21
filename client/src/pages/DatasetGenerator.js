@@ -103,12 +103,16 @@ export default function DatasetGenerator() {
             })
         }));
 
-
+    React.useEffect(() => {
+        console.log("Fetched profiles:", profileOptions);
+    }, [profileOptions]);
     React.useEffect(() => {
         fetchData('dataset_profiles', setProfileOptions)
     }, []);
     React.useEffect(() => {
-        fetchData(`datasets/${selectedDatasetProfile.value}`, setProfileDatasets)
+        if (selectedDatasetProfile.value) {
+            fetchData(`datasets/${selectedDatasetProfile.value}`, setProfileDatasets)
+        }
     }, [selectedDatasetProfile]);
 
     React.useEffect(() => {
@@ -158,7 +162,7 @@ export default function DatasetGenerator() {
     };
 
     const handleProfileDelete = (value) => {
-
+        console.log(selectedDatasetProfile)
         setProfileOptions((prevOptions) => {
             return produce(prevOptions, (draft) => {
                 const index = prevOptions.findIndex((option) => option.value === value)
@@ -182,16 +186,10 @@ export default function DatasetGenerator() {
     }, [profileForm])
 
     const delDataset = (datasetID) => {
-        setProfileDatasets((prevProfileDatasets) => {
-            return produce(prevProfileDatasets, (draft) => {
-                const delIndex = draft.findIndex((option) => 
-                    option.value === datasetID
-                )
-                draft.splice(delIndex, 1)
-            }
-            )
+        pushData(`delete_dataset/${datasetID}`, datasetID).then(() => {
+            fetchData(`datasets/${selectedDatasetProfile.value}`, setProfileDatasets)
+            setSampleImages([])
         })
-        pushData(`delete_dataset/${datasetID}`, datasetID)
     }
 
     const handleProfileSave = (event) => {
@@ -202,36 +200,36 @@ export default function DatasetGenerator() {
         setTimeout(() => {
             if (!validateForm({ formElement: profileForm })) {
                 pushData('submit_dataset_profile', selectedDatasetProfile)
-                .then(async (response) => {
-                    const data = await response.json();
-                    if (!response.ok) {
-                        throw new Error(data.error);
-                    }
-                    else {
-                        setProfileOptions((prevOptions) =>
-                            produce(prevOptions, (draft) => {
-                                const selected = prevOptions.findIndex((option) => option.value === selectedDatasetProfile.value);
-                                if (selected == -1) {
-                                    draft.push(selectedDatasetProfile)
-                                }
-                                else {
-                                    draft[selected] = structuredClone(selectedDatasetProfile);
-                                }
-                            })
-                        );
-                    }
-                })
-                .catch(error => {
-                    alert(`Server error: ${error.message}`);
-                })
+                    .then(async (response) => {
+                        const data = await response.json();
+                        if (!response.ok) {
+                            throw new Error(data.error);
+                        }
+                        else {
+                            setProfileOptions((prevOptions) =>
+                                produce(prevOptions, (draft) => {
+                                    const selected = prevOptions.findIndex((option) => option.value === selectedDatasetProfile.value);
+                                    if (selected == -1) {
+                                        draft.push(selectedDatasetProfile)
+                                    }
+                                    else {
+                                        draft[selected] = structuredClone(selectedDatasetProfile);
+                                    }
+                                })
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        alert(`Server error: ${error.message}`);
+                    })
             }
         }, 0)
 
     }
 
     const handleGenerateDataset = (event) => {
-            handleProfileSave(event)
-            if (!validateForm({ formElement: profileForm })) {
+        handleProfileSave(event)
+        if (!validateForm({ formElement: profileForm })) {
             try {
                 fetch('submit_generate_dataset', {
                     method: 'POST',
@@ -249,6 +247,7 @@ export default function DatasetGenerator() {
                     })
                     .then(data => {
                         setSampleImages(data.sample_URLs);
+                        fetchData(`datasets/${selectedDatasetProfile.value}`, setProfileDatasets)
                     })
             } catch (error) {
                 console.error('Error:', error);
@@ -267,7 +266,11 @@ export default function DatasetGenerator() {
             gap: '10px',
         }}>
             <Grid container>
-                <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", rowGap: "5px", columnGap: "5px" }}>
+                <Grid item sm={6} xs={12} sx={{
+                    display: "flex", flexDirection: "column", rowGap: "5px", columnGap: "5px", border: 1,
+                    borderColor: 'rgba(0, 0, 0, 0.23)',
+                    borderRadius: 1
+                }}>
                     <SelectorDatasetProfile
                         selectedDatasetProfile={selectedDatasetProfile}
                         handleChange={handleProfileChange}
@@ -397,13 +400,25 @@ export default function DatasetGenerator() {
                         </Box>
                     </Box> : null}
                 </Grid>
-                <Grid item sm={6} xs={12} sx={{ padding: "10px", display: "flex", flexDirection: "column", rowGap: "5px", columnGap: "5px" }}>
+                <Grid item sm={6} xs={12} sx={{
+                    padding: "10px",
+                    display: "flex",
+                    flexDirection: "column",
+                    rowGap: "5px",
+                    columnGap: "5px",
+                    border: 1,
+                    borderColor: 'rgba(0, 0, 0, 0.23)',
+                    borderRadius: 1
+                }}>
                     <Box sx={{
                         display: "flex",
                         flexWrap: "wrap",
                         flexDirection: "horizontal",
                         justifyContent: 'space-between',
-                        padding: "10px"
+                        padding: "10px",
+                        border: 1,
+                        borderColor: 'rgba(0, 0, 0, 0.23)',
+                        borderRadius: 1
                     }}>
                         {sampleImages ? sampleImages.map((option, ind) => {
                             return <Card key={ind} sx={{ maxWidth: 345 }}>
@@ -425,22 +440,22 @@ export default function DatasetGenerator() {
                             justifyContent: "space-evenly",
                             gap: "10px"
                         }}>
-                            { profileDatasets ? profileDatasets.map((option, ind) => {
-                            return <Card key={option.value} sx={{
-                                padding: "10px"
-                            }}>
+                            {profileDatasets ? profileDatasets.map((option, ind) => {
+                                return <Card key={option.value} sx={{
+                                    padding: "10px"
+                                }}>
                                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
-                                        <Typography sx={{alignSelf: "center"}} color="text.primary">Profile Name: {option.datasetName}</Typography>
-                                        <IconButton aria-label="delete" color="primary" onClick={() => {delDataset(option.value)}}><DeleteIcon /></IconButton>
+                                        <Typography sx={{ alignSelf: "center" }} color="text.primary">Profile Name: {option.datasetName}</Typography>
+                                        <IconButton aria-label="delete" color="primary" onClick={() => { delDataset(option.value) }}><DeleteIcon /></IconButton>
                                     </Box>
                                     <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
-                                        <Typography color="text.secondary">Render Date and Time: {option.value.slice(9)}</Typography>                                    
+                                        <Typography color="text.secondary">Render Date and Time: {option.value.slice(9)}</Typography>
                                         <Typography color="text.secondary">Size: {option.datasetSize}</Typography>
                                         <Typography color="text.secondary">Description: {option.description}</Typography>
-                                    </Box>    
-                                    
+                                    </Box>
+
                                 </Card>
-                        }) : null }
+                            }) : null}
                         </List>
                     </Box>
                 </Grid>

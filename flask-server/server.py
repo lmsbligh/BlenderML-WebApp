@@ -21,7 +21,7 @@ def too_large(e):
     return jsonify({"error": "File is too large. Maximum allowed size is 20MB."}), 413
 
 if __name__ == "__main__":
-        app.run(debug=True)
+        app.run(debug=True, use_reloader=True)
 
 
     

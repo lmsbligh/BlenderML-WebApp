@@ -43,10 +43,6 @@ class ImageDataset(datasets.VisionDataset):
         if isinstance(key, int):
             image_path = os.path.join(self.image_dir, f"{self.targets[key][0]}.jpg")
             image_path = os.path.normpath(image_path)
-            print(self.image_dir)
-            print(os.getcwd())
-            print("Absolute image path:", image_path)
-            print("Exists?", os.path.isfile(image_path))
             image = PIL.Image.open(image_path)
             target = torch.FloatTensor(self.targets[key][1:])
             if self.transform is not None:

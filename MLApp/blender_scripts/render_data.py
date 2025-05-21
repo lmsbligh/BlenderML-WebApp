@@ -45,8 +45,8 @@ def render_loop(obj, env_node, mat_nodes, scene_path, render_path, scene_props):
         mat_nodes['Principled BSDF'].inputs[9].default_value = material_prop["nodes['Principled BSDF'].inputs[9].default_value"]
         bpy.data.scenes["Scene"].render.filepath = os.path.join(os.getcwd(), render_path, f"{material_prop['name']}.jpg")
         print("Render Path: ", os.path.join(os.getcwd(), render_path, f"{material_prop['name']}.jpg"))
-        bpy.data.scenes["Scene"].render.resolution_x = scene_props['imageWidth']
-        bpy.data.scenes["Scene"].render.resolution_y = scene_props['imageHeight']
+        bpy.data.scenes["Scene"].render.resolution_x = int(scene_props['imageWidth'])
+        bpy.data.scenes["Scene"].render.resolution_y = int(scene_props['imageHeight'])
         if (scene_props['randomOrientation']):
                 obj.location = (random.uniform(-5,5), random.uniform(-5,5), random.uniform(-5,5))
                 obj.rotation_euler = ((random.uniform(0,360), random.uniform(0,360), random.uniform(0,360)))

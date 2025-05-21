@@ -1,9 +1,10 @@
 import json
 import os
+import shutil
 import sqlite3
 import time
 import uuid
-from flask import Blueprint, current_app, jsonify, request, send_from_directory
+from flask import Blueprint, abort, current_app, jsonify, request, send_from_directory
 from MLApp.parameters import render_data_script
 from MLApp.blender_scripts.blender_launcher import launch_blender
 from MLApp.data_generator.prop_generator import gen_props_json
@@ -22,8 +23,10 @@ def get_dataset_profiles():
     
     Returns: List of profile in JSON.
     """
+    
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
     global DATASET_PROFILES_LIST
+
     con = sqlite3.connect(DATABASE_PATH)
     con.row_factory = sqlite3.Row  # Allows row to be treated as a dictionary
     cur = con.cursor()
@@ -38,7 +41,7 @@ def get_dataset_profiles():
                 row_dict['meshes'] = json.loads(row_dict['meshes'])
             data.append(row_dict)
         DATASET_PROFILES_LIST = data
-        
+        #print(data)
         return data
     except sqlite3.Error as e:
         print("Database error:", e)
@@ -117,7 +120,7 @@ def submit_dataset_profile():
         if (prof["value"] == profile_to_save["value"] or prof["datasetName"] == profile_to_save["datasetName"] )),
         (None, None))
     if (ind != None):
-        DATASET_PROFILES_LIST[ind] == profile_to_save
+        DATASET_PROFILES_LIST[ind] = profile_to_save
     else:
         DATASET_PROFILES_LIST.append(profile_to_save)
     cur.execute('INSERT INTO profiles (value, datasetName, datasetSize, description, imageHeight, imageWidth, meshes, randomOrientation, skyboxPath) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(value) DO UPDATE SET datasetName = excluded.datasetName, datasetSize = excluded.datasetSize, description = excluded.description, imageHeight = excluded.imageHeight, imageWidth = excluded.imageWidth, meshes = excluded.meshes, randomOrientation = excluded.randomOrientation, skyboxPath = excluded.skyboxPath;', (profile_to_save['value'], profile_to_save['datasetName'], profile_to_save['datasetSize'], profile_to_save['description'], profile_to_save['imageHeight'], profile_to_save['imageWidth'], json.dumps(profile_to_save['meshes']), profile_to_save['randomOrientation'], profile_to_save['skyboxPath']))
@@ -129,13 +132,28 @@ def submit_dataset_profile():
 @bp.route('/delete_dataset/<dataset_ID>', methods=["POST"])
 def delete_dataset(dataset_ID):
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
-
-
-    con = sqlite3.connect(DATABASE_PATH)
-    cur = con.cursor()
-    cur.execute('DELETE FROM datasets WHERE value = ?', (dataset_ID,))
-    con.commit()
-    con.close()
+    DATASETS_DIR_PATH = current_app.config["DATASETS_DIR_PATH"]
+    dataset_profile_id = dataset_ID[:8]
+    dataset_dir = dataset_ID[9:]
+    dataset_full_path = os.path.realpath(os.path.join(DATASETS_DIR_PATH, dataset_profile_id, dataset_dir))
+    
+    try:
+        con = sqlite3.connect(DATABASE_PATH)
+        cur = con.cursor()
+        cur.execute('DELETE FROM datasets WHERE value = ?', (dataset_ID,))
+        con.commit()
+        con.close()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    try:
+        if not dataset_full_path.startswith(DATASETS_DIR_PATH):
+            print(f"error, path {dataset_full_path} is not within datasets folder!!")
+            abort(403)
+        else:
+            print(f"deleting dir: {dataset_full_path}")
+            shutil.rmtree(dataset_full_path)
+    except Exception as e:
+        return jsonify({"error": f"Deleted from database but not from filesytem: {str(e)}"})
     #del DATASET_PROFILES_LIST[ind]
 
     return jsonify({"body": "Profile deleted successfully!"}), 200
@@ -153,6 +171,12 @@ def delete_dataset_profile():
     """
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
     profile_to_del = json.loads(request.data.decode('utf-8'))
+    DATABASE_PATH = current_app.config["DATABASE_PATH"]
+    DATASETS_DIR_PATH = current_app.config["DATASETS_DIR_PATH"]
+    
+    profile_full_path = os.path.realpath(os.path.join(DATASETS_DIR_PATH, profile_to_del["value"]))
+
+    
     ind, profile = next(
         ((ind, prof) for ind, prof in enumerate(DATASET_PROFILES_LIST) 
         if (prof["value"] == profile_to_del["value"])),
@@ -167,7 +191,15 @@ def delete_dataset_profile():
     else:
         print("no deletion necessary")
         return jsonify({"body": "success, but no model existed with this value"}), 200
-
+    try:
+        if not profile_full_path.startswith(DATASETS_DIR_PATH):
+            print(f"error, path {profile_full_path} is not within datasets folder!!")
+            abort(403)
+        else:
+            print(f"deleting dir: {profile_full_path}")
+            shutil.rmtree(profile_full_path)
+    except Exception as e:
+        return jsonify({"error": f"Deleted from database but not from filesytem: {str(e)}"})
     return jsonify({"body": "Profile deleted successfully!"}), 200
 
 @bp.route('/submit_generate_dataset', methods=["POST"])
