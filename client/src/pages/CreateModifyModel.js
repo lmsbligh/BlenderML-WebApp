@@ -6,8 +6,9 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
-import { Grid, Button } from '@mui/material/';
-
+import { Grid, Button, List, Card, Typography } from '@mui/material/';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
 import { v4 as uuidv4 } from 'uuid';
 
 import SelectorModel from '../components/SelectorModel/SelectorModel.js';
@@ -39,7 +40,7 @@ function CreateModifyModel() {
     //Local states
     const [selectedModel, setSelectedModel] = useImmer('');
     const [modelData, setModelData] = useImmer([]);
-
+    const [modelCheckpoints, setModelCheckpoints] = useImmer([])
     React.useEffect(() => {
         fetchData('models', setModelData)
     }, []);
@@ -96,7 +97,14 @@ function CreateModifyModel() {
         if (selectedModel) {
             fillForm()
         }
+        if (selectedModel) {
+            fetchData(`checkpoints/${selectedModel.value}`, setModelCheckpoints)
+        }
+        
     }, [selectedModel])
+    React.useEffect(() => {
+        console.log(modelCheckpoints)
+    }, [modelCheckpoints])
     React.useEffect(() => {
         // console.log("selectedModel", selectedModel)
         // console.log("modelForm", modelForm)
@@ -263,6 +271,12 @@ function CreateModifyModel() {
             })
         })
     }
+
+    const delCheckpoint = (checkpointID) => {
+        pushData(`delete_checkpoint/${selectedModel.value}/${checkpointID}`).then(() => {
+            fetchData(`checkpoints/${selectedModel.value}`, setModelCheckpoints)
+        })
+    }
     return (
         <ThemeProvider theme={defaultTheme} >
             <Box sx={{ display: 'flex' }}>
@@ -306,6 +320,26 @@ function CreateModifyModel() {
                             }
 
                         </FormControl>
+                    </Grid>
+                    <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column" }}>
+                        <List sx={{
+                                                    padding: "10px",
+                                                    display: "flex",
+                                                    flexWrap: "wrap",
+                                                    flexDirection: "horizontal",
+                                                    justifyContent: "space-evenly",
+                                                    gap: "10px"
+                                                }}>
+                            {modelCheckpoints ? modelCheckpoints.map((option, ind) => {
+                                return <Card key={option} sx={{padding: "10px"}}>
+                                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
+                                        <Typography sx={{ alignSelf: "center" }} color="text.primary">Checkpoint: {option}</Typography>
+                                        <IconButton aria-label="delete" color="primary" onClick={() => { delCheckpoint(option) }}><DeleteIcon /></IconButton>
+                                    </Box>
+                                </Card>
+                            }) : null}
+                        </List>
+                        
                     </Grid>
                 </Grid>
             </Box>

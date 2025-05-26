@@ -10,7 +10,7 @@ LEARNING_RATE = 0.01
 TRAINING_SET_SIZE = 5000
 VALIDATION_SET_SIZE = 1500
 TEST_SET_SIZE = 1500
-loss_function = nn.L1Loss()
+#loss_function = nn.L1Loss()
 DATABASE_PATH = os.path.join(os.getcwd(), "MLApp", "data", "data.db")
 
 OPTIMIZER = optim.Adam
@@ -29,5 +29,5 @@ device = (
     else "cpu"
 )
 
-state_dict_dir = os.path.join("data", "w_and_b")
-state_dict_path = os.path.join("data", "w_and_b", "model_checkpoint2.pth")
+state_dict_dir = os.path.join("data", "models")
+state_dict_path = os.path.join("data", "models", "model_checkpoint2.pth")
