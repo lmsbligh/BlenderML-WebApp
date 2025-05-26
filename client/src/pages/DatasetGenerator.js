@@ -162,7 +162,6 @@ export default function DatasetGenerator() {
     };
 
     const handleProfileDelete = (value) => {
-        console.log(selectedDatasetProfile)
         setProfileOptions((prevOptions) => {
             return produce(prevOptions, (draft) => {
                 const index = prevOptions.findIndex((option) => option.value === value)
@@ -357,7 +356,7 @@ export default function DatasetGenerator() {
                             <List sx={{ display: "flex", flexDirection: "column" }}>
                                 <ListItem>
                                     <FormControlLabel
-                                        control={<Checkbox checked={profileForm.meshes.value["cube"] || false}
+                                        control={<Checkbox checked={Boolean(profileForm.meshes.value["cube"] || false)}
                                             name="cube" onChange={handleMeshListChange}
                                             sx={{ padding: "5px" }} />}
                                         label="Cube" />
@@ -365,14 +364,14 @@ export default function DatasetGenerator() {
                                 <ListItem>
                                     <FormControlLabel
                                         control={<Checkbox
-                                            checked={profileForm.meshes.value["sphere"] || false}
+                                            checked={Boolean(profileForm.meshes.value["sphere"] || false)}
                                             name="sphere" onChange={handleMeshListChange}
                                             sx={{ padding: "5px" }} />}
                                         label="Sphere" />
                                 </ListItem>
                                 <ListItem>
                                     <FormControlLabel
-                                        control={<Checkbox checked={profileForm.meshes.value["monkey"] || false}
+                                        control={<Checkbox checked={Boolean(profileForm.meshes.value["monkey"] || false)}
                                             name="monkey"
                                             onChange={handleMeshListChange}
                                             sx={{ padding: "5px" }} />}
@@ -380,7 +379,7 @@ export default function DatasetGenerator() {
                                 </ListItem>
                                 <ListItem>
                                     <FormControlLabel
-                                        control={<Checkbox checked={profileForm.meshes.value["car"] || false}
+                                        control={<Checkbox checked={Boolean(profileForm.meshes.value["car"] || false)}
                                             name="car" onChange={handleMeshListChange}
                                             sx={{ padding: "5px" }} />}
                                         label="Car" />
@@ -388,7 +387,7 @@ export default function DatasetGenerator() {
                             </List>
 
                         </Paper>
-                        <FormControlLabel control={<Checkbox checked={profileForm.randomOrientation.value || false} onChange={handleRandomOrientationChange} sx={{ padding: "10px" }} />} label="Randomized orientation" />
+                        <FormControlLabel control={<Checkbox checked={Boolean(profileForm.randomOrientation.value || false)} onChange={handleRandomOrientationChange} sx={{ padding: "10px" }} />} label="Randomized orientation" />
                         <Box sx={{
                             display: "flex",
                             flexDirection: "horizontal",

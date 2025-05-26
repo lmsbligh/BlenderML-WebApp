@@ -4,13 +4,15 @@ import json
 import sqlite3
 
 import torch
+import torch.optim as optim
+from torch import nn
 from torchvision import transforms
 from torch.utils.data import DataLoader
 
 from MLApp.custom_torch.image_dataset import ImageDataset
 from MLApp.custom_torch.custom_net import CustomNet
 
-from MLApp.parameters import OPTIMIZER, loss_function, state_dict_dir, DATABASE_PATH
+from MLApp.parameters import OPTIMIZER, state_dict_dir, DATABASE_PATH
 from MLApp.parameters import state_dict_dir
 from MLApp.parameters import device
 
@@ -26,7 +28,18 @@ def train(training_form):
     learning_rate = float(training_form['learningRate'])
     x_val = training_form['xVal']
     optimiser = training_form['optimizer']
-    
+    loss_function = training_form['lossFunction']
+    match optimiser:
+        case 'Gradient descent':
+            optimiser = optim.SGD
+        case 'ADAM':
+            optimiser = optim.Adam
+    match loss:
+        case 'MSE':
+            loss_function = nn.MSELoss()
+        case 'MAE':
+            loss_function = nn.L1Loss()
+
     model_id = training_form['model']
     model_checkpoint = training_form['checkpoint']
     dataset_profile = dataset[:dataset.find('-')]
