@@ -399,66 +399,67 @@ export default function DatasetGenerator() {
                         </Box>
                     </Box> : null}
                 </Grid>
-                <Grid item sm={6} xs={12} sx={{
-                    padding: "10px",
-                    display: "flex",
-                    flexDirection: "column",
-                    rowGap: "5px",
-                    columnGap: "5px",
-                    border: 1,
-                    borderColor: 'rgba(0, 0, 0, 0.23)',
-                    borderRadius: 1
-                }}>
-                    <Box sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        flexDirection: "horizontal",
-                        justifyContent: 'space-between',
+                {selectedDatasetProfile?.value ? (
+                    <Grid item sm={6} xs={12} sx={{
                         padding: "10px",
+                        display: "flex",
+                        flexDirection: "column",
+                        rowGap: "5px",
+                        columnGap: "5px",
                         border: 1,
                         borderColor: 'rgba(0, 0, 0, 0.23)',
                         borderRadius: 1
                     }}>
-                        {sampleImages ? sampleImages.map((option, ind) => {
-                            return <Card key={ind} sx={{ maxWidth: 345 }}>
-                                <CardMedia
-                                    component="img"
-                                    sx={{ height: 140 }}
-                                    image={option}
-                                    onError={() => console.error("Image failed to load:", option)}
-                                />
-
-                            </Card>
-                        })
-                            : null}
-                        <List sx={{
-                            padding: "10px",
+                        <Box sx={{
                             display: "flex",
                             flexWrap: "wrap",
                             flexDirection: "horizontal",
-                            justifyContent: "space-evenly",
-                            gap: "10px"
+                            justifyContent: 'space-between',
+                            padding: "10px",
                         }}>
-                            {profileDatasets ? profileDatasets.map((option, ind) => {
-                                return <Card key={option.value} sx={{
-                                    padding: "10px"
-                                }}>
-                                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
-                                        <Typography sx={{ alignSelf: "center" }} color="text.primary">Profile Name: {option.datasetName}</Typography>
-                                        <IconButton aria-label="delete" color="primary" onClick={() => { delDataset(option.value) }}><DeleteIcon /></IconButton>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
-                                        <Typography color="text.secondary">Render Date and Time: {option.value.slice(9)}</Typography>
-                                        <Typography color="text.secondary">Size: {option.datasetSize}</Typography>
-                                        <Typography color="text.secondary">Description: {option.description}</Typography>
-                                    </Box>
+                            {sampleImages ? () => (
+                                <Box>
+                                    {sampleImages.map((option, ind) => (
+                                        <Card key={ind} sx={{ maxWidth: 345 }}>
+                                            <CardMedia
+                                                component="img"
+                                                sx={{ height: 140 }}
+                                                image={option}
+                                                onError={() => console.error("Image failed to load:", option)}
+                                            />
+                                        </Card>
+                                    ))}
+                                </Box>
+                            ) : null}
+                            <List sx={{
+                                padding: "10px",
+                                display: "flex",
+                                flexWrap: "wrap",
+                                flexDirection: "horizontal",
+                                justifyContent: "space-evenly",
+                                gap: "10px"
+                            }}>
+                                {profileDatasets ? profileDatasets.map((option, ind) => (
+                                    <Card key={option.value} sx={{
+                                        padding: "10px"
+                                    }}>
+                                        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
+                                            <Typography sx={{ alignSelf: "center" }} color="text.primary">Profile Name: {option.datasetName}</Typography>
+                                            <IconButton aria-label="delete" color="primary" onClick={() => { delDataset(option.value) }}><DeleteIcon /></IconButton>
+                                        </Box>
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
+                                            <Typography color="text.secondary">Render Date and Time: {option.value.slice(9)}</Typography>
+                                            <Typography color="text.secondary">Size: {option.datasetSize}</Typography>
+                                            <Typography color="text.secondary">Description: {option.description}</Typography>
+                                        </Box>
+                                    </Card>
+                                )) : null}
+                            </List>
+                        </Box>
+                    </Grid>
+                ) : null}
 
-                                </Card>
-                            }) : null}
-                        </List>
-                    </Box>
-                </Grid>
             </Grid>
-        </Box>
+        </Box >
     )
 }
