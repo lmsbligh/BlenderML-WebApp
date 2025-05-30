@@ -16,6 +16,7 @@ import LayerCard from '../components/LayerCard/LayerCard.js';
 import ModelPropertiesModifier from '../components/ModelPropertiesModifier/ModelPropertiesModifier.js';
 
 import { fetchData, validateForm, pushData, Validation, Layer, validateField } from '../utils.js'
+import { grey } from '@mui/material/colors';
 const defaultTheme = createTheme();
 
 
@@ -100,7 +101,7 @@ function CreateModifyModel() {
         if (selectedModel) {
             fetchData(`checkpoints/${selectedModel.value}`, setModelCheckpoints)
         }
-        
+
     }, [selectedModel])
     React.useEffect(() => {
         console.log(modelCheckpoints)
@@ -281,7 +282,14 @@ function CreateModifyModel() {
         <ThemeProvider theme={defaultTheme} >
             <Box sx={{ display: 'flex' }}>
                 <Grid container>
-                    <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column" }}>
+                    <Grid item sm={6} xs={12} sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        rowGap: "5px",
+                        columnGap: "5px",
+                        paddingRight: "10px",
+                        paddingLeft: "10px"
+                    }}>
                         <CssBaseline />
                         <FormControl fullWidth>
                             {modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleModelSelectorChange} modelOptions={modelData} isModify={true} /> : null}
@@ -321,17 +329,27 @@ function CreateModifyModel() {
 
                         </FormControl>
                     </Grid>
-                    <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column" }}>
-                        <List sx={{
-                                                    padding: "10px",
-                                                    display: "flex",
-                                                    flexWrap: "wrap",
-                                                    flexDirection: "horizontal",
-                                                    justifyContent: "space-evenly",
-                                                    gap: "10px"
-                                                }}>
+                    <Grid item sm={6} xs={12} sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "flex-start",
+                        paddingLeft: "10px",
+                        paddingRight: "10px"
+                    }}>
+                        <List disablePadding sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            flexDirection: "column",
+                            justifyContent: "flex-start",
+                            gap: "10px",
+                            padding: "10px",
+                            border: 1,
+                            borderColor: 'rgba(0, 0, 0, 0.23)',
+                            borderRadius: 1
+                        }}>
+                            <Typography sx={{ alignSelf: "flex-start" }}>Existing checkpoints for this model:</Typography>
                             {modelCheckpoints ? modelCheckpoints.map((option, ind) => {
-                                return <Card key={option} sx={{padding: "10px"}}>
+                                return <Card key={option} sx={{ padding: "10px" }}>
                                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
                                         <Typography sx={{ alignSelf: "center" }} color="text.primary">Checkpoint: {option}</Typography>
                                         <IconButton aria-label="delete" color="primary" onClick={() => { delCheckpoint(option) }}><DeleteIcon /></IconButton>
@@ -339,7 +357,6 @@ function CreateModifyModel() {
                                 </Card>
                             }) : null}
                         </List>
-                        
                     </Grid>
                 </Grid>
             </Box>

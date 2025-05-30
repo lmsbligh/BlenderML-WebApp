@@ -3,7 +3,8 @@ import { useImmer } from 'use-immer';
 import produce from "immer";
 
 import Box from '@mui/material/Box';
-import { Button, Card, Paper, Grid, TextField, List, ListItem } from '@mui/material/';
+import { Button, Card, Paper, Grid, TextField, List, ListItem, Input, FormControl, FormLabel, OutlinedInput, InputLabel } from '@mui/material/';
+import Slider from '@mui/material/Slider';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,7 +13,6 @@ import IconButton from '@mui/material/IconButton';
 import SelectorDatasetProfile from '../components/SelectorDatasetProfile/SelectorDatasetProfile.js';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-
 import { v4 as uuidv4 } from 'uuid';
 
 import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, validateField, validateForm, Validation } from '../utils.js'
@@ -102,7 +102,28 @@ export default function DatasetGenerator() {
                 helper: ""
             })
         }));
+    const marks = [
+        {
+            value: 0,
+            label: '0%',
+        },
+        {
+            value: 33.333,
+            label: '10%',
+        },
+        {
+            value: 66.666,
+            label: '20%',
+        },
+        {
+            value: 100,
+            label: `${0.3 * 100}%`,
+        },
+    ];
 
+    function valuetext(value) {
+        return `${Math.ceil(value)}%`;
+    }
     React.useEffect(() => {
         console.log("Fetched profiles:", profileOptions);
     }, [profileOptions]);
@@ -266,9 +287,12 @@ export default function DatasetGenerator() {
         }}>
             <Grid container>
                 <Grid item sm={6} xs={12} sx={{
-                    display: "flex", flexDirection: "column", rowGap: "5px", columnGap: "5px", border: 1,
-                    borderColor: 'rgba(0, 0, 0, 0.23)',
-                    borderRadius: 1
+                    display: "flex",
+                    flexDirection: "column",
+                    rowGap: "5px",
+                    columnGap: "5px",
+                    paddingRight: "10px",
+                    paddingLeft: "10px"
                 }}>
                     <SelectorDatasetProfile
                         selectedDatasetProfile={selectedDatasetProfile}
@@ -298,17 +322,73 @@ export default function DatasetGenerator() {
                             error={profileForm.datasetSize.error}
                             helperText={profileForm.datasetSize.error ? profileForm.datasetSize.helper : ''}
                             value={profileForm.datasetSize.value}></TextField>
-                        <TextField
-                            name="skyboxPath"
-                            onChange={(event) => {
-                                handleTextFieldChange({ eve: event, setState: setProfileForm })
-                                validateField({ key: 'skyboxPath', setFormState: setProfileForm })
-                            }}
-                            sx={{ width: "50%", padding: "5px" }}
-                            label="Skybox path"
-                            error={profileForm.skyboxPath.error}
-                            helperText={profileForm.skyboxPath.error ? profileForm.skyboxPath.helper : ''}
-                            value={profileForm.skyboxPath.value}></TextField>
+
+                            <Box sx={{ position: 'relative', mt: 2, padding: "5px" }}>
+                                <InputLabel
+                                    shrink
+                                    sx={{
+                                        position: 'absolute',
+                                        top: '-10px',
+                                        left: '12px',
+                                        backgroundColor: 'white',
+                                        paddingX: '4px',
+                                    }}
+                                >
+                                    Cross Validation Set %:
+                                </InputLabel>
+
+                                <Box
+                                    sx={{
+                                        border: '1px solid rgba(0, 0, 0, 0.23)',
+                                        borderRadius: '4px',
+                                        padding: '16px',
+                                    }}
+                                >
+                                    <Slider
+                                        aria-label="Always visible"
+                                        defaultValue={20}
+                                        getAriaValueText={valuetext}
+                                        step={1}
+                                        valueLabelDisplay="auto"
+                                        valueLabelFormat={(x) => Math.ceil(x * 0.3)}
+                                        marks={marks}
+                                    />
+                                </Box>
+                            </Box>
+                            <Box sx={{ position: 'relative', mt: 2, padding: '5px' }}>
+                                <InputLabel
+                                    shrink
+                                    sx={{
+                                        position: 'absolute',
+                                        top: '-10px',
+                                        left: '12px',
+                                        backgroundColor: 'white',
+                                        paddingX: '4px',
+                                    }}
+                                >
+                                    Test Set %:
+                                </InputLabel>
+
+                                <Box
+                                    sx={{
+                                        border: '1px solid rgba(0, 0, 0, 0.23)',
+                                        borderRadius: '4px',
+                                        padding: '16px',
+
+                                    }}
+                                >
+                                    <Slider
+                                        aria-label="Always visible"
+                                        defaultValue={20}
+                                        getAriaValueText={valuetext}
+                                        step={1}
+                                        valueLabelDisplay="auto"
+                                        valueLabelFormat={(x) => Math.ceil(x * 0.3)}
+                                        marks={marks}
+                                    />
+                                </Box>
+                            </Box>
+                        
                         <Box sx={{
                             display: "flex",
                             flexDirection: "horizontal"
@@ -401,24 +481,26 @@ export default function DatasetGenerator() {
                 </Grid>
                 {selectedDatasetProfile?.value ? (
                     <Grid item sm={6} xs={12} sx={{
-                        padding: "10px",
                         display: "flex",
                         flexDirection: "column",
-                        rowGap: "5px",
-                        columnGap: "5px",
-                        border: 1,
-                        borderColor: 'rgba(0, 0, 0, 0.23)',
-                        borderRadius: 1
+                        justifyContent: "flex-start",
+                        paddingLeft: "10px",
+                        paddingRight: "10px"
                     }}>
                         <Box sx={{
                             display: "flex",
                             flexWrap: "wrap",
                             flexDirection: "horizontal",
-                            justifyContent: 'space-between',
-                            padding: "10px",
+                            justifyContent: 'flex-start',
                         }}>
                             {sampleImages ? () => (
-                                <Box>
+                                <Box sx={{
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    flexDirection: "column",
+                                    justifyContent: 'space-between',
+                                    padding: "10px",
+                                }}>
                                     {sampleImages.map((option, ind) => (
                                         <Card key={ind} sx={{ maxWidth: 345 }}>
                                             <CardMedia
@@ -431,17 +513,26 @@ export default function DatasetGenerator() {
                                     ))}
                                 </Box>
                             ) : null}
-                            <List sx={{
-                                padding: "10px",
+                            <List disablePadding sx={{
                                 display: "flex",
                                 flexWrap: "wrap",
-                                flexDirection: "horizontal",
-                                justifyContent: "space-evenly",
-                                gap: "10px"
+                                flexDirection: "column",
+                                justifyContent: "flex-start",
+                                gap: "10px",
+                                padding: "10px",
+                                border: 1,
+                                borderColor: 'rgba(0, 0, 0, 0.23)',
+                                borderRadius: 1
                             }}>
+                                <Typography>Existing datasets generated by this profile: </Typography>
                                 {profileDatasets ? profileDatasets.map((option, ind) => (
                                     <Card key={option.value} sx={{
-                                        padding: "10px"
+                                        flexBasis: "auto",
+                                        padding: "10px",
+                                        boxSizing: "border-box",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "space-between"
                                     }}>
                                         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
                                             <Typography sx={{ alignSelf: "center" }} color="text.primary">Profile Name: {option.datasetName}</Typography>
