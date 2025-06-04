@@ -195,6 +195,7 @@ export const validateLayer = (layer) => {
 export const validateValidator = (validator) => {
     let validatorError = false
     if (validator.required && validator.value == "") {
+        console.log("validator.value required but not provided")
         validatorError = true
     }
     else {
@@ -202,6 +203,7 @@ export const validateValidator = (validator) => {
     }
     if (validator.regex && validator.value) {
         if (!validator.regex.test(validator.value)) {
+            console.log("validator value does not meet requirements: ", validator.value)
             validatorError = true
         }
     }

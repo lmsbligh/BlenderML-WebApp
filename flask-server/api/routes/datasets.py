@@ -123,7 +123,7 @@ def submit_dataset_profile():
         DATASET_PROFILES_LIST[ind] = profile_to_save
     else:
         DATASET_PROFILES_LIST.append(profile_to_save)
-    cur.execute('INSERT INTO profiles (value, datasetName, datasetSize, description, imageHeight, imageWidth, meshes, randomOrientation, skyboxPath) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(value) DO UPDATE SET datasetName = excluded.datasetName, datasetSize = excluded.datasetSize, description = excluded.description, imageHeight = excluded.imageHeight, imageWidth = excluded.imageWidth, meshes = excluded.meshes, randomOrientation = excluded.randomOrientation, skyboxPath = excluded.skyboxPath;', (profile_to_save['value'], profile_to_save['datasetName'], profile_to_save['datasetSize'], profile_to_save['description'], profile_to_save['imageHeight'], profile_to_save['imageWidth'], json.dumps(profile_to_save['meshes']), profile_to_save['randomOrientation'], profile_to_save['skyboxPath']))
+    cur.execute('INSERT INTO profiles (value, datasetName, datasetSize, CVPercentage, TrainingSetPercentage, description, imageHeight, imageWidth, meshes, randomOrientation, skyboxPath) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(value) DO UPDATE SET datasetName = excluded.datasetName, datasetSize = excluded.datasetSize, description = excluded.description, CVPercentage = excluded.CVPercentage, TrainingSetPercentage = excluded.TrainingSetPercentage, imageHeight = excluded.imageHeight, imageWidth = excluded.imageWidth, meshes = excluded.meshes, randomOrientation = excluded.randomOrientation, skyboxPath = excluded.skyboxPath;', (profile_to_save['value'], profile_to_save['datasetName'], profile_to_save['datasetSize'], profile_to_save['CVPercentage'], profile_to_save['TrainingSetPercentage'], profile_to_save['description'], profile_to_save['imageHeight'], profile_to_save['imageWidth'], json.dumps(profile_to_save['meshes']), profile_to_save['randomOrientation'], profile_to_save['skyboxPath']))
     con.commit()
     con.close()
     print(jsonify({"value": profile_to_save['value'], "body": "success!"}), 200)  
@@ -220,7 +220,6 @@ def submit_generate_dataset():
     prof_dir = os.path.join("MLApp", "data", "training_datasets",str(generate_profile['value']), time_stamp)
     generate_profile['renderDir'] = prof_dir
     size = generate_profile['datasetSize']
-        
     gen_props_json(prof_dir, size)
     
     with open(os.path.join(prof_dir, "props", "scene_props.json"), 'w+') as file:    

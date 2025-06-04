@@ -22,6 +22,8 @@ export default function DatasetGenerator() {
         "description": "",
         "datasetName": '',
         "datasetSize": '10',
+        "CVPercentage": '20',
+        "TrainingSetPercentage": '20',
         "skyboxPath": '',
         "imageWidth": '250',
         "imageHeight": '250',
@@ -60,6 +62,20 @@ export default function DatasetGenerator() {
                 regex: /^(?:[1-9]\d{0,2}|[1-4]\d{3}|5000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 5000."
+            }),
+            "CVPercentage": new Validation({
+                value: "",
+                error: false,
+                regex: /^(?:[0-9]|[1-2][0-9]|30)$/,
+                required: true,
+                helper: ""
+            }),
+            "TrainingSetPercentage": new Validation({
+                value: "",
+                error: false,
+                regex: /^(?:[0-9]|[1-2][0-9]|30)$/,
+                required: true,
+                helper: ""
             }),
             "skyboxPath": new Validation({
                 value: "",
@@ -108,16 +124,16 @@ export default function DatasetGenerator() {
             label: '0%',
         },
         {
-            value: 33.333,
+            value: 10,
             label: '10%',
         },
         {
-            value: 66.666,
+            value: 20,
             label: '20%',
         },
         {
-            value: 100,
-            label: `${0.3 * 100}%`,
+            value: 30,
+            label: `30%`,
         },
     ];
 
@@ -125,7 +141,7 @@ export default function DatasetGenerator() {
         return `${Math.ceil(value)}%`;
     }
     React.useEffect(() => {
-        console.log("Fetched profiles:", profileOptions);
+        // console.log("Fetched profiles:", profileOptions);
     }, [profileOptions]);
     React.useEffect(() => {
         fetchData('dataset_profiles', setProfileOptions)
@@ -137,7 +153,7 @@ export default function DatasetGenerator() {
     }, [selectedDatasetProfile]);
 
     React.useEffect(() => {
-        console.log(profileDatasets)
+        // console.log(profileDatasets)
     }, [profileDatasets])
     const fillForm = () => {
         setProfileForm((prevVals) => {
@@ -149,6 +165,7 @@ export default function DatasetGenerator() {
         })
     }
     React.useEffect(() => {
+        console.log("SelectedDatasetProfile changed", selectedDatasetProfile)
         if (selectedDatasetProfile && Object.keys(selectedDatasetProfile).length > 0) {
             fillForm()
         }
@@ -193,6 +210,7 @@ export default function DatasetGenerator() {
         setSelectedDatasetProfile(defaultProfile)
     }
     const fillObject = () => {
+        console.log("profileForm: ", profileForm)
         setSelectedDatasetProfile((prevVals) => {
             return produce(prevVals, (draft) => {
                 for (var key in profileForm) {
@@ -201,9 +219,6 @@ export default function DatasetGenerator() {
             })
         })
     }
-    React.useEffect(() => {
-        fillObject()
-    }, [profileForm])
 
     const delDataset = (datasetID) => {
         pushData(`delete_dataset/${datasetID}`, datasetID).then(() => {
@@ -211,15 +226,30 @@ export default function DatasetGenerator() {
             setSampleImages([])
         })
     }
-
+    const sliderHandleChange = (event) => {
+        setProfileForm((prevVals) => {
+            return produce(prevVals, (draft) => {
+                draft[event.target.name].value = Math.ceil(event.target.value)
+            })
+        })
+    }
     const handleProfileSave = (event) => {
         //event.preventDefault();
         for (let key in profileForm) {
             validateField({ key: key, setFormState: setProfileForm })
         }
+        console.log("selectedDatasetProfile pre fillObject: ", selectedDatasetProfile)
+        console.log("profileForm pre fillobject(): ", profileForm)
+        const updatedProfile = {};
+        for (const key in profileForm) {
+            updatedProfile[key] = profileForm[key].value;
+        }
+        setSelectedDatasetProfile((prev) => ({ ...prev, ...updatedProfile }));
+
         setTimeout(() => {
             if (!validateForm({ formElement: profileForm })) {
-                pushData('submit_dataset_profile', selectedDatasetProfile)
+                console.log('selectedDatasetProfile post fillObject(): ', selectedDatasetProfile)
+                pushData('submit_dataset_profile', {...selectedDatasetProfile, ...updatedProfile})
                     .then(async (response) => {
                         const data = await response.json();
                         if (!response.ok) {
@@ -243,12 +273,15 @@ export default function DatasetGenerator() {
                         alert(`Server error: ${error.message}`);
                     })
             }
+            else {
+                console.log("validateForm error!!!")
+            }
         }, 0)
-
+        return {...selectedDatasetProfile, ...updatedProfile}
     }
 
     const handleGenerateDataset = (event) => {
-        handleProfileSave(event)
+        const updatedProfile = handleProfileSave(event)
         if (!validateForm({ formElement: profileForm })) {
             try {
                 fetch('submit_generate_dataset', {
@@ -257,7 +290,7 @@ export default function DatasetGenerator() {
                         'Content-Type': 'application/json',
                     },
                     title: 'title',
-                    body: JSON.stringify(selectedDatasetProfile),
+                    body: JSON.stringify(updatedProfile),
                 })
                     .then(response => {
                         if (!response.ok) {
@@ -306,6 +339,7 @@ export default function DatasetGenerator() {
                                 handleTextFieldChange({ eve: event, setState: setProfileForm })
                                 validateField({ key: 'datasetName', setFormState: setProfileForm })
                             }}
+                            onBlur={() => { validateField({ key: 'datasetName', setFormState: setProfileForm }) }}
                             sx={{ width: "50%", padding: "5px" }}
                             label="Dataset Name"
                             error={profileForm.datasetName.error}
@@ -317,78 +351,91 @@ export default function DatasetGenerator() {
                                 handleTextFieldChange({ eve: event, setState: setProfileForm })
                                 validateField({ key: 'datasetSize', setFormState: setProfileForm })
                             }}
+                            onBlur={() => { validateField({ key: 'datasetSize', setFormState: setProfileForm }) }}
                             sx={{ width: "50%", padding: "5px" }}
                             label="Dataset Size"
                             error={profileForm.datasetSize.error}
                             helperText={profileForm.datasetSize.error ? profileForm.datasetSize.helper : ''}
                             value={profileForm.datasetSize.value}></TextField>
 
-                            <Box sx={{ position: 'relative', mt: 2, padding: "5px" }}>
-                                <InputLabel
-                                    shrink
-                                    sx={{
-                                        position: 'absolute',
-                                        top: '-10px',
-                                        left: '12px',
-                                        backgroundColor: 'white',
-                                        paddingX: '4px',
-                                    }}
-                                >
-                                    Cross Validation Set %:
-                                </InputLabel>
+                        <Box sx={{ position: 'relative', mt: 2, padding: "5px" }}>
+                            <InputLabel
+                                shrink
+                                sx={{
+                                    position: 'absolute',
+                                    top: '-10px',
+                                    left: '12px',
+                                    backgroundColor: 'white',
+                                    paddingX: '4px',
+                                }}
+                            >
+                                Cross Validation Set %:
+                            </InputLabel>
 
-                                <Box
-                                    sx={{
-                                        border: '1px solid rgba(0, 0, 0, 0.23)',
-                                        borderRadius: '4px',
-                                        padding: '16px',
-                                    }}
-                                >
-                                    <Slider
-                                        aria-label="Always visible"
-                                        defaultValue={20}
-                                        getAriaValueText={valuetext}
-                                        step={1}
-                                        valueLabelDisplay="auto"
-                                        valueLabelFormat={(x) => Math.ceil(x * 0.3)}
-                                        marks={marks}
-                                    />
-                                </Box>
+                            <Box
+                                sx={{
+                                    border: '1px solid rgba(0, 0, 0, 0.23)',
+                                    borderRadius: '4px',
+                                    padding: '16px',
+                                    width: '50%'
+
+                                }}
+                            >
+                                <Slider
+                                    aria-label="Always visible"
+                                    label="CVPercentage"
+                                    name="CVPercentage"
+                                    onChange={sliderHandleChange}
+                                    value={Number(profileForm.CVPercentage.value)}
+                                    getAriaValueText={(value) => `${value}%`}
+                                    step={1}
+                                    min={0}
+                                    max={30}
+                                    valueLabelDisplay="auto"
+                                    marks={marks}
+                                // valueLabelFormat={(x) => Math.ceil(x * 0.3)}
+
+                                />
                             </Box>
-                            <Box sx={{ position: 'relative', mt: 2, padding: '5px' }}>
-                                <InputLabel
-                                    shrink
-                                    sx={{
-                                        position: 'absolute',
-                                        top: '-10px',
-                                        left: '12px',
-                                        backgroundColor: 'white',
-                                        paddingX: '4px',
-                                    }}
-                                >
-                                    Test Set %:
-                                </InputLabel>
+                        </Box>
+                        <Box sx={{ position: 'relative', mt: 2, padding: '5px' }}>
+                            <InputLabel
+                                shrink
+                                sx={{
+                                    position: 'absolute',
+                                    top: '-10px',
+                                    left: '12px',
+                                    backgroundColor: 'white',
+                                    paddingX: '4px',
+                                }}
+                            >
+                                Test Set %:
+                            </InputLabel>
 
-                                <Box
-                                    sx={{
-                                        border: '1px solid rgba(0, 0, 0, 0.23)',
-                                        borderRadius: '4px',
-                                        padding: '16px',
-
-                                    }}
-                                >
-                                    <Slider
-                                        aria-label="Always visible"
-                                        defaultValue={20}
-                                        getAriaValueText={valuetext}
-                                        step={1}
-                                        valueLabelDisplay="auto"
-                                        valueLabelFormat={(x) => Math.ceil(x * 0.3)}
-                                        marks={marks}
-                                    />
-                                </Box>
+                            <Box
+                                sx={{
+                                    border: '1px solid rgba(0, 0, 0, 0.23)',
+                                    borderRadius: '4px',
+                                    padding: '16px',
+                                    width: '50%'
+                                }}
+                            >
+                                <Slider
+                                    aria-label="Always visible"
+                                    label="TrainingSetPercentage"
+                                    name="TrainingSetPercentage"
+                                    onChange={sliderHandleChange}
+                                    value={Number(profileForm.TrainingSetPercentage.value)}
+                                    getAriaValueText={(value) => `${value}%`}
+                                    step={1}
+                                    min={0}
+                                    max={30}
+                                    valueLabelDisplay="auto"
+                                    marks={marks}
+                                />
                             </Box>
-                        
+                        </Box>
+
                         <Box sx={{
                             display: "flex",
                             flexDirection: "horizontal"
@@ -512,7 +559,7 @@ export default function DatasetGenerator() {
                                         </Card>
                                     ))}
                                 </Box>
-                            ) : null}
+                            ) : <Typography>No images</Typography>}
                             <List disablePadding sx={{
                                 display: "flex",
                                 flexWrap: "wrap",

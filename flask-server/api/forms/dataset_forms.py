@@ -19,6 +19,16 @@ DATASET_PROFILE_FORM = {
                         "required": False,
                         "helper": "Descriptions are limited to 150 characters."
                         },
+        "CVPercentage": {"data_type": int,
+                        "regex": r"^(?:[0-9]|[1-2][0-9]|30)$",
+                        "required": False,
+                        "helper": "Cross validation set percentages are limited to integers between 0 and 30."
+                        },
+        "TrainingSetPercentage": {"data_type": int,
+                        "regex": r"^(?:[0-9]|[1-2][0-9]|30)$",
+                        "required": False,
+                        "helper": "Training set percentages are limited to integers between 0 and 30."
+                        },
         "imageHeight": {"data_type": int,
                         "regex": r"^(?:[1-9]\d{0,2}|1000)$",
                         "required": True,

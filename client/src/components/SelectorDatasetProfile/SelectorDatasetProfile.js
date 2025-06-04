@@ -16,14 +16,14 @@ function SelectorDatasetProfile ({ selectedDatasetProfile, handleChange, profile
                 labelId="Dataset-Profile-Selector-Label"
                 id="simple-select"
                 sx={{width: "100%"}}
-                value={selectedDatasetProfile}
+                value={selectedDatasetProfile.value ? selectedDatasetProfile.value : 'Select a profile'}
                 onChange={handleChange}
                 renderValue={(selected) => {
                     const selectedOption = profileOptions.find((option) => option.value === selected.value);
-                    return selectedOption ? selectedOption.datasetName : <Typography>Select a Profile</Typography>;
+                    return selectedOption ? selectedOption.datasetName : <Typography>Select a profile</Typography>;
                   }}
             >
-                {profileOptions.map(option => (
+                {profileOptions.length > 0 ? profileOptions.map(option => (
                     <MenuItem key={option.value} value={option.value}>        
                         <Card sx={{ width: "100%"}}>
                             <CardContent>
@@ -36,7 +36,7 @@ function SelectorDatasetProfile ({ selectedDatasetProfile, handleChange, profile
                             </CardContent>
                         </Card>
                     </MenuItem>
-                ))}
+                )) : null}
                 <MenuItem key={-1} value={-1}>        
                     <Card sx={{ width: "100%"}}>
                         <CardContent>
