@@ -9,15 +9,15 @@ export const fetchData = (endpoint, setState) => {
         .catch(error => console.error('Error fetching data:', error))
 }
 export const pushData = async (endpoint, data) => {
-        return fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            title: 'title',
-            body: JSON.stringify(data),
-        });
-    }
+    return fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        title: 'title',
+        body: JSON.stringify(data),
+    });
+}
 
 export const handleSelectorFormChange = ({ eve, setSelector, setForm, options }) => {
     if (options) {
@@ -30,6 +30,8 @@ export const handleSelectorFormChange = ({ eve, setSelector, setForm, options })
     const selectLabel = eve.target.name
     setForm((prevVals) => {
         return produce(prevVals, (draft) => {
+            // console.log("selectLabel: ", selectLabel)
+            // console.log("draft[selectLabel] ". draft[selectLabel])
             draft[selectLabel].value = eve.target.value;
         })
     })
@@ -194,7 +196,7 @@ export const validateLayer = (layer) => {
 }
 export const validateValidator = (validator) => {
     let validatorError = false
-    if (validator.required && validator.value == "") {
+    if (validator.required && (validator.value === undefined || validator.value === null || validator.value === '')) {
         console.log("validator.value required but not provided")
         validatorError = true
     }

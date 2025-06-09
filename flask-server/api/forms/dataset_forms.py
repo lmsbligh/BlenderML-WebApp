@@ -24,7 +24,7 @@ DATASET_PROFILE_FORM = {
                         "required": False,
                         "helper": "Cross validation set percentages are limited to integers between 0 and 30."
                         },
-        "TrainingSetPercentage": {"data_type": int,
+        "TestSetPercentage": {"data_type": int,
                         "regex": r"^(?:[0-9]|[1-2][0-9]|30)$",
                         "required": False,
                         "helper": "Training set percentages are limited to integers between 0 and 30."
@@ -39,19 +39,19 @@ DATASET_PROFILE_FORM = {
                         "required": True,
                         "helper": "Please enter a number between 1 and 1000."
                         },
-        "meshes": {"data_type": dict,
-                        "regex": "",
-                        "required": False,
-                        "helper": "Meshes are not required"
-                        },
+        # "meshes": {"data_type": dict,
+        #                 "regex": "",
+        #                 "required": False,
+        #                 "helper": "Meshes are not required"
+        #                 },
         "randomOrientation": {"data_type": bool,
                         "regex": "",
                         "required": False,
                         "helper": "Random orientation is not required"
                         },
-        "skyboxPath": {"data_type": str,
-                        "regex": r"^[a-zA-Z0-9/:.\-]{1,150}$",#this is a quick fix to check it's not malicious.
-                        "required": False,
-                        "helper": "Skybox paths are not required"
-                        },
+        # "skyboxPath": {"data_type": str,
+        #                 "regex": r"^[a-zA-Z0-9/:.\-]{1,150}$",#this is a quick fix to check it's not malicious.
+        #                 "required": False,
+        #                 "helper": "Skybox paths are not required"
+        #                 },
     }

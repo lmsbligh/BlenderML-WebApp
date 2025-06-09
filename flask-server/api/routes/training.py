@@ -27,7 +27,9 @@ def submit_training():
     except ValueError as ve:
         print(jsonify({"error": str(ve)}), 400)
         return jsonify({"error": str(ve)}), 400
-
-    print(training_form)
+    except Exception as ve:
+        print(jsonify({"error": str(ve)}), 400)
+        return jsonify({"error": str(ve)}), 400  
+    # print(training_form)
     train(training_form)
     return jsonify({"body": "Training request received successfully."}), 200

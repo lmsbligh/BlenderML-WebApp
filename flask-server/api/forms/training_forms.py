@@ -11,11 +11,23 @@ TRAINING_FORM = {
             "required": True,
             "helper": "Please select a checkpoint."
         },
-        "dataset": {
+        "trainingDataset": {
             "data_type": str,
-            "regex": r"^[A-Za-z0-9 -]{1,30}$",
+            "regex": r"^[A-Za-z0-9 -]{1,36}$",
             "required": True,
-            "helper": "Please select a dataset."
+            "helper": "Please select a training dataset."
+        },
+        "CVDataset": {
+            "data_type": str,
+            "regex": r"^[A-Za-z0-9 -]{1,36}$",
+            "required": True,
+            "helper": "Please select a CV dataset."
+        },
+        "testDataset": {
+            "data_type": str,
+            "regex": r"^[A-Za-z0-9 -]{1,36}$",
+            "required": True,
+            "helper": "Please select a test dataset."
         },
         "epochs": {
             "data_type": int,
@@ -41,11 +53,5 @@ TRAINING_FORM = {
             "required": True,
             "helper": "Please select a loss function"
 
-        },
-        "xVal": {
-            "data_type": int,
-            "regex": r"^(?:[0-9]\d?|99)$",
-            "required": True,
-            "helper": "Please enter an integer between 1 and 99"
         },
     }

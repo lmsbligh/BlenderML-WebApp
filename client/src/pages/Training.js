@@ -42,12 +42,26 @@ export default function Training() {
             required: true,
             helper: "Please select a checkpoint."
         }),
-        "dataset": new Validation({
+        "trainingDataset": new Validation({
             value: "",
             error: false,
             regex: "",
             required: true,
-            helper: "Please select a dataset."
+            helper: "Please select a training dataset."
+        }),
+        "CVDataset": new Validation({
+            value: "",
+            error: false,
+            regex: "",
+            required: true,
+            helper: "Please select a CV dataset."
+        }),
+        "testDataset": new Validation({
+            value: "",
+            error: false,
+            regex: "",
+            required: true,
+            helper: "Please select a test dataset."
         }),
         "epochs": new Validation({
             value: 100,
@@ -74,22 +88,18 @@ export default function Training() {
             error: false,
             regex: "",
             required: true
-        }),
-        "xVal": new Validation({
-            value: 20,
-            error: false,
-            regex: /^(?:[0-9]\d?|99)$/,
-            required: true,
-            helper: "Please enter an integer between 1 and 99"
-        }),
+        })
     }))
 
     const [modelData, setModelData] = useImmer([]);
     const [selectedModel, setSelectedModel] = React.useState('');
 
     const [datasetOptions, setDatasetOptions] = React.useState([]);
-    const [selectedDataset, setSelectedDataset] = React.useState('');
+    const [selectedTrainingDataset, setSelectedTrainingDataset] = React.useState('');
+    const [selectedCVDataset, setSelectedCVDataset] = React.useState('');
+    const [selectedTestDataset, setSelectedTestDataset] = React.useState('');
 
+    
     const [optimizerOptions, setOptimizerOptions] = React.useState([{ "value": 0, "label": "Gradient descent" }, { "value": 1, "label": "ADAM" }]);
     const [selectedOptimizer, setSelectedOptimizer] = React.useState(optimizerOptions[1]);
 
@@ -121,12 +131,13 @@ export default function Training() {
                 const formToPush = {
                     model: trainingForm.model.value,
                     checkpoint: trainingForm.checkpoint.value,
-                    dataset: trainingForm.dataset.value,
+                    trainingDataset: trainingForm.trainingDataset.value,
+                    CVDataset: trainingForm.CVDataset.value,
+                    testDataset: trainingForm.testDataset.value,
                     epochs: trainingForm.epochs.value,
                     learningRate: trainingForm.learningRate.value,
                     optimizer: trainingForm.optimizer.value,
                     lossFunction: trainingForm.lossFunction.value,
-                    xVal: trainingForm.xVal.value  
                 }
                 pushData('submit_training', formToPush)
             }
@@ -197,17 +208,51 @@ export default function Training() {
                     checkpointOptions={checkpointOptions}
                 /> : null}
                 <SelectorDataset
-                    error={trainingForm.dataset.error}
-                    helperText={trainingForm.dataset.error ? trainingForm.dataset.helper : ''}
-                    selectedDataset={selectedDataset}
+                    error={trainingForm.trainingDataset.error}
+                    datasetType={"training"}
+                    helperText={trainingForm.trainingDataset.error ? trainingForm.trainingDataset.helper : ''}
+                    selectedDataset={selectedTrainingDataset}
                     handleChange={(event) => {
                         handleSelectorFormChange({
                             eve: event,
-                            setSelector: setSelectedDataset,
+                            setSelector: setSelectedTrainingDataset,
                             setForm: setTrainingForm,
                             options: datasetOptions
                         })
-                        validateField({ key: 'dataset', setFormState: setTrainingForm })
+                        validateField({ key: 'trainingDataset', setFormState: setTrainingForm })
+
+                    }}
+                    datasetOptions={datasetOptions} />
+                    <SelectorDataset
+                    datasetType={"CV"}
+
+                    error={trainingForm.CVDataset.error}
+                    helperText={trainingForm.CVDataset.error ? trainingForm.CVDataset.helper : ''}
+                    selectedDataset={selectedCVDataset}
+                    handleChange={(event) => {
+                        handleSelectorFormChange({
+                            eve: event,
+                            setSelector: setSelectedCVDataset,
+                            setForm: setTrainingForm,
+                            options: datasetOptions
+                        })
+                        validateField({ key: 'CVDataset', setFormState: setTrainingForm })
+
+                    }}
+                    datasetOptions={datasetOptions} />
+                    <SelectorDataset
+                    datasetType={"test"}
+                    error={trainingForm.testDataset.error}
+                    helperText={trainingForm.testDataset.error ? trainingForm.testDataset.helper : ''}
+                    selectedDataset={selectedTestDataset}
+                    handleChange={(event) => {
+                        handleSelectorFormChange({
+                            eve: event,
+                            setSelector: setSelectedTestDataset,
+                            setForm: setTrainingForm,
+                            options: datasetOptions
+                        })
+                        validateField({ key: 'testDataset', setFormState: setTrainingForm })
 
                     }}
                     datasetOptions={datasetOptions} />
@@ -261,16 +306,7 @@ export default function Training() {
                     }}
                     lossOptions={lossOptions}
                 />
-                <TextField
-                    error={trainingForm.xVal.error}
-                    helperText={trainingForm.xVal.error ? trainingForm.xVal.helper : ''}
-                    name="xVal"
-                    label="Cross validation set %"
-                    value={trainingForm.xVal.value}
-                    onChange={(event) => {
-                        handleTextFieldChange({ eve: event, setState: setTrainingForm })
-                        validateField({ key: 'xVal', setFormState: setTrainingForm })
-                    }} />
+
                 <Button
                     variant='contained'
                     style={{ alignSelf: 'center', width: '150px' }}

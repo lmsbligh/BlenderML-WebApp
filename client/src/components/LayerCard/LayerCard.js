@@ -115,7 +115,7 @@ const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFun
                             validateField({ key: 'x_1', setFormState: setLocalLayer });
                             validateLayerDimensions(localLayer, prevLayer)
                             }}/>
-                <TextField 
+                {/* <TextField 
                     name="x_2" 
                     label="x_2" 
                     error={localLayer.x_2.error}
@@ -136,7 +136,7 @@ const LayerCard = ({ layerUpdater, layer, prevLayer, index, saveCallback, delFun
                         (event) => { 
                             handleTextFieldChange({ eve: event, setState: setLocalLayer }) 
                             validateField({ key: 'x_3', setFormState: setLocalLayer });
-                            }}/>
+                            }}/> */}
             </Box>
             <TextField 
                 name="padding" 

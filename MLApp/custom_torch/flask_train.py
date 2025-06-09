@@ -26,7 +26,6 @@ def train(training_form):
     dataset = training_form['dataset']
     epochs = int(training_form['epochs'])
     learning_rate = float(training_form['learningRate'])
-    x_val = training_form['xVal']
     optimiser = training_form['optimizer']
     loss_function = training_form['lossFunction']
     match optimiser:
@@ -46,12 +45,13 @@ def train(training_form):
     dataset_date_time = dataset[dataset.find('-')+1:]
     #dataset_dir = f'MLApp\\data\\training_datasets\\{dataset_profile}\\{dataset_date_time}'
     dataset_dir = os.path.join(os.getcwd(),"MLApp", "data", "training_datasets", dataset_profile, dataset_date_time)
-    
+    !!!training_dataset_dir = os.path.join(os.getcwd(),"MLApp", "data", "training_datasets", training_form['trainingDataset'])
     transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))])
     
     targets = target_loader(dataset_dir) 
-    data_set = ImageDataset(dataset_dir, targets ,transform=transform)
-    data_loader = DataLoader(data_set, shuffle=True)
+    training_dataset = ImageDataset(dataset_dir, targets ,transform=transform)
+    
+    data_loader = DataLoader(training_dataset, shuffle=True)
     model_data = []
     try:
         print("model_id: ", model_id)

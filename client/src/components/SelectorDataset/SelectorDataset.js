@@ -6,16 +6,16 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 
 
-function SelectorDataset ({ helperText, error, selectedDataset, handleChange, datasetOptions}){
+function SelectorDataset ({ helperText, error, selectedDataset, handleChange, datasetOptions, datasetType}){
     
     return (   
         <FormControl sx={{ width: "100%", padding: "5px" }}> 
-            {!selectedDataset && <InputLabel >Select a dataset </InputLabel>}                  
+            {!selectedDataset && <InputLabel >Select a {datasetType} dataset </InputLabel>}                  
             <Select
                 labelId="Dataset-Selector-Label"
                 id="simple-select"
                 sx={{width: "100%"}}
-                name="dataset"
+                name={datasetType+"Dataset"}
                 value={selectedDataset}
                 onChange={handleChange}
                 error={error}
@@ -29,7 +29,8 @@ function SelectorDataset ({ helperText, error, selectedDataset, handleChange, da
                         <Card sx={{ width: "100%"}}>
                             <CardContent>
                                 <Typography>
-                                    Dataset Name: {option.datasetName}
+                                    Dataset Name: {option.datasetName}<br></br>
+                                    Dataset Split: {option.split}
                                 </Typography>
                                 <Typography color="text.secondary">Dataset Size: {option.datasetSize}</Typography>
 

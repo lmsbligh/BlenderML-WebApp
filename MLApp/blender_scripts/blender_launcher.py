@@ -15,6 +15,7 @@ def launch_blender(data="train", script="", scene_props="", render_dir=""):
         Location of the script to run in Blender on launch.
 
     """
+    os.makedirs(render_dir, exist_ok=True)
     script_path = os.path.join(os.getcwd(), script)
     print("script_path:", script_path)
     data_path = os.path.join(os.getcwd(), data)
@@ -40,9 +41,9 @@ def launch_blender(data="train", script="", scene_props="", render_dir=""):
     sample_URLs = []
     for file in sample_scandir:
             sample_URLs.append(f"{render_dir}\\{file.name}".replace("\\", "/"))
-    if len(sample_URLs) > 9:
-        return sample_URLs[:9]
+    if len(sample_URLs) > 5:
+        return sample_URLs[:5]
     elif len(sample_URLs) >= 1:
-        return sample_URLs[0]
+        return [sample_URLs[0:len(sample_URLs)]]
     else:
         return "null"

@@ -8,6 +8,7 @@ from flask import Blueprint, abort, current_app, jsonify, request, send_from_dir
 from MLApp.parameters import render_data_script
 from MLApp.blender_scripts.blender_launcher import launch_blender
 from MLApp.data_generator.prop_generator import gen_props_json
+from ..services.dataset_service import save_dataset_props, add_dataset_db
 from ..forms.dataset_forms import DATASET_PROFILE_FORM
 from ..utils import validate_form
 
@@ -123,19 +124,94 @@ def submit_dataset_profile():
         DATASET_PROFILES_LIST[ind] = profile_to_save
     else:
         DATASET_PROFILES_LIST.append(profile_to_save)
-    cur.execute('INSERT INTO profiles (value, datasetName, datasetSize, CVPercentage, TrainingSetPercentage, description, imageHeight, imageWidth, meshes, randomOrientation, skyboxPath) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(value) DO UPDATE SET datasetName = excluded.datasetName, datasetSize = excluded.datasetSize, description = excluded.description, CVPercentage = excluded.CVPercentage, TrainingSetPercentage = excluded.TrainingSetPercentage, imageHeight = excluded.imageHeight, imageWidth = excluded.imageWidth, meshes = excluded.meshes, randomOrientation = excluded.randomOrientation, skyboxPath = excluded.skyboxPath;', (profile_to_save['value'], profile_to_save['datasetName'], profile_to_save['datasetSize'], profile_to_save['CVPercentage'], profile_to_save['TrainingSetPercentage'], profile_to_save['description'], profile_to_save['imageHeight'], profile_to_save['imageWidth'], json.dumps(profile_to_save['meshes']), profile_to_save['randomOrientation'], profile_to_save['skyboxPath']))
+    cur.execute("INSERT INTO profiles ("
+                "value, " 
+                "datasetName, "
+                "datasetSize, "
+                "CVPercentage, "
+                "TestSetPercentage, "
+                "description, "
+                "imageHeight, "
+                "imageWidth, "
+                "randomOrientation )"
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(value) DO UPDATE SET "
+                "datasetName = excluded.datasetName, "
+                "datasetSize = excluded.datasetSize, "
+                "description = excluded.description, "
+                "CVPercentage = excluded.CVPercentage, "
+                "TestSetPercentage = excluded.TestSetPercentage, "
+                "imageHeight = excluded.imageHeight, "
+                "imageWidth = excluded.imageWidth, "
+                "randomOrientation = excluded.randomOrientation",
+                (profile_to_save['value'], 
+                profile_to_save['datasetName'], 
+                profile_to_save['datasetSize'], 
+                profile_to_save['CVPercentage'], 
+                profile_to_save['TestSetPercentage'], 
+                profile_to_save['description'], 
+                profile_to_save['imageHeight'], 
+                profile_to_save['imageWidth'], 
+                profile_to_save['randomOrientation']))
     con.commit()
     con.close()
     print(jsonify({"value": profile_to_save['value'], "body": "success!"}), 200)  
     return jsonify({"value": profile_to_save['value'], "body": "success!"}), 200
+@bp.route('/submit_generate_dataset', methods=["POST"])
+def submit_generate_dataset():
+    """
+    POSTs dataset profile JSON form to server to initiate the generation of a dataset as well as saving the submitted profile.
+    
+    Route: /submit_generate_dataset
+    
+    returns:
+        - 200 - Success
+        - 400 - Error
+    """
+    DATABASE_PATH = current_app.config["DATABASE_PATH"]    
+    generate_profile = json.loads(request.data.decode('utf-8'))
+    time_stamp = time.strftime('%d-%m-%Y-%H%M-%S')
+    dataset_value = f"{generate_profile['value']}-{time_stamp}"
+    prof_dir = os.path.join("MLApp", "data", "training_datasets",str(generate_profile['value']), time_stamp)
+    generate_profile['renderDir'] = prof_dir
+    size = generate_profile['datasetSize']
+    
+    save_dataset_props(os.path.join(prof_dir, "train"), generate_profile, "train")
+    add_dataset_db(dataset_value=dataset_value+"-train", db_path=DATABASE_PATH, generate_profile=generate_profile, split="train")
+    train_dir = os.path.join(prof_dir, "train")
+    sample_URLs = launch_blender(data=os.path.join(train_dir, "props"), 
+                                 script=os.path.join("MLApp", render_data_script), 
+                                 scene_props=os.path.join(train_dir, "props","scene_props.json"), 
+                                 render_dir=train_dir)
+
+    
+    if (generate_profile["CVPercentage"] > 0):
+        split_dir = os.path.join(prof_dir, "CV")
+        save_dataset_props(split_dir, generate_profile, "CV")
+        add_dataset_db(dataset_value=dataset_value+"-CV", db_path=DATABASE_PATH, generate_profile=generate_profile, split="CV")
+        launch_blender(data=os.path.join(split_dir, "props"), 
+                       script=os.path.join("MLApp", render_data_script), 
+                       scene_props=os.path.join(split_dir, "props","scene_props.json"), 
+                       render_dir=split_dir)
+        
+    if (generate_profile["TestSetPercentage"] > 0):
+        split_dir = os.path.join(prof_dir, "test")
+        save_dataset_props(split_dir, generate_profile, "test")
+        add_dataset_db(dataset_value=dataset_value+"-test", db_path=DATABASE_PATH, generate_profile=generate_profile, split="test")
+        launch_blender(data=os.path.join(split_dir, "props"), 
+                       script=os.path.join("MLApp", render_data_script), 
+                       scene_props=os.path.join(split_dir, "props","scene_props.json"), 
+                       render_dir=split_dir)
+    print("!!!sample URLS: ", sample_URLs)
+    return jsonify({"sample_URLs": sample_URLs, "body": "success!"}), 200
 
 @bp.route('/delete_dataset/<dataset_ID>', methods=["POST"])
 def delete_dataset(dataset_ID):
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
     DATASETS_DIR_PATH = current_app.config["DATASETS_DIR_PATH"]
     dataset_profile_id = dataset_ID[:8]
-    dataset_dir = dataset_ID[9:]
-    dataset_full_path = os.path.realpath(os.path.join(DATASETS_DIR_PATH, dataset_profile_id, dataset_dir))
+    dataset_base_dir = os.path.join(dataset_ID[9:27])
+    dataset_split_dir = os.path.join(dataset_base_dir, dataset_ID.split('-')[-1])
+    dataset_full_path = os.path.realpath(os.path.join(DATASETS_DIR_PATH, dataset_profile_id, dataset_split_dir))
     
     try:
         con = sqlite3.connect(DATABASE_PATH)
@@ -157,7 +233,24 @@ def delete_dataset(dataset_ID):
     #del DATASET_PROFILES_LIST[ind]
 
     return jsonify({"body": "Profile deleted successfully!"}), 200
+
+@bp.route('/MLApp/data/training_datasets/<string:profile_id>/<path:dataset_render_date>/<path:dataset_filename>', methods=['GET'])
+def return_sample(profile_id, dataset_render_date, dataset_filename):
+    """
+    Requests a sample of images from a generated datset.
     
+    Route: /MLApp/data/training_datasets/<string:profile_id>/<path:dataset_render_date>/<path:dataset_filename>
+    
+    Args:
+        - profile_id
+        - dataset_render_date
+        - dataset_filename
+    returns:
+        - 200 - Success
+        - 400 - Error
+    """
+    return send_from_directory(f"../MLApp/data/training_datasets/{profile_id}/{dataset_render_date}/", dataset_filename)
+
 @bp.route('/delete_dataset_profile', methods=["POST"])
 def delete_dataset_profile():
     """
@@ -202,76 +295,3 @@ def delete_dataset_profile():
         return jsonify({"error": f"Deleted from database but not from filesytem: {str(e)}"})
     return jsonify({"body": "Profile deleted successfully!"}), 200
 
-@bp.route('/submit_generate_dataset', methods=["POST"])
-def submit_generate_dataset():
-    """
-    POSTs dataset profile JSON form to server to initiate the generation of a dataset as well as saving the submitted profile.
-    
-    Route: /submit_generate_dataset
-    
-    returns:
-        - 200 - Success
-        - 400 - Error
-    """
-    DATABASE_PATH = current_app.config["DATABASE_PATH"]    
-    generate_profile = json.loads(request.data.decode('utf-8'))
-    time_stamp = time.strftime('%d-%m-%Y-%H%M-%S')
-    dataset_value = f"{generate_profile['value']}-{time_stamp}"
-    prof_dir = os.path.join("MLApp", "data", "training_datasets",str(generate_profile['value']), time_stamp)
-    generate_profile['renderDir'] = prof_dir
-    size = generate_profile['datasetSize']
-    gen_props_json(prof_dir, size)
-    
-    with open(os.path.join(prof_dir, "props", "scene_props.json"), 'w+') as file:    
-        # try:
-        #     file_data = json.load(file) if file_exists and file.read().strip() else []
-        # except json.JSONDecodeError:
-        #     file_data = []  # If there's an error, just use an empty dictionary
-        
-        json.dump(generate_profile, file)
-    sample_URLs = launch_blender(data=os.path.join(prof_dir, "props"), script=os.path.join("MLApp", render_data_script), scene_props=os.path.join(prof_dir, "props","scene_props.json"), render_dir=prof_dir)
-    
-    con = sqlite3.connect(DATABASE_PATH)
-    cur = con.cursor()
-    #cur.execute("DROP TABLE datasets")
-    #cur.execute("CREATE TABLE datasets (value TEXT UNIQUE, datasetName TEXT, datasetSize INTEGER, description TEXT, imageHeight INTEGER, imageWidth INTEGER, meshes TEXT, randomOrientation TEXT, skyboxPath TEXT)")
-    sql = ("INSERT INTO datasets (value, datasetName, datasetSize, description, imageHeight, imageWidth, meshes, randomOrientation, skyboxPath) "
-           "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) "
-           "ON CONFLICT(value) DO UPDATE SET " 
-           "datasetName = excluded.datasetName, "
-           "datasetSize = excluded.datasetSize, "
-           "description = excluded.description, "
-           "imageHeight = excluded.imageHeight, "
-           "imageWidth = excluded.imageWidth, "
-           "meshes = excluded.meshes, " 
-           "randomOrientation = excluded.randomOrientation, "
-           "skyboxPath = excluded.skyboxPath;")
-    cur.execute(sql, (dataset_value, 
-                      generate_profile['datasetName'], 
-                      generate_profile['datasetSize'], 
-                      generate_profile['description'], 
-                      generate_profile['imageHeight'], 
-                      generate_profile['imageWidth'], 
-                      json.dumps(generate_profile['meshes']), 
-                      generate_profile['randomOrientation'], 
-                      generate_profile['skyboxPath']))
-    con.commit()
-    con.close()
-    return jsonify({"sample_URLs": sample_URLs, "body": "success!"}), 200
-
-@bp.route('/MLApp/data/training_datasets/<string:profile_id>/<path:dataset_render_date>/<path:dataset_filename>', methods=['GET'])
-def return_sample(profile_id, dataset_render_date, dataset_filename):
-    """
-    Requests a sample of images from a generated datset.
-    
-    Route: /MLApp/data/training_datasets/<string:profile_id>/<path:dataset_render_date>/<path:dataset_filename>
-    
-    Args:
-        - profile_id
-        - dataset_render_date
-        - dataset_filename
-    returns:
-        - 200 - Success
-        - 400 - Error
-    """
-    return send_from_directory(f"../MLApp/data/training_datasets/{profile_id}/{dataset_render_date}/", dataset_filename)

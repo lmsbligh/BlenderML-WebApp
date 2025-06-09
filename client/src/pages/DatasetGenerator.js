@@ -23,7 +23,7 @@ export default function DatasetGenerator() {
         "datasetName": '',
         "datasetSize": '10',
         "CVPercentage": '20',
-        "TrainingSetPercentage": '20',
+        "TestSetPercentage": '20',
         "skyboxPath": '',
         "imageWidth": '250',
         "imageHeight": '250',
@@ -70,7 +70,7 @@ export default function DatasetGenerator() {
                 required: true,
                 helper: ""
             }),
-            "TrainingSetPercentage": new Validation({
+            "TestSetPercentage": new Validation({
                 value: "",
                 error: false,
                 regex: /^(?:[0-9]|[1-2][0-9]|30)$/,
@@ -422,10 +422,10 @@ export default function DatasetGenerator() {
                             >
                                 <Slider
                                     aria-label="Always visible"
-                                    label="TrainingSetPercentage"
-                                    name="TrainingSetPercentage"
+                                    label="TestSetPercentage"
+                                    name="TestSetPercentage"
                                     onChange={sliderHandleChange}
-                                    value={Number(profileForm.TrainingSetPercentage.value)}
+                                    value={Number(profileForm.TestSetPercentage.value)}
                                     getAriaValueText={(value) => `${value}%`}
                                     step={1}
                                     min={0}
@@ -476,44 +476,6 @@ export default function DatasetGenerator() {
                             helperText={profileForm.description.error ? profileForm.description.helper : ''}
                             value={profileForm.description.value}
                             sx={{ padding: "5px", width: "100%" }}></TextField>
-                        <Paper variant='outlined'>
-                            <Typography>
-                                Available meshes:
-                            </Typography>
-                            <List sx={{ display: "flex", flexDirection: "column" }}>
-                                <ListItem>
-                                    <FormControlLabel
-                                        control={<Checkbox checked={Boolean(profileForm.meshes.value["cube"] || false)}
-                                            name="cube" onChange={handleMeshListChange}
-                                            sx={{ padding: "5px" }} />}
-                                        label="Cube" />
-                                </ListItem>
-                                <ListItem>
-                                    <FormControlLabel
-                                        control={<Checkbox
-                                            checked={Boolean(profileForm.meshes.value["sphere"] || false)}
-                                            name="sphere" onChange={handleMeshListChange}
-                                            sx={{ padding: "5px" }} />}
-                                        label="Sphere" />
-                                </ListItem>
-                                <ListItem>
-                                    <FormControlLabel
-                                        control={<Checkbox checked={Boolean(profileForm.meshes.value["monkey"] || false)}
-                                            name="monkey"
-                                            onChange={handleMeshListChange}
-                                            sx={{ padding: "5px" }} />}
-                                        label="Monkey" />
-                                </ListItem>
-                                <ListItem>
-                                    <FormControlLabel
-                                        control={<Checkbox checked={Boolean(profileForm.meshes.value["car"] || false)}
-                                            name="car" onChange={handleMeshListChange}
-                                            sx={{ padding: "5px" }} />}
-                                        label="Car" />
-                                </ListItem>
-                            </List>
-
-                        </Paper>
                         <FormControlLabel control={<Checkbox checked={Boolean(profileForm.randomOrientation.value || false)} onChange={handleRandomOrientationChange} sx={{ padding: "10px" }} />} label="Randomized orientation" />
                         <Box sx={{
                             display: "flex",
@@ -540,7 +502,7 @@ export default function DatasetGenerator() {
                             flexDirection: "horizontal",
                             justifyContent: 'flex-start',
                         }}>
-                            {sampleImages ? () => (
+                            {Array.isArray(sampleImages) && sampleImages.length > 0 ? (
                                 <Box sx={{
                                     display: "flex",
                                     flexWrap: "wrap",
@@ -559,7 +521,7 @@ export default function DatasetGenerator() {
                                         </Card>
                                     ))}
                                 </Box>
-                            ) : <Typography>No images</Typography>}
+                            ) : null}
                             <List disablePadding sx={{
                                 display: "flex",
                                 flexWrap: "wrap",
@@ -586,6 +548,7 @@ export default function DatasetGenerator() {
                                             <IconButton aria-label="delete" color="primary" onClick={() => { delDataset(option.value) }}><DeleteIcon /></IconButton>
                                         </Box>
                                         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
+                                            <Typography color="text.primary">Split: {option.split}</Typography>
                                             <Typography color="text.secondary">Render Date and Time: {option.value.slice(9)}</Typography>
                                             <Typography color="text.secondary">Size: {option.datasetSize}</Typography>
                                             <Typography color="text.secondary">Description: {option.description}</Typography>
