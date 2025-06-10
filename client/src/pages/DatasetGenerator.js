@@ -140,9 +140,7 @@ export default function DatasetGenerator() {
     function valuetext(value) {
         return `${Math.ceil(value)}%`;
     }
-    React.useEffect(() => {
-        // console.log("Fetched profiles:", profileOptions);
-    }, [profileOptions]);
+
     React.useEffect(() => {
         fetchData('dataset_profiles', setProfileOptions)
     }, []);
@@ -165,7 +163,6 @@ export default function DatasetGenerator() {
         })
     }
     React.useEffect(() => {
-        console.log("SelectedDatasetProfile changed", selectedDatasetProfile)
         if (selectedDatasetProfile && Object.keys(selectedDatasetProfile).length > 0) {
             fillForm()
         }
@@ -210,7 +207,6 @@ export default function DatasetGenerator() {
         setSelectedDatasetProfile(defaultProfile)
     }
     const fillObject = () => {
-        console.log("profileForm: ", profileForm)
         setSelectedDatasetProfile((prevVals) => {
             return produce(prevVals, (draft) => {
                 for (var key in profileForm) {
@@ -238,8 +234,6 @@ export default function DatasetGenerator() {
         for (let key in profileForm) {
             validateField({ key: key, setFormState: setProfileForm })
         }
-        console.log("selectedDatasetProfile pre fillObject: ", selectedDatasetProfile)
-        console.log("profileForm pre fillobject(): ", profileForm)
         const updatedProfile = {};
         for (const key in profileForm) {
             updatedProfile[key] = profileForm[key].value;
@@ -248,7 +242,6 @@ export default function DatasetGenerator() {
 
         setTimeout(() => {
             if (!validateForm({ formElement: profileForm })) {
-                console.log('selectedDatasetProfile post fillObject(): ', selectedDatasetProfile)
                 pushData('submit_dataset_profile', {...selectedDatasetProfile, ...updatedProfile})
                     .then(async (response) => {
                         const data = await response.json();

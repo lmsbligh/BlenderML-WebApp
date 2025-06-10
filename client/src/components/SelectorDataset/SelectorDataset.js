@@ -10,7 +10,7 @@ function SelectorDataset ({ helperText, error, selectedDataset, handleChange, da
     
     return (   
         <FormControl sx={{ width: "100%", padding: "5px" }}> 
-            {!selectedDataset && <InputLabel >Select a {datasetType} dataset </InputLabel>}                  
+            {<InputLabel >Select a {datasetType} dataset </InputLabel>}                  
             <Select
                 labelId="Dataset-Selector-Label"
                 id="simple-select"
@@ -21,7 +21,7 @@ function SelectorDataset ({ helperText, error, selectedDataset, handleChange, da
                 error={error}
                 renderValue={(selected) => {
                     const selectedOption = datasetOptions.find((option) => option.value === selected.value);
-                    return selectedOption ? selectedOption.datasetName : <Typography>Select a Dataset</Typography>;
+                    return selectedOption ? selectedOption.datasetName+' '+ selectedOption.value.slice(9) : <Typography>Select a Dataset</Typography>;
                   }}
             >
                 {datasetOptions.map(option => (

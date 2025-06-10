@@ -75,8 +75,6 @@ export const handleTextFieldChange = ({ eve, setState }) => {
 // }
 export const validateForm = ({ formElement, elementParent = null }) => {
 
-    console.log("validateForm(): ")
-    console.log(formElement)
     //console.log(formElement.constructor.name)
     switch (formElement.constructor.name) {
         case "Array":
@@ -89,12 +87,8 @@ export const validateForm = ({ formElement, elementParent = null }) => {
             if ("type" in formElement) {
                 switch (formElement.type) {
                     case "Validation":
-                        console.log("Validation: ", formElement)
-                        console.log("Validation evaluation: ", validateValidator(formElement));
                         return validateValidator(formElement);
                     case "Layer":
-                        console.log("Layer evaluation: ", validateLayer(formElement));
-                        console.log("Rehydrated layer")
                         var layerIndex = elementParent.findIndex((option) => option.id === formElement.id)
                         if (layerIndex > 0) {
                             const [x_0_error, x_0_helper] = validateLayerDimensions({ layer: formElement, layers: elementParent[layerIndex - 1] });
@@ -116,7 +110,6 @@ export const validateForm = ({ formElement, elementParent = null }) => {
             }
         default:
             //console.log("Error: Invalid formElement.")
-            console.log("default: formElement.constructor.name: ", formElement.constructor.name)
             break;
     }
 }

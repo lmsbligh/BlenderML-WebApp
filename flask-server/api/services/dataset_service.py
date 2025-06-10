@@ -29,6 +29,15 @@ def add_dataset_db(dataset_value, db_path, generate_profile, split):
     
     con = sqlite3.connect(db_path)
     cur = con.cursor()
+    dataset_size = 0
+    match split:
+        case 'train':
+            dataset_size = generate_profile['datasetSize']*(100 - generate_profile['CVPercentage'] - generate_profile['TestSetPercentage'])/100
+        case 'CV':
+            dataset_size = generate_profile['datasetSize']*generate_profile['CVPercentage']/100
+        case 'test':
+            dataset_size = generate_profile['datasetSize']*generate_profile['TestSetPercentage']/100
+    
     #cur.execute("DROP TABLE datasets")
     #cur.execute("CREATE TABLE datasets (value TEXT UNIQUE, datasetName TEXT, datasetSize INTEGER, description TEXT, imageHeight INTEGER, imageWidth INTEGER, meshes TEXT, randomOrientation TEXT, skyboxPath TEXT)")
     sql = ("INSERT INTO datasets (value, datasetName, split, datasetSize, description, imageHeight, imageWidth, randomOrientation) "
@@ -44,7 +53,7 @@ def add_dataset_db(dataset_value, db_path, generate_profile, split):
     cur.execute(sql, (dataset_value, 
                       generate_profile['datasetName'],
                       split, 
-                      generate_profile['datasetSize'], 
+                      dataset_size, 
                       generate_profile['description'], 
                       generate_profile['imageHeight'], 
                       generate_profile['imageWidth'], 
