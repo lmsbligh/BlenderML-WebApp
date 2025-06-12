@@ -46,21 +46,21 @@ export default function Training() {
             value: "",
             error: false,
             regex: "",
-            required: true,
+            required: false,
             helper: "Please select a training dataset."
         }),
         "CVDataset": new Validation({
             value: "",
             error: false,
             regex: "",
-            required: true,
+            required: false,
             helper: "Please select a CV dataset."
         }),
         "testDataset": new Validation({
             value: "",
             error: false,
             regex: "",
-            required: true,
+            required: false,
             helper: "Please select a test dataset."
         }),
         "epochs": new Validation({

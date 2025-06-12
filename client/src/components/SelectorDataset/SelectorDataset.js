@@ -24,6 +24,15 @@ function SelectorDataset ({ helperText, error, selectedDataset, handleChange, da
                     return selectedOption ? selectedOption.datasetName+' '+ selectedOption.value.slice(9) : <Typography>Select a Dataset</Typography>;
                   }}
             >
+                <MenuItem key={-1} value={""}>        
+                        <Card sx={{ width: "100%"}}>
+                            <CardContent>
+                                <Typography>
+                                    None
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                </MenuItem>
                 {datasetOptions.map(option => (
                     <MenuItem key={option.value} value={option.value}>        
                         <Card sx={{ width: "100%"}}>
@@ -44,6 +53,7 @@ function SelectorDataset ({ helperText, error, selectedDataset, handleChange, da
                         </Card>
                     </MenuItem>
                 ))}
+                
             </Select>
             <FormHelperText sx={{color: 'error.main'}}>{helperText}</FormHelperText>
         </FormControl>

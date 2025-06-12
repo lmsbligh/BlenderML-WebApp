@@ -14,19 +14,19 @@ TRAINING_FORM = {
         "trainingDataset": {
             "data_type": str,
             "regex": r"^[A-Za-z0-9 -]{1,36}$",
-            "required": True,
+            "required": False,
             "helper": "Please select a training dataset."
         },
         "CVDataset": {
             "data_type": str,
             "regex": r"^[A-Za-z0-9 -]{1,36}$",
-            "required": True,
+            "required": False,
             "helper": "Please select a CV dataset."
         },
         "testDataset": {
             "data_type": str,
             "regex": r"^[A-Za-z0-9 -]{1,36}$",
-            "required": True,
+            "required": False,
             "helper": "Please select a test dataset."
         },
         "epochs": {
