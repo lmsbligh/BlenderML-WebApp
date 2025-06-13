@@ -16,7 +16,7 @@ function SelectorDataset ({ helperText, error, selectedDataset, handleChange, da
                 id="simple-select"
                 sx={{width: "100%"}}
                 name={datasetType+"Dataset"}
-                value={selectedDataset}
+                value={selectedDataset || "-1"}
                 onChange={handleChange}
                 error={error}
                 renderValue={(selected) => {

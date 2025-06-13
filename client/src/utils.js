@@ -27,6 +27,7 @@ export const handleSelectorFormChange = ({ eve, setSelector, setForm, options })
     else {
         setSelector(eve.target.value)
     }
+    console.log("VALUE: !!!! ", eve.target.value)
     const selectLabel = eve.target.name
     setForm((prevVals) => {
         return produce(prevVals, (draft) => {

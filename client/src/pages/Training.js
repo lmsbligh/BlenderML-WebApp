@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { Accordion, AccordionDetails, AccordionSummary, Button, Card, Grid } from '@mui/material/';
+import { Accordion, AccordionDetails, AccordionSummary, Button, Card, Grid, FormHelperText } from '@mui/material/';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -90,7 +90,10 @@ export default function Training() {
             required: true
         })
     }))
-
+    const [trainingMode, setTrainingMode] = useImmer({
+        "selected": false,
+        "helper": "Please select a training, CV or test set."
+    })
     const [modelData, setModelData] = useImmer([]);
     const [selectedModel, setSelectedModel] = React.useState('');
 
@@ -99,7 +102,7 @@ export default function Training() {
     const [selectedCVDataset, setSelectedCVDataset] = React.useState('');
     const [selectedTestDataset, setSelectedTestDataset] = React.useState('');
 
-    
+
     const [optimizerOptions, setOptimizerOptions] = React.useState([{ "value": 0, "label": "Gradient descent" }, { "value": 1, "label": "ADAM" }]);
     const [selectedOptimizer, setSelectedOptimizer] = React.useState(optimizerOptions[1]);
 
@@ -121,13 +124,83 @@ export default function Training() {
     }, [selectedModel]);
 
 
+    const checkDatasetSelected = (event) => {
+        console.log("checkDatasetSelected ran")
+        console.log("event.value: ", event.target.value)
+        console.log("event.target.name: ", event.target.name)
+        if (event.target.value != "") {
+            setTrainingMode((prevVal) => {
+                return produce(prevVal, (draft) => {
+                    draft["selected"] = true
+                })
+            })
+        }
+        if (event.target.value === "") {
+            switch (event.target.name) {
+                case "trainingDataset":
+                    console.log("trainingForm.CVDataset: ", trainingForm.CVDataset)
+                    console.log("trainingForm.CVDataset: ", trainingForm.testDataset)
+
+                    if (!trainingForm.CVDataset.value && !trainingForm.testDataset.value) {
+                        setTrainingMode((prevVal) => {
+                            return produce(prevVal, (draft) => {
+                                draft["selected"] = false
+                            })
+                        })
+                    }
+                    else {
+                        setTrainingMode((prevVal) => {
+                            return produce(prevVal, (draft) => {
+                                draft["selected"] = true
+                            })
+                        })
+                    }
+                    break;
+                case "CVDataset":
+                    if (!trainingForm.trainingDataset.value && !trainingForm.testDataset.value) {
+                        setTrainingMode((prevVal) => {
+                            return produce(prevVal, (draft) => {
+                                draft["selected"] = false
+                            })
+                        })
+                    }
+                    else {
+                        setTrainingMode((prevVal) => {
+                            return produce(prevVal, (draft) => {
+                                draft["selected"] = true
+                            })
+                        })
+                    }
+                    break;
+                case "testDataset":
+                    if (!trainingForm.CVDataset.value && !trainingForm.trainingDataset.value) {
+                        setTrainingMode((prevVal) => {
+                            return produce(prevVal, (draft) => {
+                                draft["selected"] = false
+                            })
+                        })
+                    }
+                    else {
+                        setTrainingMode((prevVal) => {
+                            return produce(prevVal, (draft) => {
+                                draft["selected"] = true
+                            })
+                        })
+                    }
+                    break;
+            }
+
+        }
+    }
+    
     const handleTrain = (event) => {
         for (let key in trainingForm) {
-            validateField({key: key, setFormState: setTrainingForm})
+            validateField({ key: key, setFormState: setTrainingForm })
         }
         setTimeout(() => {
+
             var formValid = validateForm({ formElement: trainingForm })
-            if (!formValid) {
+            if (!formValid && trainingMode.selected) {
                 const formToPush = {
                     model: trainingForm.model.value,
                     checkpoint: trainingForm.checkpoint.value,
@@ -219,11 +292,12 @@ export default function Training() {
                             setForm: setTrainingForm,
                             options: datasetOptions
                         })
+                        checkDatasetSelected(event)
                         validateField({ key: 'trainingDataset', setFormState: setTrainingForm })
 
                     }}
                     datasetOptions={datasetOptions} />
-                    <SelectorDataset
+                <SelectorDataset
                     datasetType={"CV"}
 
                     error={trainingForm.CVDataset.error}
@@ -236,11 +310,12 @@ export default function Training() {
                             setForm: setTrainingForm,
                             options: datasetOptions
                         })
+                        checkDatasetSelected(event)
                         validateField({ key: 'CVDataset', setFormState: setTrainingForm })
 
                     }}
                     datasetOptions={datasetOptions} />
-                    <SelectorDataset
+                <SelectorDataset
                     datasetType={"test"}
                     error={trainingForm.testDataset.error}
                     helperText={trainingForm.testDataset.error ? trainingForm.testDataset.helper : ''}
@@ -252,6 +327,7 @@ export default function Training() {
                             setForm: setTrainingForm,
                             options: datasetOptions
                         })
+                        checkDatasetSelected(event)
                         validateField({ key: 'testDataset', setFormState: setTrainingForm })
 
                     }}
@@ -306,13 +382,14 @@ export default function Training() {
                     }}
                     lossOptions={lossOptions}
                 />
-
+                {trainingMode.selected ? null : <FormHelperText sx={{color: 'error.main'}}>{trainingMode.helper}</FormHelperText>}
                 <Button
                     variant='contained'
                     style={{ alignSelf: 'center', width: '150px' }}
                     onClick={handleTrain}
+                    disabled={!trainingMode.selected}
                 >
-                    Train
+                    Train/Test
                 </Button>
             </Grid>
         </Grid>
