@@ -1,4 +1,6 @@
-MLApp/data/
+MLApp/data/models
+MLApp/data/training_datasets
+MLApp/data/user_uploaded_test
 MLApp/__pycache__
 *.pth
 .venv
