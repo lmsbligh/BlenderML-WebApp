@@ -9,6 +9,7 @@ from torch import nn
 from torchvision import transforms
 from torch.utils.data import DataLoader
 
+from flask_server.sockets import socketio
 from MLApp.custom_torch.image_dataset import ImageDataset
 from MLApp.custom_torch.custom_net import CustomNet
 
@@ -18,16 +19,25 @@ from MLApp.parameters import device
 
 from MLApp.custom_torch.target_loader import target_loader
 
+training_cancelled = False
+
+def cancel_training():
+    global training_cancelled
+    training_cancelled = True
+    
 def train(training_form):
     """
     Simple training loop using parameters from the training_form, saves a checkpoint.
     """
     print(training_form)
+    global training_cancelled
+    training_cancelled = False  # reset at start
     # dataset = training_form['dataset']
     epochs = int(training_form['epochs'])
     learning_rate = float(training_form['learningRate'])
     optimiser = training_form['optimizer']
     loss = training_form['lossFunction']
+    batch_size = training_form['batchSize']
     
     match optimiser:
         case 'Gradient descent':
@@ -67,7 +77,7 @@ def train(training_form):
     test_data_loader = gen_dataloader(test_dataset_dir, transform) if test_dataset_dir and os.path.exists(test_dataset_dir) else None
     
     if (training_data_loader):
-        training_loop(epochs, model_id, model_checkpoint, learning_rate, training_data_loader, loss_function)
+        training_loop(epochs, model_id, model_checkpoint, learning_rate, training_data_loader, loss_function, batch_size)
     
     if (CV_data_loader):
         test_loop(model_id, model_checkpoint, CV_data_loader, loss_function, "CV")
@@ -76,7 +86,7 @@ def train(training_form):
         test_loop(model_id, model_checkpoint, test_data_loader, loss_function, "test")
 
 
-def training_loop(epochs, model_id, model_checkpoint, learning_rate, data_loader, loss_function):
+def training_loop(epochs, model_id, model_checkpoint, learning_rate, data_loader, loss_function, batch_size):
     model_data = []
     try:
         print("model_id: ", model_id)
@@ -98,12 +108,15 @@ def training_loop(epochs, model_id, model_checkpoint, learning_rate, data_loader
     model.to(device)
     state_dict_path = os.path.join("MLApp", state_dict_dir, model_id, model_checkpoint)
     model.load_state_dict(torch.load(state_dict_path))
-    
+    training_data = []
     for epoch in range(epochs):  # loop over the dataset
         optim_instance = OPTIMIZER(model.parameters(), lr=learning_rate)
         running_loss = 0.0
         print(f"Epoch: {epoch}/{epochs}")
         for i, data in enumerate(data_loader, 0):
+            if training_cancelled:
+                socketio.emit("training_cancelled", {"message": "Training cancelled by user."})
+                return
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
 
@@ -118,9 +131,19 @@ def training_loop(epochs, model_id, model_checkpoint, learning_rate, data_loader
 
             # print statistics
             running_loss += loss.item()
-            if i % 20 == 19:    # print every 20 mini-batches
+            if i % batch_size == batch_size - 1: 
                 print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 20:.6f}')
                 running_loss = 0.0
+                batch_data = {
+                'epoch': epoch + 1,
+                'batch': i + 1,
+                'loss': loss.item()
+                }
+                training_data.append(batch_data)
+                socketio.emit('training_update', batch_data)
+                socketio.sleep(0.01)
+    #add some functionality to save training data     
+            
     print('Finished Training')
     
     state_filename = time.strftime('%d-%m-%Y-%H%M-%S')

@@ -1,20 +1,17 @@
 import * as React from 'react';
 import { useImmer } from 'use-immer';
 import produce from "immer";
+import { io } from 'socket.io-client'
 
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+
 import { Accordion, AccordionDetails, AccordionSummary, Button, Card, Grid, FormHelperText } from '@mui/material/';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import TextField from '@mui/material/TextField';
-import InputLabel from '@mui/material/InputLabel';
 
 import ModelDetailsCard from '../components/ModelDetailsCard/ModelDetailsCard.js'
 import SelectedModel from '../components/SelectedModel/SelectedModel.js'
@@ -24,6 +21,7 @@ import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpo
 import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, validateField, validateForm, Validation } from '../utils.js'
 import SelectorOptimizer from '../components/SelectorOptimizer/SelectorOptimizer.js';
 import SelectorLoss from '../components/SelectorLoss/SelectorLoss.js';
+import TrainingChart from '../components/TrainingChart/TrainingChart';
 
 export default function Training() {
 
@@ -88,6 +86,13 @@ export default function Training() {
             error: false,
             regex: "",
             required: true
+        }),
+        "batchSize": new Validation({
+            value: 20,
+            error: false,
+            regex: /^(?:[1-9]\d{0,2}|1000)$/,
+            required: true,
+            helper: "Batch size cannot be bigger than the size of the training dataset."
         })
     }))
     const [trainingMode, setTrainingMode] = useImmer({
@@ -112,6 +117,25 @@ export default function Training() {
     const [checkpointOptions, setCheckpointOptions] = React.useState([]);
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
 
+    const [trainingLog, setTrainingLog] = React.useState([]);
+    const [chartData, setChartData] = React.useState([]);
+
+    const socket = io('http://localhost:5000')
+
+    const [isTraining, setIsTraining] = React.useState(false)
+    React.useEffect(() => {
+        socket.on("training_update", (data) => {
+            setTrainingLog(prev => [...prev, `Epoch ${data.epoch}, Batch ${data.batch}: Loss ${data.loss}`]);
+            setChartData(prev => [...prev, {
+                step: `E${data.epoch}-B${data.batch}`,
+                loss: data.loss
+            }]);
+        });
+        return () => {
+            socket.off("training_update");
+            socket.off("connect");
+        };
+    }, []);
 
     React.useEffect(() => {
         fetchData('datasets', setDatasetOptions)
@@ -192,11 +216,34 @@ export default function Training() {
 
         }
     }
-    
+    const validateBatchSize = (input) => {
+        let value;
+        if (input && input.target) {
+            value = input.target.value
+        }
+        else {
+            value = input
+        }
+        if (Number(value) >= selectedTrainingDataset.datasetSize) {
+                            setTrainingForm((prevVal) => {
+                                return produce(prevVal, (draft) => {
+                                    draft['batchSize'].error = true
+                                })
+                            })
+                        }
+        else {
+            setTrainingForm((prevVal) => {
+                                return produce(prevVal, (draft) => {
+                                    draft['batchSize'].error = false
+                                })
+                            })
+        }
+    }
     const handleTrain = (event) => {
         for (let key in trainingForm) {
             validateField({ key: key, setFormState: setTrainingForm })
         }
+        validateBatchSize(trainingForm.batchSize.value)
         setTimeout(() => {
 
             var formValid = validateForm({ formElement: trainingForm })
@@ -211,7 +258,11 @@ export default function Training() {
                     learningRate: trainingForm.learningRate.value,
                     optimizer: trainingForm.optimizer.value,
                     lossFunction: trainingForm.lossFunction.value,
+                    batchSize: trainingForm.batchSize.value
                 }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setIsTraining(true)
+                setTrainingLog([]);
                 pushData('submit_training', formToPush)
             }
         }, 0)
@@ -344,6 +395,20 @@ export default function Training() {
                     }}
                 />
                 <TextField
+                    error={trainingForm.batchSize.error}
+                    name="batchSize"
+                    label="Batch Size"
+                    helperText={trainingForm.batchSize.error ? trainingForm.batchSize.helper : ''}
+                    value={trainingForm.batchSize.value}
+                    onChange={(event) => {
+                        handleTextFieldChange({ eve: event, setState: setTrainingForm })
+                        console.log("selectedTrainingDataset: ", selectedTrainingDataset)
+                        validateField({ key: 'batchSize', setFormState: setTrainingForm })
+                        validateBatchSize(event)
+                        
+                    }}
+                />
+                <TextField
                     error={trainingForm.learningRate.error}
                     helperText={trainingForm.learningRate.error ? trainingForm.learningRate.helper : ''}
                     name="learningRate"
@@ -382,7 +447,7 @@ export default function Training() {
                     }}
                     lossOptions={lossOptions}
                 />
-                {trainingMode.selected ? null : <FormHelperText sx={{color: 'error.main'}}>{trainingMode.helper}</FormHelperText>}
+                {trainingMode.selected ? null : <FormHelperText sx={{ color: 'error.main' }}>{trainingMode.helper}</FormHelperText>}
                 <Button
                     variant='contained'
                     style={{ alignSelf: 'center', width: '150px' }}
@@ -391,7 +456,40 @@ export default function Training() {
                 >
                     Train/Test
                 </Button>
+                {isTraining ? <Button
+                    variant='contained'
+                    color='error'
+                    style={{ alignSelf: 'center', width: '150px', marginTop: '10px' }}
+                    onClick={() => {
+                        fetch("/cancel_training", { method: "POST" }).then(
+                            (response => {
+                                if (response.ok) {
+                                    setIsTraining(false)
+                                }
+                            })
+                        );
+                    }}
+                >
+                    Cancel
+                </Button> : null}
             </Grid>
+            <Box>
+                {chartData.length > 1 ? <><Box sx={{ mt: 4 }}>
+                    <Typography variant="h6">Training Loss Over Time</Typography>
+                    <TrainingChart data={chartData} />
+                </Box></>: null}
+                <Box sx={{ mt: 2 }}>
+                    {trainingLog.length > 0 ? <><Typography variant="h6">Training Progress</Typography>
+                        <List dense>
+                            {trainingLog.map((entry, idx) => (
+                                <ListItem key={idx}>
+                                    <Typography>{entry}</Typography>
+                                </ListItem>
+                            ))}
+                        </List> </> : null}
+
+                </Box>
+            </Box>
         </Grid>
         </Box>
     )
