@@ -4,8 +4,8 @@ MLApp/data/user_uploaded_test
 MLApp/__pycache__
 *.pth
 .venv
-flask-server/__pycache__
-flask-server/venv
+flask_server/__pycache__
+flask_server/venv
 __pycache__
 client/node_modules
 docs/docs
