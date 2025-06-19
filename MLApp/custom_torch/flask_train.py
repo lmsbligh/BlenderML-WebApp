@@ -87,7 +87,7 @@ def train(training_form):
 
 
 def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, learning_rate, data_loader, loss_function, optimiser, batch_size):
-    run_id = f"{model_id}-{session_id}-train"
+    training_run_id = f"{model_id}-{session_id}-train"
     model_data = []
     try:
         print("model_id: ", model_id)
@@ -107,9 +107,11 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
 
     model = CustomNet(json.loads(model_data['layers']))
     model.to(device)
-    state_dict_path = os.path.join(
-        "MLApp", state_dict_dir, model_id, model_checkpoint)
-    model.load_state_dict(torch.load(state_dict_path))
+    if (model_checkpoint):
+        state_dict_path = os.path.join(
+            "MLApp", state_dict_dir, model_id, model_checkpoint)
+        model.load_state_dict(torch.load(state_dict_path))
+        model_checkpoint = model_checkpoint.replace(".pth", "")
     optimiser_instance = optimiser
     loss_instance = loss_function
     match optimiser:
@@ -155,7 +157,8 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
                     'batch': i + 1,
                     'loss': loss.item()
                 }
-                training_data.append((run_id, epoch+1, i + 1, loss.item()))
+                training_data.append(
+                    (training_run_id, epoch+1, i + 1, loss.item()))
                 socketio.emit('training_update', batch_data)
                 socketio.sleep(0.01)
     # add some functionality to save training data
@@ -177,7 +180,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
                         session_id
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (
-                        run_id,
+                        training_run_id,
                         model_id,
                         model_checkpoint,
                         dataset_id,
@@ -204,7 +207,35 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
         con.close()
     print('Finished Training')
 
-    state_filename = time.strftime('%d-%m-%Y-%H%M-%S')
+    try:
+        con = sqlite3.connect(DATABASE_PATH)
+        # Ensure foreign keys are enforced
+        con.execute("PRAGMA foreign_keys = ON;")
+        cursor = con.cursor()
+
+        cursor.execute("""
+            INSERT INTO checkpoints (
+                id, model_id, training_run_id, name, notes, final_loss, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            session_id,
+            model_id,
+            training_run_id,
+            None,
+            None,
+            training_data[-1][3],
+            None
+        ))
+
+        con.commit()
+        print("Checkpoint inserted successfully.")
+
+    except sqlite3.Error as e:
+        print("Database error:", e)
+
+    finally:
+        con.close()
+    state_filename = session_id
     try:
         os.mkdir(os.path.join("MLApp", state_dict_dir, model_id))
     except OSError as e:

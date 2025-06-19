@@ -37,7 +37,7 @@ export default function Training() {
             value: "",
             error: false,
             regex: "",
-            required: true,
+            required: false,
             helper: "Please select a checkpoint."
         }),
         "trainingDataset": new Validation({
@@ -120,6 +120,8 @@ export default function Training() {
     const [trainingLog, setTrainingLog] = React.useState([]);
     const [chartData, setChartData] = React.useState([]);
 
+    const [trainingSessions, setTrainingSessions] = useImmer([]);
+
     const socket = io('http://localhost:5000')
 
     const [isTraining, setIsTraining] = React.useState(false)
@@ -147,6 +149,14 @@ export default function Training() {
         fetchData(`checkpoints/${selectedModel.value}`, setCheckpointOptions)
     }, [selectedModel]);
 
+    React.useEffect(() => {
+        fetchData('/training_sessions', setTrainingSessions)
+
+    }, [])
+
+    React.useEffect(() => {
+        console.log("trainingSessions: ", trainingSessions)
+    }, [trainingSessions])
 
     const checkDatasetSelected = (event) => {
         console.log("checkDatasetSelected ran")
@@ -225,18 +235,18 @@ export default function Training() {
             value = input
         }
         if (Number(value) >= selectedTrainingDataset.datasetSize) {
-                            setTrainingForm((prevVal) => {
-                                return produce(prevVal, (draft) => {
-                                    draft['batchSize'].error = true
-                                })
-                            })
-                        }
+            setTrainingForm((prevVal) => {
+                return produce(prevVal, (draft) => {
+                    draft['batchSize'].error = true
+                })
+            })
+        }
         else {
             setTrainingForm((prevVal) => {
-                                return produce(prevVal, (draft) => {
-                                    draft['batchSize'].error = false
-                                })
-                            })
+                return produce(prevVal, (draft) => {
+                    draft['batchSize'].error = false
+                })
+            })
         }
     }
     const handleTrain = (event) => {
@@ -405,7 +415,7 @@ export default function Training() {
                         console.log("selectedTrainingDataset: ", selectedTrainingDataset)
                         validateField({ key: 'batchSize', setFormState: setTrainingForm })
                         validateBatchSize(event)
-                        
+
                     }}
                 />
                 <TextField
@@ -473,23 +483,40 @@ export default function Training() {
                     Cancel
                 </Button> : null}
             </Grid>
-            <Box>
-                {chartData.length > 1 ? <><Box sx={{ mt: 4 }}>
-                    <Typography variant="h6">Training Loss Over Time</Typography>
-                    <TrainingChart data={chartData} />
-                </Box></>: null}
-                <Box sx={{ mt: 2 }}>
-                    {trainingLog.length > 0 ? <><Typography variant="h6">Training Progress</Typography>
-                        <List dense>
-                            {trainingLog.map((entry, idx) => (
-                                <ListItem key={idx}>
-                                    <Typography>{entry}</Typography>
-                                </ListItem>
-                            ))}
-                        </List> </> : null}
+            <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
+                <Box>
+                    <Typography>Training Session Analysis</Typography>
+                    <List dense>
+                        {trainingSessions ? trainingSessions.map((entry, ind) => (
+                            <ListItem key={entry.id}>
+                                <Card>
+                                    <Typography>Session ID: {entry.id}</Typography>
+                                </Card>
+                            </ListItem>
+
+                        )) : null}
+                    </List>
 
                 </Box>
-            </Box>
+                <Box>
+                    {chartData.length > 1 ? <><Box sx={{ mt: 4 }}>
+                        <Typography variant="h6">Training Loss Over Time</Typography>
+                        <TrainingChart data={chartData} />
+                    </Box></> : null}
+                    <Box sx={{ mt: 2 }}>
+                        {trainingLog.length > 0 ? <><Typography variant="h6">Training Progress</Typography>
+                            <List dense>
+                                {trainingLog.map((entry, idx) => (
+                                    <ListItem key={idx}>
+                                        <Typography>{entry}</Typography>
+                                    </ListItem>
+                                ))}
+                            </List> </> : null}
+
+                    </Box>
+                </Box>
+
+            </Grid>
         </Grid>
         </Box>
     )
