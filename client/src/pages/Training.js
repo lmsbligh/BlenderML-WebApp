@@ -6,7 +6,7 @@ import { io } from 'socket.io-client'
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 
-import { Accordion, AccordionDetails, AccordionSummary, Button, Card, Grid, FormHelperText } from '@mui/material/';
+import { Accordion, AccordionDetails, AccordionSummary, Button, Card, Grid, FormHelperText, IconButton } from '@mui/material/';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
@@ -18,11 +18,12 @@ import SelectedModel from '../components/SelectedModel/SelectedModel.js'
 import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import SelectorDataset from '../components/SelectorDataset/SelectorDataset.js'
 import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpoint.js';
-import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, validateField, validateForm, Validation } from '../utils.js'
+import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, validateField, validateForm, Validation, appendData } from '../utils.js'
 import SelectorOptimizer from '../components/SelectorOptimizer/SelectorOptimizer.js';
 import SelectorLoss from '../components/SelectorLoss/SelectorLoss.js';
 import TrainingChart from '../components/TrainingChart/TrainingChart';
-
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import TrendingDownOutlinedIcon from '@mui/icons-material/TrendingDownOutlined';
 export default function Training() {
 
     const [trainingForm, setTrainingForm] = useImmer(structuredClone({
@@ -125,6 +126,7 @@ export default function Training() {
     const socket = io('http://localhost:5000')
 
     const [isTraining, setIsTraining] = React.useState(false)
+
     React.useEffect(() => {
         socket.on("training_update", (data) => {
             setTrainingLog(prev => [...prev, `Epoch ${data.epoch}, Batch ${data.batch}: Loss ${data.loss}`]);
@@ -157,6 +159,31 @@ export default function Training() {
     React.useEffect(() => {
         console.log("trainingSessions: ", trainingSessions)
     }, [trainingSessions])
+    const isRunVisible = (runId) => chartData.some(run => run.run_id === runId)
+    const handleGraphClick = (event) => {
+        const runId = event.currentTarget.getAttribute("data-run-id")
+        let wasPresent = false
+        setChartData((prevChartData) => {
+            const newChartData = prevChartData.filter((run) => {
+                if (run.run_id === runId) {
+                    wasPresent = true;
+                    return false; // remove this run
+                }
+                return true;
+            });
+
+            if (!wasPresent) {
+                appendData(`/training_metrics/${runId}`, setChartData);
+            }
+
+            return newChartData;
+        });
+
+    }
+
+    React.useEffect(() => {
+        console.log("chartData: ", chartData)
+    }, [chartData])
 
     const checkDatasetSelected = (event) => {
         console.log("checkDatasetSelected ran")
@@ -485,21 +512,7 @@ export default function Training() {
             </Grid>
             <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
                 <Box>
-                    <Typography>Training Session Analysis</Typography>
-                    <List dense>
-                        {trainingSessions ? trainingSessions.map((entry, ind) => (
-                            <ListItem key={entry.id}>
-                                <Card>
-                                    <Typography>Session ID: {entry.id}</Typography>
-                                </Card>
-                            </ListItem>
-
-                        )) : null}
-                    </List>
-
-                </Box>
-                <Box>
-                    {chartData.length > 1 ? <><Box sx={{ mt: 4 }}>
+                    {chartData.length > 0 ? <><Box sx={{ mt: 4 }}>
                         <Typography variant="h6">Training Loss Over Time</Typography>
                         <TrainingChart data={chartData} />
                     </Box></> : null}
@@ -515,6 +528,29 @@ export default function Training() {
 
                     </Box>
                 </Box>
+                <Box>
+                    <Typography>Training Session Analysis</Typography>
+                    <List dense>
+                        {trainingSessions ? trainingSessions.map((entry, i) => (
+                            <ListItem key={entry.id}>
+                                <Card sx={{backgroundColor: isRunVisible(entry.id) ? `hsl(${chartData.findIndex((option) => (option.run_id === entry.id)) * 60}, 65%, 70%)` : "primary"}}>
+                                    <IconButton aria-label="graph" data-run-id={entry.id} color="primary"
+                                        onClick={(event) => { handleGraphClick(event) }
+                                        }>
+                                        {isRunVisible(entry.id)
+                                            ? <Box sx={{ display: 'flex', alignItems: 'center', borderRadius: "8px", padding: "5px", bgcolor: "primary.main" }}><TrendingDownIcon sx={{ borderLeft: 1, borderBottom: 1, color: "white" }} /></Box>
+                                            : <Box sx={{ display: 'flex', alignItems: 'center', borderRadius: "8px", padding: "5px", bgcolor: "white" }}><TrendingDownOutlinedIcon sx={{ marginBottom: 0, borderLeft: 1, borderBottom: 1 }} color="primary" /></Box>
+                                        }
+                                    </IconButton>
+                                    <Typography>Run ID: {entry.id}</Typography>
+                                </Card>
+                            </ListItem>
+
+                        )) : null}
+                    </List>
+
+                </Box>
+                
 
             </Grid>
         </Grid>

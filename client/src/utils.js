@@ -8,6 +8,15 @@ export const fetchData = (endpoint, setState) => {
         })
         .catch(error => console.error('Error fetching data:', error))
 }
+
+export const appendData = (endpoint, setState) => {
+    fetch(endpoint)
+        .then(response => response.json())
+        .then(data => {
+            setState(prev => [...prev, data]);
+        })
+        .catch(error => console.error('Error fetching data:', error))
+}
 export const pushData = async (endpoint, data) => {
     return fetch(endpoint, {
         method: 'POST',

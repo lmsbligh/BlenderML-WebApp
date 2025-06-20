@@ -56,13 +56,44 @@ def training_sessions():
 
         cur.execute("""
             SELECT * FROM training_runs
-            ORDER BY id ASC
+            ORDER BY session_id ASC
         """)
 
         rows = cur.fetchall()
         runs_as_dicts = [dict(row) for row in rows]
         print(runs_as_dicts)
         return runs_as_dicts
+
+    except sqlite3.Error as e:
+        print("Database error:", e)
+        return json.dumps({"error": str(e)})
+    finally:
+        con.close()
+    return res
+
+
+@bp.route("/training_metrics/<string:run_id>", methods=["GET"])
+def training_metrics(run_id):
+    con = sqlite3.connect(DATABASE_PATH)
+    cur = con.cursor()
+
+    try:
+        con.row_factory = sqlite3.Row  # enables name-based column access
+        cur = con.cursor()
+        cur.execute("PRAGMA foreign_keys = ON;")
+
+        cur.execute("""
+            SELECT epoch, batch, loss FROM training_metrics 
+            WHERE run_id = ?
+            ORDER BY epoch ASC, batch ASC
+        """, (run_id,))
+
+        rows = cur.fetchall()
+        metrics_as_dict = [dict(row) for row in rows]
+        rows_step = [{"step": f"E{row['epoch']}-B{row['batch']}",
+                      "loss": row['loss']} for row in metrics_as_dict]
+        # print(metrics_as_dicts)
+        return {"run_id": run_id, "data": rows_step}
 
     except sqlite3.Error as e:
         print("Database error:", e)
