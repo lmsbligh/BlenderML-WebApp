@@ -21,7 +21,7 @@ function SelectorDataset ({ helperText, error, selectedDataset, handleChange, da
                 error={error}
                 renderValue={(selected) => {
                     const selectedOption = datasetOptions.find((option) => option.value === selected.value);
-                    return selectedOption ? selectedOption.datasetName+' '+ selectedOption.value.slice(9) : <Typography>Select a Dataset</Typography>;
+                    return selectedOption ? selectedOption.datasetName+' '+ selectedOption.value.slice(9) : <Typography>Select a {datasetType} dataset</Typography>;
                   }}
             >
                 <MenuItem key={-1} value={""}>        
@@ -34,7 +34,7 @@ function SelectorDataset ({ helperText, error, selectedDataset, handleChange, da
                         </Card>
                 </MenuItem>
                 {datasetOptions.map(option => (
-                    <MenuItem key={option.value} value={option.value}>        
+                    option.split === datasetType ?  (<MenuItem key={option.value} value={option.value}>        
                         <Card sx={{ width: "100%"}}>
                             <CardContent>
                                 <Typography>
@@ -51,7 +51,8 @@ function SelectorDataset ({ helperText, error, selectedDataset, handleChange, da
                                 </Typography>
                             </CardContent>
                         </Card>
-                    </MenuItem>
+                    </MenuItem>) : (null)
+                    
                 ))}
                 
             </Select>

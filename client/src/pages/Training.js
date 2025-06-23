@@ -184,7 +184,11 @@ export default function Training() {
     React.useEffect(() => {
         console.log("chartData: ", chartData)
     }, [chartData])
-
+    function modelIdToColor(modelId) {
+        const hash = Array.from(modelId).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const hue = hash % 360;  // wrap around color wheel
+        return `hsl(${hue}, 70%, 70%)`;  // adjust saturation/lightness for pastel feel
+    }
     const checkDatasetSelected = (event) => {
         console.log("checkDatasetSelected ran")
         console.log("event.value: ", event.target.value)
@@ -370,7 +374,7 @@ export default function Training() {
                 /> : null}
                 <SelectorDataset
                     error={trainingForm.trainingDataset.error}
-                    datasetType={"training"}
+                    datasetType={"train"}
                     helperText={trainingForm.trainingDataset.error ? trainingForm.trainingDataset.helper : ''}
                     selectedDataset={selectedTrainingDataset}
                     handleChange={(event) => {
@@ -420,56 +424,59 @@ export default function Training() {
 
                     }}
                     datasetOptions={datasetOptions} />
-                <TextField
-                    error={trainingForm.epochs.error}
-                    name="epochs"
-                    label="Epochs"
-                    helperText={trainingForm.epochs.error ? trainingForm.epochs.helper : ''}
-                    value={trainingForm.epochs.value}
-                    onChange={(event) => {
-                        handleTextFieldChange({ eve: event, setState: setTrainingForm })
-                        validateField({ key: 'epochs', setFormState: setTrainingForm })
-                    }}
-                />
-                <TextField
-                    error={trainingForm.batchSize.error}
-                    name="batchSize"
-                    label="Batch Size"
-                    helperText={trainingForm.batchSize.error ? trainingForm.batchSize.helper : ''}
-                    value={trainingForm.batchSize.value}
-                    onChange={(event) => {
-                        handleTextFieldChange({ eve: event, setState: setTrainingForm })
-                        console.log("selectedTrainingDataset: ", selectedTrainingDataset)
-                        validateField({ key: 'batchSize', setFormState: setTrainingForm })
-                        validateBatchSize(event)
+                {trainingForm.selectedTrainingDataset ?
+                    <><TextField
+                        error={trainingForm.epochs.error}
+                        name="epochs"
+                        label="Epochs"
+                        helperText={trainingForm.epochs.error ? trainingForm.epochs.helper : ''}
+                        value={trainingForm.epochs.value}
+                        onChange={(event) => {
+                            handleTextFieldChange({ eve: event, setState: setTrainingForm })
+                            validateField({ key: 'epochs', setFormState: setTrainingForm })
+                        }}
+                    />
+                        <TextField
+                            error={trainingForm.batchSize.error}
+                            name="batchSize"
+                            label="Batch Size"
+                            helperText={trainingForm.batchSize.error ? trainingForm.batchSize.helper : ''}
+                            value={trainingForm.batchSize.value}
+                            onChange={(event) => {
+                                handleTextFieldChange({ eve: event, setState: setTrainingForm })
+                                console.log("selectedTrainingDataset: ", selectedTrainingDataset)
+                                validateField({ key: 'batchSize', setFormState: setTrainingForm })
+                                validateBatchSize(event)
 
-                    }}
-                />
-                <TextField
-                    error={trainingForm.learningRate.error}
-                    helperText={trainingForm.learningRate.error ? trainingForm.learningRate.helper : ''}
-                    name="learningRate"
-                    label="Learning rate"
-                    value={trainingForm.learningRate.value}
-                    onChange={(event) => {
-                        handleTextFieldChange({ eve: event, setState: setTrainingForm })
-                        validateField({ key: 'learningRate', setFormState: setTrainingForm })
-                    }}
-                />
-                <SelectorOptimizer
-                    error={trainingForm.optimizer.error}
-                    selectedOptimizer={selectedOptimizer}
-                    handleChange={(event) => {
-                        handleSelectorFormChange({
-                            eve: event,
-                            setSelector: setSelectedOptimizer,
-                            setForm: setTrainingForm,
-                            options: optimizerOptions
-                        })
-                        validateField({ key: 'optimizer', setFormState: setTrainingForm })
-                    }}
-                    optimizerOptions={optimizerOptions}
-                />
+                            }}
+                        />
+                        <TextField
+                            error={trainingForm.learningRate.error}
+                            helperText={trainingForm.learningRate.error ? trainingForm.learningRate.helper : ''}
+                            name="learningRate"
+                            label="Learning rate"
+                            value={trainingForm.learningRate.value}
+                            onChange={(event) => {
+                                handleTextFieldChange({ eve: event, setState: setTrainingForm })
+                                validateField({ key: 'learningRate', setFormState: setTrainingForm })
+                            }}
+                        />
+                        <SelectorOptimizer
+                            error={trainingForm.optimizer.error}
+                            selectedOptimizer={selectedOptimizer}
+                            handleChange={(event) => {
+                                handleSelectorFormChange({
+                                    eve: event,
+                                    setSelector: setSelectedOptimizer,
+                                    setForm: setTrainingForm,
+                                    options: optimizerOptions
+                                })
+                                validateField({ key: 'optimizer', setFormState: setTrainingForm })
+                            }}
+                            optimizerOptions={optimizerOptions}
+                        />
+                    </>
+                    : null}
                 <SelectorLoss
                     error={trainingForm.lossFunction.error}
                     selectedLoss={selectedLoss}
@@ -533,16 +540,30 @@ export default function Training() {
                     <List dense>
                         {trainingSessions ? trainingSessions.map((entry, i) => (
                             <ListItem key={entry.id}>
-                                <Card sx={{backgroundColor: isRunVisible(entry.id) ? `hsl(${chartData.findIndex((option) => (option.run_id === entry.id)) * 60}, 65%, 70%)` : "primary"}}>
+                                <Card sx={{ backgroundColor: "primary" }}>
                                     <IconButton aria-label="graph" data-run-id={entry.id} color="primary"
                                         onClick={(event) => { handleGraphClick(event) }
                                         }>
                                         {isRunVisible(entry.id)
-                                            ? <Box sx={{ display: 'flex', alignItems: 'center', borderRadius: "8px", padding: "5px", bgcolor: "primary.main" }}><TrendingDownIcon sx={{ borderLeft: 1, borderBottom: 1, color: "white" }} /></Box>
+                                            ? <Box sx={{ display: 'flex', alignItems: 'center', borderRadius: "8px", padding: "5px", bgcolor: `hsl(${chartData.findIndex((option) => (option.run_id === entry.id)) * 60}, 65%, 70%)` }}><TrendingDownIcon sx={{ borderLeft: 1, borderBottom: 1, color: "white" }} /></Box>
                                             : <Box sx={{ display: 'flex', alignItems: 'center', borderRadius: "8px", padding: "5px", bgcolor: "white" }}><TrendingDownOutlinedIcon sx={{ marginBottom: 0, borderLeft: 1, borderBottom: 1 }} color="primary" /></Box>
                                         }
                                     </IconButton>
                                     <Typography>Run ID: {entry.id}</Typography>
+                                    <Box sx={{ backgroundColor: modelIdToColor(entry.model_id) }}>
+                                        <Typography>
+                                            Model name: {modelData.find((option) => option.value === entry.model_id).modelName}
+                                        </Typography>
+                                        <Typography>
+                                            Model id: {entry.model_id}
+                                        </Typography>
+                                    </Box>
+                                    <Typography>Base checkpoint: {entry.checkpoint}</Typography>
+                                    <Typography>Split: <b>{entry.id.substring(entry.id.lastIndexOf('-') + 1)}</b></Typography>
+                                    {entry.optimiser ? <Typography>Optimiser: {entry.optimiser}</Typography> : null}
+                                    {entry.cv_dataset ? <Typography>CV Dataset: {entry.cv_dataset}</Typography> : null}
+                                    {entry.test_dataset ? <Typography>Test Dataset: {entry.test_dataset}</Typography> : null}
+                                    {entry.training_dataset ? <Typography>Training Dataset: {entry.training_dataset}</Typography> : null}
                                 </Card>
                             </ListItem>
 
@@ -550,7 +571,7 @@ export default function Training() {
                     </List>
 
                 </Box>
-                
+
 
             </Grid>
         </Grid>
