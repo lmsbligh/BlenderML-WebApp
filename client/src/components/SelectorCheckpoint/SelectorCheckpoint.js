@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FormHelperText, Typography } from '@mui/material';
+import { FormHelperText, Menu, Typography } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -21,10 +21,15 @@ function SelectorCheckpoint({ helperText, error, selectedCheckpoint, handleChang
                 onChange={handleChange}
                 renderValue={() => selectedCheckpoint ? selectedCheckpoint : <Typography>"Select a checkpoint"</Typography>} // Show the label as the selected text
             >
+                <MenuItem key={-1} value={"None"}>
+                    <Typography variant="body2">
+                            None
+                    </Typography>
+                </MenuItem>
                 {checkpointOptions.map(option => (
-                    <MenuItem key={option} value={option}>
+                    <MenuItem key={option.id} value={option.id}>
                         <Typography variant="body2">
-                            {option}
+                            {option.id}
                         </Typography>
                     </MenuItem>
                 ))}

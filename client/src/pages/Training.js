@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import TextField from '@mui/material/TextField';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import ModelDetailsCard from '../components/ModelDetailsCard/ModelDetailsCard.js'
 import SelectedModel from '../components/SelectedModel/SelectedModel.js'
@@ -24,6 +25,7 @@ import SelectorLoss from '../components/SelectorLoss/SelectorLoss.js';
 import TrainingChart from '../components/TrainingChart/TrainingChart';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingDownOutlinedIcon from '@mui/icons-material/TrendingDownOutlined';
+import CheckpointCard from '../components/CheckpointCard/CheckpointCard.js';
 export default function Training() {
 
     const [trainingForm, setTrainingForm] = useImmer(structuredClone({
@@ -336,7 +338,7 @@ export default function Training() {
                             <div>
                                 <Accordion>
                                     <AccordionSummary
-                                        expandIcon={<ArrowDropDownIcon />}
+                                        expandIcon={<ExpandMoreIcon />}
                                     >
                                         Show more details
                                     </AccordionSummary>
@@ -358,7 +360,18 @@ export default function Training() {
                         </ListItem>
                     </List>
                 </Box>
-                {selectedModel ? <SelectorCheckpoint
+                {selectedModel ? (<div>
+                    <Accordion expandIcon={<ExpandMoreIcon />}>
+                        <AccordionSummary>
+                            <Typography>Select checkpoints:</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            {checkpointOptions.map((option) => (CheckpointCard(option)))}
+                        </AccordionDetails>
+                    </Accordion>
+                    
+                </div>) : null}
+                {selectedModel ? (<SelectorCheckpoint
                     error={trainingForm.checkpoint.error}
                     helperText={trainingForm.checkpoint.error ? trainingForm.checkpoint.helper : ''}
                     selectedCheckpoint={selectedCheckpoint}
@@ -371,7 +384,7 @@ export default function Training() {
                         validateField({ key: 'checkpoint', setFormState: setTrainingForm })
                     }}
                     checkpointOptions={checkpointOptions}
-                /> : null}
+                />) : null }
                 <SelectorDataset
                     error={trainingForm.trainingDataset.error}
                     datasetType={"train"}
