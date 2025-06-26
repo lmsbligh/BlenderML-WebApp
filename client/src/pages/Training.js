@@ -43,7 +43,7 @@ export default function Training() {
             required: false,
             helper: "Please select a checkpoint."
         }),
-        "trainingDataset": new Validation({
+        "trainDataset": new Validation({
             value: "",
             error: false,
             regex: "",
@@ -106,7 +106,7 @@ export default function Training() {
     const [selectedModel, setSelectedModel] = React.useState('');
 
     const [datasetOptions, setDatasetOptions] = React.useState([]);
-    const [selectedTrainingDataset, setSelectedTrainingDataset] = React.useState('');
+    const [selectedTrainDataset, setSelectedTrainDataset] = React.useState('');
     const [selectedCVDataset, setSelectedCVDataset] = React.useState('');
     const [selectedTestDataset, setSelectedTestDataset] = React.useState('');
 
@@ -186,6 +186,9 @@ export default function Training() {
     React.useEffect(() => {
         console.log("chartData: ", chartData)
     }, [chartData])
+    React.useEffect(() => {
+        console.log("selectedTrainDataset: ", selectedTrainDataset)
+    }, [selectedTrainDataset])
     function modelIdToColor(modelId) {
         const hash = Array.from(modelId).reduce((acc, char) => acc + char.charCodeAt(0), 0);
         const hue = hash % 360;  // wrap around color wheel
@@ -204,7 +207,7 @@ export default function Training() {
         }
         if (event.target.value === "") {
             switch (event.target.name) {
-                case "trainingDataset":
+                case "trainDataset":
                     console.log("trainingForm.CVDataset: ", trainingForm.CVDataset)
                     console.log("trainingForm.CVDataset: ", trainingForm.testDataset)
 
@@ -224,7 +227,7 @@ export default function Training() {
                     }
                     break;
                 case "CVDataset":
-                    if (!trainingForm.trainingDataset.value && !trainingForm.testDataset.value) {
+                    if (!trainingForm.trainDataset.value && !trainingForm.testDataset.value) {
                         setTrainingMode((prevVal) => {
                             return produce(prevVal, (draft) => {
                                 draft["selected"] = false
@@ -240,7 +243,7 @@ export default function Training() {
                     }
                     break;
                 case "testDataset":
-                    if (!trainingForm.CVDataset.value && !trainingForm.trainingDataset.value) {
+                    if (!trainingForm.CVDataset.value && !trainingForm.trainDataset.value) {
                         setTrainingMode((prevVal) => {
                             return produce(prevVal, (draft) => {
                                 draft["selected"] = false
@@ -267,7 +270,7 @@ export default function Training() {
         else {
             value = input
         }
-        if (Number(value) >= selectedTrainingDataset.datasetSize) {
+        if (Number(value) >= selectedTrainDataset.datasetSize) {
             setTrainingForm((prevVal) => {
                 return produce(prevVal, (draft) => {
                     draft['batchSize'].error = true
@@ -294,7 +297,7 @@ export default function Training() {
                 const formToPush = {
                     model: trainingForm.model.value,
                     checkpoint: trainingForm.checkpoint.value,
-                    trainingDataset: trainingForm.trainingDataset.value,
+                    trainDataset: trainingForm.trainDataset.value,
                     CVDataset: trainingForm.CVDataset.value,
                     testDataset: trainingForm.testDataset.value,
                     epochs: trainingForm.epochs.value,
@@ -386,19 +389,19 @@ export default function Training() {
                     checkpointOptions={checkpointOptions}
                 />) : null }
                 <SelectorDataset
-                    error={trainingForm.trainingDataset.error}
+                    error={trainingForm.trainDataset.error}
                     datasetType={"train"}
-                    helperText={trainingForm.trainingDataset.error ? trainingForm.trainingDataset.helper : ''}
-                    selectedDataset={selectedTrainingDataset}
+                    helperText={trainingForm.trainDataset.error ? trainingForm.trainDataset.helper : ''}
+                    selectedDataset={selectedTrainDataset}
                     handleChange={(event) => {
                         handleSelectorFormChange({
                             eve: event,
-                            setSelector: setSelectedTrainingDataset,
+                            setSelector: setSelectedTrainDataset,
                             setForm: setTrainingForm,
                             options: datasetOptions
                         })
                         checkDatasetSelected(event)
-                        validateField({ key: 'trainingDataset', setFormState: setTrainingForm })
+                        validateField({ key: 'trainDataset', setFormState: setTrainingForm })
 
                     }}
                     datasetOptions={datasetOptions} />
@@ -437,7 +440,7 @@ export default function Training() {
 
                     }}
                     datasetOptions={datasetOptions} />
-                {trainingForm.selectedTrainingDataset ?
+                {selectedTrainDataset ?
                     <><TextField
                         error={trainingForm.epochs.error}
                         name="epochs"
@@ -457,7 +460,7 @@ export default function Training() {
                             value={trainingForm.batchSize.value}
                             onChange={(event) => {
                                 handleTextFieldChange({ eve: event, setState: setTrainingForm })
-                                console.log("selectedTrainingDataset: ", selectedTrainingDataset)
+                                console.log("selectedTrainDataset: ", selectedTrainDataset)
                                 validateField({ key: 'batchSize', setFormState: setTrainingForm })
                                 validateBatchSize(event)
 
@@ -565,7 +568,7 @@ export default function Training() {
                                     <Typography>Run ID: {entry.id}</Typography>
                                     <Box sx={{ backgroundColor: modelIdToColor(entry.model_id) }}>
                                         <Typography>
-                                            Model name: {modelData.find((option) => option.value === entry.model_id).modelName}
+                                            Model name: {modelData ? modelData.find((option) => option.value === entry.model_id).modelName : null}
                                         </Typography>
                                         <Typography>
                                             Model id: {entry.model_id}

@@ -11,7 +11,7 @@ TRAINING_FORM = {
         "required": False,
         "helper": "Please select a checkpoint."
     },
-    "trainingDataset": {
+    "trainDataset": {
         "data_type": str,
         "regex": r"^[A-Za-z0-9 -]{1,36}$",
         "required": False,

@@ -40,8 +40,9 @@ export const handleSelectorFormChange = ({ eve, setSelector, setForm, options })
     const selectLabel = eve.target.name
     setForm((prevVals) => {
         return produce(prevVals, (draft) => {
-            // console.log("selectLabel: ", selectLabel)
-            // console.log("draft[selectLabel] ". draft[selectLabel])
+            console.log("selectLabel: ", selectLabel)
+            console.log("eve.target.value", eve.target.value)
+            console.log("draft[selectLabel] ", draft[selectLabel])
             draft[selectLabel].value = eve.target.value;
         })
     })

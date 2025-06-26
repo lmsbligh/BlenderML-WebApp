@@ -52,8 +52,8 @@ def train(training_form):
         os.getcwd(), "MLApp", "data", "training_datasets")
     # dataset_dir = os.path.join(os.getcwd(),"MLApp", "data", "training_datasets", dataset_profile, dataset_date_time)
 
-    training_dataset_dir = os.path.join(training_datasets_path, training_form['trainingDataset'][:training_form['trainingDataset'].find('-')],
-                                        training_form['trainingDataset'][9:27], "train") if training_form['trainingDataset'] else None
+    training_dataset_dir = os.path.join(training_datasets_path, training_form['trainDataset'][:training_form['trainDataset'].find('-')],
+                                        training_form['trainDataset'][9:27], "train") if training_form['trainDataset'] else None
     CV_dataset_dir = os.path.join(training_datasets_path, training_form['CVDataset'][:training_form['CVDataset'].find('-')],
                                   training_form['CVDataset'][9:27], "CV") if training_form['CVDataset'] else None
     test_dataset_dir = os.path.join(training_datasets_path, training_form['testDataset'][:training_form['testDataset'].find('-')],
@@ -74,7 +74,7 @@ def train(training_form):
         test_dataset_dir, transform) if test_dataset_dir and os.path.exists(test_dataset_dir) else None
 
     if (training_data_loader):
-        training_loop(session_id, training_form['trainingDataset'], epochs, model_id, model_checkpoint,
+        training_loop(session_id, training_form['trainDataset'], epochs, model_id, model_checkpoint,
                       learning_rate, training_data_loader, loss_function, optimiser, batch_size)
 
     if (CV_data_loader):
@@ -110,7 +110,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
     if (model_checkpoint):
         state_dict_path = os.path.join(
             "MLApp", state_dict_dir, model_id, model_checkpoint)
-        model.load_state_dict(torch.load(state_dict_path))
+        model.load_state_dict(torch.load(state_dict_path+".pth"))
         model_checkpoint = model_checkpoint.replace(".pth", "")
     optimiser_instance = optimiser
     loss_instance = loss_function
