@@ -1,4 +1,5 @@
 import json
+import pprint
 import sqlite3
 from flask import Blueprint, current_app, jsonify, request
 
@@ -93,6 +94,7 @@ def training_metrics(run_id):
         rows_step = [{"step": f"E{row['epoch']}-B{row['batch']}",
                       "loss": row['loss']} for row in metrics_as_dict]
         # print(metrics_as_dicts)
+        print({"run_id": run_id, "data": rows_step})
         return {"run_id": run_id, "data": rows_step}
 
     except sqlite3.Error as e:
@@ -101,3 +103,44 @@ def training_metrics(run_id):
     finally:
         con.close()
     return res
+
+
+@bp.route("/training_tree/<string:checkpoint_id>", methods=["GET"])
+def training_tree(checkpoint_id):
+    con = sqlite3.connect(DATABASE_PATH)
+    con.row_factory = sqlite3.Row
+
+    training_runs_past = []
+    MAX_DEPTH = 50
+
+    def past_training_runs_query(chkpt_id, depth=0):
+        cur = con.cursor()
+        if not chkpt_id.strip():
+            return
+        if depth > MAX_DEPTH:
+            print("Max recursion depth hit")
+            return
+        try:
+            print(f"Len == {len(training_runs_past)}")
+            cur.execute("""
+                SELECT * FROM training_runs
+                WHERE INSTR(id, ?) > 0
+            """, (chkpt_id,))
+
+            rows = cur.fetchall()
+            runs_as_dict = [dict(row) for row in rows]
+
+            if len(runs_as_dict) == 1:
+
+                training_runs_past.append(runs_as_dict[0])
+                pprint.pprint(f"Recursing: {chkpt_id}, depth: {depth},  row: ")
+                pprint.pprint(runs_as_dict)
+                past_training_runs_query(
+                    runs_as_dict[0]['checkpoint'], depth+1)
+
+        except sqlite3.Error as e:
+            print("Database error:", e)
+            return json.dumps({"error": str(e)})
+
+    past_training_runs_query(checkpoint_id)
+    return training_runs_past

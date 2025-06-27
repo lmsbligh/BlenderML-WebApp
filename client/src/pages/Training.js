@@ -369,7 +369,7 @@ export default function Training() {
                             <Typography>Select checkpoints:</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            {checkpointOptions.map((option) => (CheckpointCard(option)))}
+                            {checkpointOptions.map((option) => (<CheckpointCard key={option.id} {...option}/>))}
                         </AccordionDetails>
                     </Accordion>
                     
