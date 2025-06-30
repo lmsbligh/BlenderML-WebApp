@@ -22,7 +22,6 @@ import TrainingChart from '../TrainingChart/TrainingChart.js';
 
 const CheckpointCard = ({ id, model_id, training_run_id }) => {
     const [trainingHistory, setTrainingHistory] = React.useState([]);
-    const [chartData, setChartData] = []
     React.useEffect(() => {
         fetchData(`/training_tree/${id}`, setTrainingHistory)
     }, []);

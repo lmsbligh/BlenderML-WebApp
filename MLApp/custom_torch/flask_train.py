@@ -177,8 +177,9 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
                         loss_function,
                         learning_rate,
                         epochs,
+                        batch_size,
                         session_id
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (
                         training_run_id,
                         model_id,
@@ -190,6 +191,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
                         loss_function,
                         learning_rate,
                         epochs,
+                        batch_size,
                         session_id
                     ))
         con.commit()

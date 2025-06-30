@@ -26,6 +26,7 @@ import TrainingChart from '../components/TrainingChart/TrainingChart';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingDownOutlinedIcon from '@mui/icons-material/TrendingDownOutlined';
 import CheckpointCard from '../components/CheckpointCard/CheckpointCard.js';
+import SessionAnalysis from '../components/SessionAnalysis/SessionAnalysis.js';
 export default function Training() {
 
     const [trainingForm, setTrainingForm] = useImmer(structuredClone({
@@ -161,13 +162,13 @@ export default function Training() {
     React.useEffect(() => {
         console.log("trainingSessions: ", trainingSessions)
     }, [trainingSessions])
-    const isRunVisible = (runId) => chartData.some(run => run.run_id === runId)
+    const isRunVisible = (runId) => chartData.some(run => run.runId === runId)
     const handleGraphClick = (event) => {
         const runId = event.currentTarget.getAttribute("data-run-id")
         let wasPresent = false
         setChartData((prevChartData) => {
             const newChartData = prevChartData.filter((run) => {
-                if (run.run_id === runId) {
+                if (run.runId === runId) {
                     wasPresent = true;
                     return false; // remove this run
                 }
@@ -183,9 +184,9 @@ export default function Training() {
 
     }
 
-    React.useEffect(() => {
-        console.log("chartData: ", chartData)
-    }, [chartData])
+    // React.useEffect(() => {
+    //     console.log("chartData: ", chartData)
+    // }, [chartData])
     React.useEffect(() => {
         console.log("selectedTrainDataset: ", selectedTrainDataset)
     }, [selectedTrainDataset])
@@ -369,10 +370,10 @@ export default function Training() {
                             <Typography>Select checkpoints:</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            {checkpointOptions.map((option) => (<CheckpointCard key={option.id} {...option}/>))}
+                            {checkpointOptions.map((option) => (<CheckpointCard key={option.id} {...option} />))}
                         </AccordionDetails>
                     </Accordion>
-                    
+
                 </div>) : null}
                 {selectedModel ? (<SelectorCheckpoint
                     error={trainingForm.checkpoint.error}
@@ -387,7 +388,7 @@ export default function Training() {
                         validateField({ key: 'checkpoint', setFormState: setTrainingForm })
                     }}
                     checkpointOptions={checkpointOptions}
-                />) : null }
+                />) : null}
                 <SelectorDataset
                     error={trainingForm.trainDataset.error}
                     datasetType={"train"}
@@ -552,39 +553,12 @@ export default function Training() {
                     </Box>
                 </Box>
                 <Box>
-                    <Typography>Training Session Analysis</Typography>
-                    <List dense>
-                        {trainingSessions ? trainingSessions.map((entry, i) => (
-                            <ListItem key={entry.id}>
-                                <Card sx={{ backgroundColor: "primary" }}>
-                                    <IconButton aria-label="graph" data-run-id={entry.id} color="primary"
-                                        onClick={(event) => { handleGraphClick(event) }
-                                        }>
-                                        {isRunVisible(entry.id)
-                                            ? <Box sx={{ display: 'flex', alignItems: 'center', borderRadius: "8px", padding: "5px", bgcolor: `hsl(${chartData.findIndex((option) => (option.run_id === entry.id)) * 60}, 65%, 70%)` }}><TrendingDownIcon sx={{ borderLeft: 1, borderBottom: 1, color: "white" }} /></Box>
-                                            : <Box sx={{ display: 'flex', alignItems: 'center', borderRadius: "8px", padding: "5px", bgcolor: "white" }}><TrendingDownOutlinedIcon sx={{ marginBottom: 0, borderLeft: 1, borderBottom: 1 }} color="primary" /></Box>
-                                        }
-                                    </IconButton>
-                                    <Typography>Run ID: {entry.id}</Typography>
-                                    <Box sx={{ backgroundColor: modelIdToColor(entry.model_id) }}>
-                                        <Typography>
-                                            Model name: {modelData ? modelData.find((option) => option.value === entry.model_id).modelName : null}
-                                        </Typography>
-                                        <Typography>
-                                            Model id: {entry.model_id}
-                                        </Typography>
-                                    </Box>
-                                    <Typography>Base checkpoint: {entry.checkpoint}</Typography>
-                                    <Typography>Split: <b>{entry.id.substring(entry.id.lastIndexOf('-') + 1)}</b></Typography>
-                                    {entry.optimiser ? <Typography>Optimiser: {entry.optimiser}</Typography> : null}
-                                    {entry.cv_dataset ? <Typography>CV Dataset: {entry.cv_dataset}</Typography> : null}
-                                    {entry.test_dataset ? <Typography>Test Dataset: {entry.test_dataset}</Typography> : null}
-                                    {entry.training_dataset ? <Typography>Training Dataset: {entry.training_dataset}</Typography> : null}
-                                </Card>
-                            </ListItem>
+                    
 
-                        )) : null}
-                    </List>
+                    {trainingSessions ? trainingSessions.filter((session) => (session.split === "train")).map((session, i) => (
+                        <SessionAnalysis session={session}/>
+                    )) : null}
+
 
                 </Box>
 

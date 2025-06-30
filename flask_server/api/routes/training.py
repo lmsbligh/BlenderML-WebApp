@@ -61,7 +61,17 @@ def training_sessions():
         """)
 
         rows = cur.fetchall()
-        runs_as_dicts = [dict(row) for row in rows]
+        # runs_as_dicts = [dict(row) for row in rows]
+        # runs_as_dicts = [for row in runs_as_dicts]
+        runs_as_dicts = []
+        for row in rows:
+            run = dict(row)
+            run_id = run.get("id", "")
+            # Extract the final part after the last hyphen
+            split = run_id.split("-")[-1] if "-" in run_id else None
+            run["split"] = split
+            runs_as_dicts.append(run)
+
         print(runs_as_dicts)
         return runs_as_dicts
 
@@ -94,8 +104,33 @@ def training_metrics(run_id):
         rows_step = [{"step": f"E{row['epoch']}-B{row['batch']}",
                       "loss": row['loss']} for row in metrics_as_dict]
         # print(metrics_as_dicts)
+
+        cur = con.cursor()
+        cur.execute("""
+            SELECT epochs, batch_size, training_dataset FROM training_runs
+            WHERE id = ?
+                    """, (run_id,))
+        rows = cur.fetchall()
+        params_as_dict = [dict(row) for row in rows]
+        print(params_as_dict)
+
+        dataset_size = 0
+        if params_as_dict[0]['training_dataset'] is not None:
+            cur = con.cursor()
+            cur.execute("""
+                SELECT datasetSize FROM datasets
+                WHERE value = ?
+                        """, (params_as_dict[0]['training_dataset'],))
+            rows = cur.fetchall()
+            dataset_size = [dict(row) for row in rows][0]['datasetSize']
+
         print({"run_id": run_id, "data": rows_step})
-        return {"run_id": run_id, "data": rows_step}
+        return {"runId": run_id,
+                "batchSize": params_as_dict[0]['batch_size'],
+                "epochs": params_as_dict[0]['epochs'],
+                "data": rows_step,
+                "datasetSize": dataset_size
+                }
 
     except sqlite3.Error as e:
         print("Database error:", e)
