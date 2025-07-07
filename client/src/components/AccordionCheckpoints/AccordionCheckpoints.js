@@ -1,0 +1,58 @@
+import * as React from 'react';
+import { useImmer } from 'use-immer';
+import produce from "immer";
+
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
+import { Accordion, AccordionDetails, AccordionSummary, Card, Checkbox, List, Paper, Tooltip } from '@mui/material/';
+import Typography from '@mui/material/Typography';
+import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
+import SpeedIcon from '@mui/icons-material/Speed';
+import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
+import AddIcon from '@mui/icons-material/Add';
+import HubIcon from '@mui/icons-material/Hub';
+
+import SelectorLayerType from '../SelectorLayerType/SelectorLayerType.js'
+import SelectorLayerActivation from '../SelectorLayerActivation/SelectorLayerActivation.js'
+import { appendData, handleTextFieldChange, validateField, validateLayerDimensions } from '../../utils.js';
+import { fetchData } from '../../utils.js';
+import TrainingChart from '../TrainingChart/TrainingChart.js';
+import CheckpointCard from '../CheckpointCard/CheckpointCard.js';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
+const AccordionCheckpoints = ({ modelId, handleCheckpointChange }) => {
+
+    const [checkpointOptions, setCheckpointOptions] = React.useState([]);
+    const [newCheckpoint, setNewcheckpoint] = React.useState(false);
+    React.useEffect(() => {
+        fetchData(`checkpoints/${modelId}`, setCheckpointOptions)
+    }, []);
+
+    const handleNewCheckboxChange = (event) => {
+        setNewcheckpoint(event.target.checked)
+        handleCheckpointChange(event.target.getAttribute('data-model-id'), event.target.getAttribute('data-checkpoint-id'), )
+    }
+    return (
+        <Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}> 
+                <Tooltip title="Select for training with fresh, randomly assigned weights."><Checkbox data-model-id={modelId} data-checkpoint-id={-1} checked={newCheckpoint} onChange={handleNewCheckboxChange}/> </Tooltip>
+                <Typography >Create new checkpoint</Typography></Box>
+
+            <Accordion expandIcon={<ExpandMoreIcon />}>
+                <AccordionSummary>
+                    <Typography>Select checkpoints:</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {checkpointOptions ? checkpointOptions.map((checkpoint) => (
+                        <CheckpointCard id={checkpoint.id} model_id={modelId} handleCheckpointChange={handleCheckpointChange}/>
+                    )) : null}
+                </AccordionDetails>
+            </Accordion>
+
+        </Box>
+    )
+}
+
+export default AccordionCheckpoints

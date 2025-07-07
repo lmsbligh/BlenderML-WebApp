@@ -7,7 +7,7 @@ MODEL_FORM = {
     },
     "modelName": {
         "data_type": str,
-        "regex": r"^[A-Za-z0-9 -]{1,15}$",
+        "regex": r"^[A-Za-z0-9 -]{1,30}$",
         "required": True,
         "helper": "Please enter an alphanumeric name of up to 15 characters."
     },
@@ -18,17 +18,17 @@ MODEL_FORM = {
         "helper": "Please enter an alphanumeric description of up to 150 characters."
     },
     "input": {
-            "data_type": int,
-            "regex": r"^(?:[0-9]\d?|1000)$",
-            "required": False,
-            "helper": "Please enter an integer between 1 and 1000"
-        },
+        "data_type": int,
+        "regex": r"^(?:[0-9]\d?|1000)$",
+        "required": False,
+        "helper": "Please enter an integer between 1 and 1000"
+    },
     "output": {
-            "data_type": int,
-            "regex": r"^(?:[0-9]\d?|1000)$",
-            "required": False,
-            "helper": "Please enter an integer between 1 and 1000"
-        },
+        "data_type": int,
+        "regex": r"^(?:[0-9]\d?|1000)$",
+        "required": False,
+        "helper": "Please enter an integer between 1 and 1000"
+    },
     "layers": {
         "data_type": list,
         "regex": "",
@@ -66,19 +66,19 @@ LAYER_FORM = {
         "regex": r"^(?:0|[1-9]\d{0,2}|1000)$",
         "required": True,
         "helper": "Please enter an integer from 0 to 1000."
-    }, 
+    },
     "x_1": {
         "data_type": int,
         "regex": r"^(?:0|[1-9]\d{0,2}|1000)$",
         "required": True,
         "helper": "Please enter an integer from 0 to 1000."
-    }, 
+    },
     "x_2": {
         "data_type": int,
         "regex": r"^(?:0|[1-9]\d{0,2}|1000)$",
         "required": False,
         "helper": "Please enter an integer from 0 to 1000."
-    }, 
+    },
     "x_3": {
         "data_type": int,
         "regex": r"^(?:0|[1-9]\d{0,2}|1000)$",

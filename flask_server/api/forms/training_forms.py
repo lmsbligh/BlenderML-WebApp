@@ -1,13 +1,7 @@
 TRAINING_FORM = {
-    "model": {
-        "data_type": str,
-        "regex": r"^[A-Za-z0-9 -]{1,15}$",
-        "required": True,
-        "helper": "Please select a model."
-    },
-    "checkpoint": {
-        "data_type": str,
-        "regex": r"^[A-Za-z0-9 -.]{1,30}$",
+    "checkpoints": {
+        "data_type": list,
+        "regex": "",
         "required": False,
         "helper": "Please select a checkpoint."
     },
@@ -61,3 +55,10 @@ TRAINING_FORM = {
 
     },
 }
+
+CHECKPOINTS = {"checkpoint": {
+    "data_type": str,
+    "regex": r"^[A-Za-z0-9 -]{1,30}$",
+    "required": False,
+    "helper": "Please select a dataset"
+}}

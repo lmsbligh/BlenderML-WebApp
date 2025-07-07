@@ -276,7 +276,7 @@ def test_loop(session_id, dataset_id, model_id, model_checkpoint, data_loader, l
     model.to(device)
     state_dict_path = os.path.join(
         "MLApp", state_dict_dir, model_id, model_checkpoint)
-    model.load_state_dict(torch.load(state_dict_path))
+    model.load_state_dict(torch.load(state_dict_path+".pth"))
     total_loss = 0.0
     for i, data in enumerate(data_loader, 0):
         # get the inputs; data is a list of [inputs, labels]

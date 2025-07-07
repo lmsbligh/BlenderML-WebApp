@@ -26,6 +26,7 @@ def submit_training():
     """
     training_form = json.loads(request.data.decode("utf-8"))
     print("training_form: ", training_form)
+    return
     try:
         validate_form(training_form, TRAINING_FORM)
     except ValueError as ve:
@@ -43,6 +44,36 @@ def submit_training():
 def cancel_training_route():
     cancel_training()
     return {"status": "cancelled"}, 200
+
+
+@bp.route("/checkpoint_test_sessions/<string:checkpoint_id>")
+def checkpoint_test_sessions(checkpoint_id):
+    con = sqlite3.connect(DATABASE_PATH)
+    cur = con.cursor()
+    try:
+        con.row_factory = sqlite3.Row  # enables name-based column access
+        cur = con.cursor()
+        cur.execute("PRAGMA foreign_keys = ON;")
+
+        cur.execute("""
+            SELECT * FROM training_runs WHERE checkpoint = ?
+            AND (test_dataset IS NOT NULL OR cv_dataset IS NOT NULL)
+            ORDER BY session_id ASC
+        """, (checkpoint_id,))
+
+        rows = cur.fetchall()
+        # runs_as_dicts = [dict(row) for row in rows]
+        # runs_as_dicts = [for row in runs_as_dicts]
+        runs_as_dicts = [dict(row) for row in rows]
+
+        print(runs_as_dicts)
+        return runs_as_dicts
+
+    except sqlite3.Error as e:
+        print("Database error:", e)
+        return json.dumps({"error": str(e)})
+    finally:
+        con.close()
 
 
 @bp.route("/training_sessions", methods=["GET"])

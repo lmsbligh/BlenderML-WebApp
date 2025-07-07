@@ -2,6 +2,8 @@ import ast
 import os
 import re
 from api.forms.model_forms import LAYER_FORM
+from api.forms.training_forms import CHECKPOINTS
+
 
 def validate_form(data, required_fields):
     """
@@ -24,13 +26,18 @@ def validate_form(data, required_fields):
                 if field_vals["data_type"] == dict:
                     data[field] = ast.literal_eval(data[field])
             except:
-                raise ValueError(f"Field {field} must be of type {field_vals['data_type']}")
-            
+                raise ValueError(
+                    f"Field {field} must be of type {field_vals['data_type']}")
+
     def val_entry(entry, val):
         print(f"entry: {entry}, val: {val}")
+        if (entry == "checkpoints"):
+            print("checkpoints: ", entry)
+            for checkpoint in val:
+                validate_form(checkpoint, CHECKPOINTS)
         if (entry == "layers"):
             print("layers: ", entry)
-            for layer in val: 
+            for layer in val:
                 print("layer: ", layer)
                 validate_form(layer, LAYER_FORM)
         if (entry == "skyboxPath" or entry == "image_path"):
@@ -38,16 +45,18 @@ def validate_form(data, required_fields):
             real_base = os.path.realpath(os.getcwd())
             real_target = os.path.realpath(os.path.join(real_base, val))
             if not (real_target.startswith(real_base)):
-                raise ValueError(f"Error: {entry} {val} is not within the application.")
+                raise ValueError(
+                    f"Error: {entry} {val} is not within the application.")
         if (entry not in required_fields):
             raise ValueError(f"Error {entry} is not a valid field.")
         if (val):
             if not (re.match(required_fields[entry]["regex"], str(val))):
-                raise ValueError(f"Error: {entry}: regex eval failed {required_fields[entry]['helper']}")
+                raise ValueError(
+                    f"Error: {entry}: regex eval failed {required_fields[entry]['helper']}")
         elif (required_fields[entry]["required"]):
-            raise ValueError(f"Error: {entry} is a required field: {required_fields[entry]['helper']}")
-    
+            raise ValueError(
+                f"Error: {entry} is a required field: {required_fields[entry]['helper']}")
+
     # Additional sanity checks
     for entry, val in data.items():
         val_entry(entry=entry, val=val)
-        

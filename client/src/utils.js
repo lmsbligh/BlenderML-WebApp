@@ -127,6 +127,12 @@ export const validateForm = ({ formElement, elementParent = null }) => {
 export const validateField = ({ key, setFormState }) => {
     setFormState((prevForm) => {
         return produce(prevForm, (draft) => {
+            console.log("!!!validate field: ", draft)
+            const field = draft[key].type
+            // if (field?.type !== "Validation") { 
+            //     console.log("!!is not validation")
+            //     return
+            // };
             if (draft[key].required && draft[key].value == "") {
                 draft[key].error = true
             }
@@ -225,3 +231,27 @@ export class Validation {
         this.type = "Validation";
     }
 }
+
+export const validateBatchSize = (input, setTrainingForm, datasetSize) => {
+        let value;
+        if (input && input.target) {
+            value = input.target.value
+        }
+        else {
+            value = input
+        }
+        if (Number(value) >= datasetSize) {
+            setTrainingForm((prevVal) => {
+                return produce(prevVal, (draft) => {
+                    draft['batchSize'].error = true
+                })
+            })
+        }
+        else {
+            setTrainingForm((prevVal) => {
+                return produce(prevVal, (draft) => {
+                    draft['batchSize'].error = false
+                })
+            })
+        }
+    }

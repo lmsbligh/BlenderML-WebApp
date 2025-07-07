@@ -28,7 +28,7 @@ function CreateModifyModel() {
         "layers": [{ layer_type: 'Dense', activation: 'Linear', x_0: '', x_1: '', x_2: '', x_3: '', padding: '' }]
     }
     const defaultForm = {
-        "modelName": new Validation({ required: true, regex: /^[A-Za-z0-9 -]{1,15}$/, helper: "Please enter an alphanumeric name for your model." }),
+        "modelName": new Validation({ required: true, regex: /^[A-Za-z0-9 -]{1,30}$/, helper: "Please enter an alphanumeric name for your model." }),
         "description": new Validation({ regex: /^[A-Za-z0-9 -]{1,150}$/, helper: "Please enter an alphanumeric description for your model." }),
         "layers": []
     }
@@ -351,8 +351,8 @@ function CreateModifyModel() {
                             {modelCheckpoints ? modelCheckpoints.map((option, ind) => {
                                 return <Card key={option} sx={{ padding: "10px" }}>
                                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
-                                        <Typography sx={{ alignSelf: "center" }} color="text.primary">Checkpoint: {option}</Typography>
-                                        <IconButton aria-label="delete" color="primary" onClick={() => { delCheckpoint(option) }}><DeleteIcon /></IconButton>
+                                        <Typography sx={{ alignSelf: "center" }} color="text.primary">Checkpoint: {option.id}</Typography>
+                                        <IconButton aria-label="delete" color="primary" onClick={() => { delCheckpoint(option.id) }}><DeleteIcon /></IconButton>
                                     </Box>
                                 </Card>
                             }) : null}

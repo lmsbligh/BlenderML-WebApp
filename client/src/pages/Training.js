@@ -27,23 +27,19 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingDownOutlinedIcon from '@mui/icons-material/TrendingDownOutlined';
 import CheckpointCard from '../components/CheckpointCard/CheckpointCard.js';
 import SessionAnalysis from '../components/SessionAnalysis/SessionAnalysis.js';
+import AccordionModels from '../components/AccordionModels/AccordionModels.js';
+import TrainingHyperparams from '../components/TrainingHyperparams/TrainingHyperparams.js';
 export default function Training() {
 
     const [trainingForm, setTrainingForm] = useImmer(structuredClone({
-        "model": new Validation({
-            value: "",
-            error: false,
-            regex: "",
-            required: true,
-            helper: "Please select a model."
-        }),
-        "checkpoint": new Validation({
-            value: "",
-            error: false,
-            regex: "",
-            required: false,
-            helper: "Please select a checkpoint."
-        }),
+        // "model": new Validation({
+        //     value: "",
+        //     error: false,
+        //     regex: "",
+        //     required: true,
+        //     helper: "Please select a model."
+        // }),
+        "checkpoints": [],
         "trainDataset": new Validation({
             value: "",
             error: false,
@@ -112,8 +108,7 @@ export default function Training() {
     const [selectedTestDataset, setSelectedTestDataset] = React.useState('');
 
 
-    const [optimizerOptions, setOptimizerOptions] = React.useState([{ "value": 0, "label": "Gradient descent" }, { "value": 1, "label": "ADAM" }]);
-    const [selectedOptimizer, setSelectedOptimizer] = React.useState(optimizerOptions[1]);
+
 
     const [lossOptions, setLossOptions] = React.useState([{ "value": 0, "label": "MSE" }, { "value": 1, "label": "MAE" }]);
     const [selectedLoss, setSelectedLoss] = React.useState(lossOptions[0]);
@@ -121,8 +116,9 @@ export default function Training() {
     const [checkpointOptions, setCheckpointOptions] = React.useState([]);
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
 
-    const [trainingLog, setTrainingLog] = React.useState([]);
     const [chartData, setChartData] = React.useState([]);
+
+    const [trainingLog, setTrainingLog] = React.useState([]);
 
     const [trainingSessions, setTrainingSessions] = useImmer([]);
 
@@ -162,27 +158,7 @@ export default function Training() {
     React.useEffect(() => {
         console.log("trainingSessions: ", trainingSessions)
     }, [trainingSessions])
-    const isRunVisible = (runId) => chartData.some(run => run.runId === runId)
-    const handleGraphClick = (event) => {
-        const runId = event.currentTarget.getAttribute("data-run-id")
-        let wasPresent = false
-        setChartData((prevChartData) => {
-            const newChartData = prevChartData.filter((run) => {
-                if (run.runId === runId) {
-                    wasPresent = true;
-                    return false; // remove this run
-                }
-                return true;
-            });
 
-            if (!wasPresent) {
-                appendData(`/training_metrics/${runId}`, setChartData);
-            }
-
-            return newChartData;
-        });
-
-    }
 
     // React.useEffect(() => {
     //     console.log("chartData: ", chartData)
@@ -190,11 +166,10 @@ export default function Training() {
     React.useEffect(() => {
         console.log("selectedTrainDataset: ", selectedTrainDataset)
     }, [selectedTrainDataset])
-    function modelIdToColor(modelId) {
-        const hash = Array.from(modelId).reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const hue = hash % 360;  // wrap around color wheel
-        return `hsl(${hue}, 70%, 70%)`;  // adjust saturation/lightness for pastel feel
-    }
+    React.useEffect(() => {
+        console.log("trainingForm: ", trainingForm)
+    }, [trainingForm])
+
     const checkDatasetSelected = (event) => {
         console.log("checkDatasetSelected ran")
         console.log("event.value: ", event.target.value)
@@ -292,12 +267,11 @@ export default function Training() {
         }
         validateBatchSize(trainingForm.batchSize.value)
         setTimeout(() => {
-
             var formValid = validateForm({ formElement: trainingForm })
             if (!formValid && trainingMode.selected) {
                 const formToPush = {
                     model: trainingForm.model.value,
-                    checkpoint: trainingForm.checkpoint.value,
+                    checkpoint: trainingForm.checkpoints,
                     trainDataset: trainingForm.trainDataset.value,
                     CVDataset: trainingForm.CVDataset.value,
                     testDataset: trainingForm.testDataset.value,
@@ -315,11 +289,28 @@ export default function Training() {
         }, 0)
     }
 
+    const handleCheckpointChange = (modelId, checkpointId) => {
+        if (trainingForm.checkpoints.includes(checkpointId)) {
+            setTrainingForm((prevVals) => {
+                return produce(prevVals, (draft) => {
+                    draft.checkpoints = draft.checkpoints.filter((entry) => entry.checkpointId !== checkpointId)
+                })
+            })
+        }
+        else {
+            setTrainingForm((prevVals) => {
+                return produce(prevVals, (draft) => {
+                    draft.checkpoints.push({"checkpointId" : checkpointId, "modelId" : modelId});
+                })
+            })
+        }
+
+    }
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}><Grid container>
             <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
                 <CssBaseline />
-                {modelData ? <SelectorModel
+                {/* {modelData ? <SelectorModel
                     error={trainingForm.model.error}
                     helperText={trainingForm.model.error ? trainingForm.model.helper : ''}
                     selectedModel={selectedModel}
@@ -334,61 +325,19 @@ export default function Training() {
                         validateField({ key: 'model', setFormState: setTrainingForm })
                     }}
 
-                /> : null}
-                <Box>
-                    <List>
-                        <SelectedModel selectedModel={selectedModel} />
-                        <ListItem>
-                            <div>
-                                <Accordion>
-                                    <AccordionSummary
-                                        expandIcon={<ExpandMoreIcon />}
-                                    >
-                                        Show more details
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                        <List>
-                                            {
-                                                Array.from({ length: 5 }, (_, i) => (
-                                                    <ListItem key={i} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                                        {
-                                                            <ModelDetailsCard layer_n={i} />
-                                                        }
-                                                    </ListItem>
-                                                ))
-                                            }
-                                        </List>
-                                    </AccordionDetails>
-                                </Accordion>
-                            </div>
-                        </ListItem>
-                    </List>
-                </Box>
-                {selectedModel ? (<div>
+                /> : null} */}
+                
+                <AccordionModels modelData={modelData} handleCheckpointChange={handleCheckpointChange}/>
+                {/* {selectedModel ? (<div>
                     <Accordion expandIcon={<ExpandMoreIcon />}>
                         <AccordionSummary>
                             <Typography>Select checkpoints:</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            {checkpointOptions.map((option) => (<CheckpointCard key={option.id} {...option} />))}
+                            {checkpointOptions.map((option) => (<CheckpointCard key={option.id} {...option} callback={handleCheckpointChange}  />))}
                         </AccordionDetails>
                     </Accordion>
-
-                </div>) : null}
-                {selectedModel ? (<SelectorCheckpoint
-                    error={trainingForm.checkpoint.error}
-                    helperText={trainingForm.checkpoint.error ? trainingForm.checkpoint.helper : ''}
-                    selectedCheckpoint={selectedCheckpoint}
-                    handleChange={(event) => {
-                        handleSelectorFormChange({
-                            eve: event,
-                            setSelector: setSelectedCheckpoint,
-                            setForm: setTrainingForm
-                        })
-                        validateField({ key: 'checkpoint', setFormState: setTrainingForm })
-                    }}
-                    checkpointOptions={checkpointOptions}
-                />) : null}
+                </div>) : null} */}
                 <SelectorDataset
                     error={trainingForm.trainDataset.error}
                     datasetType={"train"}
@@ -442,57 +391,7 @@ export default function Training() {
                     }}
                     datasetOptions={datasetOptions} />
                 {selectedTrainDataset ?
-                    <><TextField
-                        error={trainingForm.epochs.error}
-                        name="epochs"
-                        label="Epochs"
-                        helperText={trainingForm.epochs.error ? trainingForm.epochs.helper : ''}
-                        value={trainingForm.epochs.value}
-                        onChange={(event) => {
-                            handleTextFieldChange({ eve: event, setState: setTrainingForm })
-                            validateField({ key: 'epochs', setFormState: setTrainingForm })
-                        }}
-                    />
-                        <TextField
-                            error={trainingForm.batchSize.error}
-                            name="batchSize"
-                            label="Batch Size"
-                            helperText={trainingForm.batchSize.error ? trainingForm.batchSize.helper : ''}
-                            value={trainingForm.batchSize.value}
-                            onChange={(event) => {
-                                handleTextFieldChange({ eve: event, setState: setTrainingForm })
-                                console.log("selectedTrainDataset: ", selectedTrainDataset)
-                                validateField({ key: 'batchSize', setFormState: setTrainingForm })
-                                validateBatchSize(event)
-
-                            }}
-                        />
-                        <TextField
-                            error={trainingForm.learningRate.error}
-                            helperText={trainingForm.learningRate.error ? trainingForm.learningRate.helper : ''}
-                            name="learningRate"
-                            label="Learning rate"
-                            value={trainingForm.learningRate.value}
-                            onChange={(event) => {
-                                handleTextFieldChange({ eve: event, setState: setTrainingForm })
-                                validateField({ key: 'learningRate', setFormState: setTrainingForm })
-                            }}
-                        />
-                        <SelectorOptimizer
-                            error={trainingForm.optimizer.error}
-                            selectedOptimizer={selectedOptimizer}
-                            handleChange={(event) => {
-                                handleSelectorFormChange({
-                                    eve: event,
-                                    setSelector: setSelectedOptimizer,
-                                    setForm: setTrainingForm,
-                                    options: optimizerOptions
-                                })
-                                validateField({ key: 'optimizer', setFormState: setTrainingForm })
-                            }}
-                            optimizerOptions={optimizerOptions}
-                        />
-                    </>
+                    <TrainingHyperparams trainingForm={trainingForm} datasetSize={selectedTrainDataset.datasetSize}/>
                     : null}
                 <SelectorLoss
                     error={trainingForm.lossFunction.error}
@@ -553,13 +452,9 @@ export default function Training() {
                     </Box>
                 </Box>
                 <Box>
-                    
-
-                    {trainingSessions ? trainingSessions.filter((session) => (session.split === "train")).map((session, i) => (
-                        <SessionAnalysis session={session}/>
-                    )) : null}
-
-
+                    {trainingSessions ?
+                        <SessionAnalysis trainingSessions={trainingSessions} modelData={modelData ? modelData : null} />
+                        : null}
                 </Box>
 
 
