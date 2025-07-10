@@ -26,7 +26,6 @@ def submit_training():
     """
     training_form = json.loads(request.data.decode("utf-8"))
     print("training_form: ", training_form)
-    return
     try:
         validate_form(training_form, TRAINING_FORM)
     except ValueError as ve:

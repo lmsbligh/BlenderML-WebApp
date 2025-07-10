@@ -270,7 +270,6 @@ export default function Training() {
             var formValid = validateForm({ formElement: trainingForm })
             if (!formValid && trainingMode.selected) {
                 const formToPush = {
-                    model: trainingForm.model.value,
                     checkpoint: trainingForm.checkpoints,
                     trainDataset: trainingForm.trainDataset.value,
                     CVDataset: trainingForm.CVDataset.value,
@@ -290,10 +289,11 @@ export default function Training() {
     }
 
     const handleCheckpointChange = (modelId, checkpointId) => {
-        if (trainingForm.checkpoints.includes(checkpointId)) {
+        const exists = trainingForm.checkpoints.some( obj => obj.checkpointId === checkpointId && obj.modelId === modelId )
+        if (exists) {
             setTrainingForm((prevVals) => {
                 return produce(prevVals, (draft) => {
-                    draft.checkpoints = draft.checkpoints.filter((entry) => entry.checkpointId !== checkpointId)
+                    draft.checkpoints = draft.checkpoints.filter((entry) => entry.checkpointId !== checkpointId && entry.modelId === modelId)
                 })
             })
         }

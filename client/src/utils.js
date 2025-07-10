@@ -129,10 +129,10 @@ export const validateField = ({ key, setFormState }) => {
         return produce(prevForm, (draft) => {
             console.log("!!!validate field: ", draft)
             const field = draft[key].type
-            // if (field?.type !== "Validation") { 
-            //     console.log("!!is not validation")
-            //     return
-            // };
+            if (field?.type !== "Validation") { 
+                console.log("!!is not validation")
+                return
+            };
             if (draft[key].required && draft[key].value == "") {
                 draft[key].error = true
             }

@@ -3,20 +3,14 @@ import { useImmer } from 'use-immer';
 import produce from "immer";
 
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import { Accordion, AccordionDetails, AccordionSummary, Card, Checkbox, List, Paper, Tooltip } from '@mui/material/';
 import Typography from '@mui/material/Typography';
-import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import SpeedIcon from '@mui/icons-material/Speed';
-import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
-import AddIcon from '@mui/icons-material/Add';
 import HubIcon from '@mui/icons-material/Hub';
 
-import SelectorLayerType from '../SelectorLayerType/SelectorLayerType.js'
-import SelectorLayerActivation from '../SelectorLayerActivation/SelectorLayerActivation.js'
-import { appendData, handleTextFieldChange, validateField, validateLayerDimensions } from '../../utils.js';
+import { appendData, validateField } from '../../utils.js';
 import { fetchData } from '../../utils.js';
 import TrainingChart from '../TrainingChart/TrainingChart.js';
 
@@ -46,11 +40,12 @@ const CheckpointCard = ({ id, model_id, handleCheckpointChange }) => {
     const delFunction = (event) => {
 
     }
+
     return (
         <Paper variant='outlined' >
             {console.log("CheckpointCard: ", id)}
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Tooltip title="Select for training"><Checkbox data-model-id={model_id} data-checkpoint-id={id} onChange={(event) => handleCheckpointChange(event.target.getAttribute('data-model-id'), event.target.getAttribute('data-checkpoint-id'))}/></Tooltip>
+                <Tooltip title="Select for training"><Checkbox data-model-id={model_id} data-checkpoint-id={id} onChange={(event) => handleCheckpointChange(model_id, id)} /></Tooltip>
                 <Tooltip><IconButton aria-label="delete" color="error" ><DeleteIcon /></IconButton></Tooltip>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
@@ -76,7 +71,7 @@ const CheckpointCard = ({ id, model_id, handleCheckpointChange }) => {
                                     return <Paper variant="outlined" sx={{ padding: "5px", margin: "5px" }}>
                                         <Typography>CV set: {option.cv_dataset}</Typography>
                                         <Typography>Loss function: {option.loss_function}</Typography>
-                                        <Typography>Loss: {matchingMetric ? matchingMetric.data?.[0].loss :  'N/A'}</Typography>
+                                        <Typography>Loss: {matchingMetric ? matchingMetric.data?.[0].loss : 'N/A'}</Typography>
                                     </Paper>
 
                                 }

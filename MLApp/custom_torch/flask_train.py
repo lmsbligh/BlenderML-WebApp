@@ -42,30 +42,22 @@ def train(training_form):
     loss_function = training_form['lossFunction']
     batch_size = training_form['batchSize']
 
-    model_id = training_form['model']
-    model_checkpoint = training_form['checkpoint']
-
-    # dataset_profile = dataset[:dataset.find('-')]
-    # dataset_date_time = dataset[dataset.find('-')+1:]
-
     training_datasets_path = os.path.join(
         os.getcwd(), "MLApp", "data", "training_datasets")
-    # dataset_dir = os.path.join(os.getcwd(),"MLApp", "data", "training_datasets", dataset_profile, dataset_date_time)
 
     training_dataset_dir = os.path.join(training_datasets_path, training_form['trainDataset'][:training_form['trainDataset'].find('-')],
                                         training_form['trainDataset'][9:27], "train") if training_form['trainDataset'] else None
+    # dataset_dir = os.path.join(os.getcwd(),"MLApp", "data", "training_datasets", dataset_profile, dataset_date_time)
     CV_dataset_dir = os.path.join(training_datasets_path, training_form['CVDataset'][:training_form['CVDataset'].find('-')],
                                   training_form['CVDataset'][9:27], "CV") if training_form['CVDataset'] else None
     test_dataset_dir = os.path.join(training_datasets_path, training_form['testDataset'][:training_form['testDataset'].find('-')],
                                     training_form['testDataset'][9:27], "test") if training_form['testDataset'] else None
+    transform = transforms.Compose(
+        [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     print("training_dataset_dir: ", training_dataset_dir)
     print("CV_dataset_dir: ", CV_dataset_dir)
     print("test_dataset_dir: ", test_dataset_dir)
-
-    transform = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
     training_data_loader = gen_dataloader(
         training_dataset_dir, transform) if training_dataset_dir and os.path.exists(training_dataset_dir) else None
     CV_data_loader = gen_dataloader(
@@ -73,17 +65,24 @@ def train(training_form):
     test_data_loader = gen_dataloader(
         test_dataset_dir, transform) if test_dataset_dir and os.path.exists(test_dataset_dir) else None
 
-    if (training_data_loader):
-        training_loop(session_id, training_form['trainDataset'], epochs, model_id, model_checkpoint,
-                      learning_rate, training_data_loader, loss_function, optimiser, batch_size)
+    for checkpoint in training_form['checkpoints']:
+        model_id = checkpoint['modelId']
+        model_checkpoint = checkpoint['checkpointId']
 
-    if (CV_data_loader):
-        test_loop(session_id, training_form['CVDataset'], model_id, model_checkpoint,
-                  CV_data_loader, loss_function, "CV")
+        # dataset_profile = dataset[:dataset.find('-')]
+        # dataset_date_time = dataset[dataset.find('-')+1:]
 
-    if (test_data_loader):
-        test_loop(session_id, training_form['testDataset'], model_id, model_checkpoint,
-                  test_data_loader, loss_function, "test")
+        if (training_data_loader):
+            training_loop(session_id, training_form['trainDataset'], epochs, model_id, model_checkpoint,
+                          learning_rate, training_data_loader, loss_function, optimiser, batch_size)
+
+        if (CV_data_loader):
+            test_loop(session_id, training_form['CVDataset'], model_id, model_checkpoint,
+                      CV_data_loader, loss_function, "CV")
+
+        if (test_data_loader):
+            test_loop(session_id, training_form['testDataset'], model_id, model_checkpoint,
+                      test_data_loader, loss_function, "test")
 
 
 def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, learning_rate, data_loader, loss_function, optimiser, batch_size):
@@ -107,11 +106,12 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
 
     model = CustomNet(json.loads(model_data['layers']))
     model.to(device)
-    if (model_checkpoint):
+    if (model_checkpoint and model_checkpoint != "-1"):
         state_dict_path = os.path.join(
             "MLApp", state_dict_dir, model_id, model_checkpoint)
         model.load_state_dict(torch.load(state_dict_path+".pth"))
         model_checkpoint = model_checkpoint.replace(".pth", "")
+
     optimiser_instance = optimiser
     loss_instance = loss_function
     match optimiser:
@@ -162,6 +162,8 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
                 socketio.emit('training_update', batch_data)
                 socketio.sleep(0.01)
     # add some functionality to save training data
+    if (model_checkpoint == "-1"):
+        model_checkpoint = session_id
     try:
         print("model_id: ", model_id)
         con = sqlite3.connect(DATABASE_PATH)

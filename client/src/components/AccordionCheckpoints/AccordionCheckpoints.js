@@ -32,12 +32,12 @@ const AccordionCheckpoints = ({ modelId, handleCheckpointChange }) => {
 
     const handleNewCheckboxChange = (event) => {
         setNewcheckpoint(event.target.checked)
-        handleCheckpointChange(event.target.getAttribute('data-model-id'), event.target.getAttribute('data-checkpoint-id'), )
+        handleCheckpointChange(event.target.getAttribute('data-model-id'), event.target.getAttribute('data-checkpoint-id'))
     }
     return (
         <Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}> 
-                <Tooltip title="Select for training with fresh, randomly assigned weights."><Checkbox data-model-id={modelId} data-checkpoint-id={-1} checked={newCheckpoint} onChange={handleNewCheckboxChange}/> </Tooltip>
+                <Tooltip title="Select for training with fresh, randomly assigned weights."><Checkbox onChange={(event) => handleCheckpointChange(modelId, "-1")}/> </Tooltip>
                 <Typography >Create new checkpoint</Typography></Box>
 
             <Accordion expandIcon={<ExpandMoreIcon />}>

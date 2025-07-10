@@ -31,10 +31,20 @@ def validate_form(data, required_fields):
 
     def val_entry(entry, val):
         print(f"entry: {entry}, val: {val}")
+        real_base = os.path.realpath(os.getcwd())
+        real_target = os.path.realpath(os.path.join(real_base, val))
         if (entry == "checkpoints"):
             print("checkpoints: ", entry)
             for checkpoint in val:
-                validate_form(checkpoint, CHECKPOINTS)
+                for key in CHECKPOINTS["checkpoint"]["keys"]:
+                    if key not in checkpoint:
+                        raise ValueError(
+                            f"Error: no {key} in {val}."
+                        )
+                    if not (real_target.startswith(real_base)):
+                        raise ValueError(
+                            f"Error: {entry} {val} is not within the application.")
+
         if (entry == "layers"):
             print("layers: ", entry)
             for layer in val:
@@ -42,8 +52,7 @@ def validate_form(data, required_fields):
                 validate_form(layer, LAYER_FORM)
         if (entry == "skyboxPath" or entry == "image_path"):
             print(os.getcwd())
-            real_base = os.path.realpath(os.getcwd())
-            real_target = os.path.realpath(os.path.join(real_base, val))
+
             if not (real_target.startswith(real_base)):
                 raise ValueError(
                     f"Error: {entry} {val} is not within the application.")

@@ -57,8 +57,9 @@ TRAINING_FORM = {
 }
 
 CHECKPOINTS = {"checkpoint": {
-    "data_type": str,
-    "regex": r"^[A-Za-z0-9 -]{1,30}$",
+    "data_type": dict,
+    "keys": ["modelId", "checkpointId"],
+    "regex": "",
     "required": False,
     "helper": "Please select a dataset"
 }}
