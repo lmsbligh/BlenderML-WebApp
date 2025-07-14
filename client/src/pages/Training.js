@@ -123,9 +123,8 @@ export default function Training() {
     const [trainingSessions, setTrainingSessions] = useImmer([]);
 
     const socket = io('http://localhost:5000')
-
     const [isTraining, setIsTraining] = React.useState(false)
-
+    const fetchHyperparams = React.useRef(() => ({}));
     React.useEffect(() => {
         socket.on("training_update", (data) => {
             setTrainingLog(prev => [...prev, `Epoch ${data.epoch}, Batch ${data.batch}: Loss ${data.loss}`]);
@@ -261,35 +260,10 @@ export default function Training() {
             })
         }
     }
-    const handleTrain = (event) => {
-        for (let key in trainingForm) {
-            validateField({ key: key, setFormState: setTrainingForm })
-        }
-        validateBatchSize(trainingForm.batchSize.value)
-        setTimeout(() => {
-            var formValid = validateForm({ formElement: trainingForm })
-            if (!formValid && trainingMode.selected) {
-                const formToPush = {
-                    checkpoint: trainingForm.checkpoints,
-                    trainDataset: trainingForm.trainDataset.value,
-                    CVDataset: trainingForm.CVDataset.value,
-                    testDataset: trainingForm.testDataset.value,
-                    epochs: trainingForm.epochs.value,
-                    learningRate: trainingForm.learningRate.value,
-                    optimizer: trainingForm.optimizer.value,
-                    lossFunction: trainingForm.lossFunction.value,
-                    batchSize: trainingForm.batchSize.value
-                }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                setIsTraining(true)
-                setTrainingLog([]);
-                pushData('submit_training', formToPush)
-            }
-        }, 0)
-    }
+
 
     const handleCheckpointChange = (modelId, checkpointId) => {
-        const exists = trainingForm.checkpoints.some( obj => obj.checkpointId === checkpointId && obj.modelId === modelId )
+        const exists = trainingForm.checkpoints.some(obj => obj.checkpointId === checkpointId && obj.modelId === modelId)
         if (exists) {
             setTrainingForm((prevVals) => {
                 return produce(prevVals, (draft) => {
@@ -300,11 +274,39 @@ export default function Training() {
         else {
             setTrainingForm((prevVals) => {
                 return produce(prevVals, (draft) => {
-                    draft.checkpoints.push({"checkpointId" : checkpointId, "modelId" : modelId});
+                    draft.checkpoints.push({ "checkpointId": checkpointId, "modelId": modelId });
                 })
             })
         }
 
+    }
+
+        const handleTrain = (event) => {
+        for (let key in trainingForm) {
+            validateField({ key: key, setFormState: setTrainingForm })
+        }
+        validateBatchSize(trainingForm.batchSize.value)
+        setTimeout(() => {
+            var formValid = validateForm({ formElement: trainingForm })
+            const hyperparams = fetchHyperparams.current();
+            if (!formValid && trainingMode.selected) {
+                const formToPush = {
+                    checkpoints: trainingForm.checkpoints,
+                    trainDataset: trainingForm.trainDataset.value,
+                    CVDataset: trainingForm.CVDataset.value,
+                    testDataset: trainingForm.testDataset.value,
+                    epochs: hyperparams.epochs.value,
+                    learningRate: hyperparams.learningRate.value,
+                    optimizer: trainingForm.optimizer.value,
+                    lossFunction: trainingForm.lossFunction.value,
+                    batchSize: hyperparams.batchSize.value
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setIsTraining(true)
+                setTrainingLog([]);
+                pushData('submit_training', formToPush)
+            }
+        }, 0)
     }
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}><Grid container>
@@ -326,8 +328,8 @@ export default function Training() {
                     }}
 
                 /> : null} */}
-                
-                <AccordionModels modelData={modelData} handleCheckpointChange={handleCheckpointChange}/>
+
+                <AccordionModels modelData={modelData} handleCheckpointChange={handleCheckpointChange} />
                 {/* {selectedModel ? (<div>
                     <Accordion expandIcon={<ExpandMoreIcon />}>
                         <AccordionSummary>
@@ -391,7 +393,9 @@ export default function Training() {
                     }}
                     datasetOptions={datasetOptions} />
                 {selectedTrainDataset ?
-                    <TrainingHyperparams trainingForm={trainingForm} datasetSize={selectedTrainDataset.datasetSize}/>
+                    <TrainingHyperparams trainingForm={trainingForm} datasetSize={selectedTrainDataset.datasetSize} saveCallback={(fn) => {
+                        fetchHyperparams.current = fn;
+                    }} />
                     : null}
                 <SelectorLoss
                     error={trainingForm.lossFunction.error}

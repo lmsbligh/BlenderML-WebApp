@@ -29,12 +29,13 @@ def submit_training():
     try:
         validate_form(training_form, TRAINING_FORM)
     except ValueError as ve:
-        print(jsonify({"error": str(ve)}), 400)
+        print("ValueError Validation error:", ve)
         return jsonify({"error": str(ve)}), 400
     except Exception as ve:
-        print(jsonify({"error": str(ve)}), 400)
+        print("Generic validation error:", ve)
         return jsonify({"error": str(ve)}), 400
     # print(training_form)
+
     train(training_form)
     return jsonify({"body": "Training request received successfully."}), 200
 

@@ -66,6 +66,7 @@ def train(training_form):
         test_dataset_dir, transform) if test_dataset_dir and os.path.exists(test_dataset_dir) else None
 
     for checkpoint in training_form['checkpoints']:
+        print("Checkpoint/model for loop.")
         model_id = checkpoint['modelId']
         model_checkpoint = checkpoint['checkpointId']
 
@@ -75,6 +76,8 @@ def train(training_form):
         if (training_data_loader):
             training_loop(session_id, training_form['trainDataset'], epochs, model_id, model_checkpoint,
                           learning_rate, training_data_loader, loss_function, optimiser, batch_size)
+            if (model_checkpoint == '-1'):
+                model_checkpoint = session_id
 
         if (CV_data_loader):
             test_loop(session_id, training_form['CVDataset'], model_id, model_checkpoint,
