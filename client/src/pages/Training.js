@@ -107,12 +107,6 @@ export default function Training() {
     const [selectedCVDataset, setSelectedCVDataset] = React.useState('');
     const [selectedTestDataset, setSelectedTestDataset] = React.useState('');
 
-
-
-
-    const [lossOptions, setLossOptions] = React.useState([{ "value": 0, "label": "MSE" }, { "value": 1, "label": "MAE" }]);
-    const [selectedLoss, setSelectedLoss] = React.useState(lossOptions[0]);
-
     const [checkpointOptions, setCheckpointOptions] = React.useState([]);
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
 
@@ -125,6 +119,10 @@ export default function Training() {
     const socket = io('http://localhost:5000')
     const [isTraining, setIsTraining] = React.useState(false)
     const fetchHyperparams = React.useRef(() => ({}));
+
+    const [lossOptions, setLossOptions] = React.useState([{ "value": 0, "label": "MSE" }, { "value": 1, "label": "MAE" }]);
+    const [selectedLoss, setSelectedLoss] = React.useState(lossOptions[0]);
+
     React.useEffect(() => {
         socket.on("training_update", (data) => {
             setTrainingLog(prev => [...prev, `Epoch ${data.epoch}, Batch ${data.batch}: Loss ${data.loss}`]);
@@ -237,29 +235,7 @@ export default function Training() {
 
         }
     }
-    const validateBatchSize = (input) => {
-        let value;
-        if (input && input.target) {
-            value = input.target.value
-        }
-        else {
-            value = input
-        }
-        if (Number(value) >= selectedTrainDataset.datasetSize) {
-            setTrainingForm((prevVal) => {
-                return produce(prevVal, (draft) => {
-                    draft['batchSize'].error = true
-                })
-            })
-        }
-        else {
-            setTrainingForm((prevVal) => {
-                return produce(prevVal, (draft) => {
-                    draft['batchSize'].error = false
-                })
-            })
-        }
-    }
+
 
 
     const handleCheckpointChange = (modelId, checkpointId) => {
@@ -278,29 +254,51 @@ export default function Training() {
                 })
             })
         }
-
     }
 
-        const handleTrain = (event) => {
+    const handleTrain = (event) => {
         for (let key in trainingForm) {
             validateField({ key: key, setFormState: setTrainingForm })
         }
-        validateBatchSize(trainingForm.batchSize.value)
+
         setTimeout(() => {
-            var formValid = validateForm({ formElement: trainingForm })
-            const hyperparams = fetchHyperparams.current();
-            if (!formValid && trainingMode.selected) {
-                const formToPush = {
+            // var formValid = validateForm({ formElement: trainingForm })
+            let formToPush = {}
+            if (selectedTrainDataset) {
+                console.log("if TRUE")
+                const hyperparams = fetchHyperparams.current();
+
+
+                formToPush = {
                     checkpoints: trainingForm.checkpoints,
                     trainDataset: trainingForm.trainDataset.value,
                     CVDataset: trainingForm.CVDataset.value,
                     testDataset: trainingForm.testDataset.value,
-                    epochs: hyperparams.epochs.value,
-                    learningRate: hyperparams.learningRate.value,
-                    optimizer: trainingForm.optimizer.value,
+                    epochs: hyperparams ? hyperparams.epochs.value : null,
+                    learningRate: hyperparams ? hyperparams.learningRate.value : null,
+                    optimizer: hyperparams ? trainingForm.optimizer.value : null,
                     lossFunction: trainingForm.lossFunction.value,
-                    batchSize: hyperparams.batchSize.value
+                    batchSize: hyperparams ? hyperparams.batchSize.value : null
                 }
+
+            }
+            else {
+                console.log("if FALSE ")
+
+                formToPush = {
+                    checkpoints: trainingForm.checkpoints,
+                    trainDataset: trainingForm.trainDataset.value,
+                    CVDataset: trainingForm.CVDataset.value,
+                    epochs: trainingForm.epochs.value,
+                    learningRate: trainingForm.learningRate.value,
+                    optimizer: trainingForm.optimizer.value,
+                    batchSize: trainingForm.batchSize.value,
+                    testDataset: trainingForm.testDataset.value,
+                    lossFunction: trainingForm.lossFunction.value,
+                }
+            }
+            let formValid = validateForm({ formElement: formToPush })
+            if (!formValid && trainingMode.selected) {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 setIsTraining(true)
                 setTrainingLog([]);
@@ -329,7 +327,7 @@ export default function Training() {
 
                 /> : null} */}
 
-                <AccordionModels modelData={modelData} handleCheckpointChange={handleCheckpointChange} />
+                <AccordionModels modelData={modelData} handleCheckpointChange={handleCheckpointChange} formCheckpoints={trainingForm.checkpoints} />
                 {/* {selectedModel ? (<div>
                     <Accordion expandIcon={<ExpandMoreIcon />}>
                         <AccordionSummary>
@@ -397,6 +395,9 @@ export default function Training() {
                         fetchHyperparams.current = fn;
                     }} />
                     : null}
+
+                {trainingMode.selected ? null : <FormHelperText sx={{ color: 'error.main' }}>{trainingMode.helper}</FormHelperText>}
+
                 <SelectorLoss
                     error={trainingForm.lossFunction.error}
                     selectedLoss={selectedLoss}
@@ -411,7 +412,7 @@ export default function Training() {
                     }}
                     lossOptions={lossOptions}
                 />
-                {trainingMode.selected ? null : <FormHelperText sx={{ color: 'error.main' }}>{trainingMode.helper}</FormHelperText>}
+
                 <Button
                     variant='contained'
                     style={{ alignSelf: 'center', width: '150px' }}

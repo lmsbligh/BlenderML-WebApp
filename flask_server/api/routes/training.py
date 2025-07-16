@@ -56,7 +56,7 @@ def checkpoint_test_sessions(checkpoint_id):
         cur.execute("PRAGMA foreign_keys = ON;")
 
         cur.execute("""
-            SELECT * FROM training_runs WHERE checkpoint = ?
+            SELECT * FROM training_runs WHERE base_checkpoint = ?
             AND (test_dataset IS NOT NULL OR cv_dataset IS NOT NULL)
             ORDER BY session_id ASC
         """, (checkpoint_id,))
@@ -181,8 +181,9 @@ def training_tree(checkpoint_id):
 
     def past_training_runs_query(chkpt_id, depth=0):
         cur = con.cursor()
-        if not chkpt_id.strip():
-            return
+        if chkpt_id:
+            if not chkpt_id.strip():
+                return
         if depth > MAX_DEPTH:
             print("Max recursion depth hit")
             return
@@ -202,7 +203,7 @@ def training_tree(checkpoint_id):
                 pprint.pprint(f"Recursing: {chkpt_id}, depth: {depth},  row: ")
                 pprint.pprint(runs_as_dict)
                 past_training_runs_query(
-                    runs_as_dict[0]['checkpoint'], depth+1)
+                    runs_as_dict[0]['base_checkpoint'], depth+1)
 
         except sqlite3.Error as e:
             print("Database error:", e)

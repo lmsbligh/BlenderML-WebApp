@@ -2,6 +2,7 @@ import os
 import time
 import json
 import sqlite3
+import uuid
 
 import torch
 import torch.optim as optim
@@ -89,7 +90,8 @@ def train(training_form):
 
 
 def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, learning_rate, data_loader, loss_function, optimiser, batch_size):
-    training_run_id = f"{model_id}-{session_id}-train"
+    checkpoint_id = uuid.uuid4().hex[:8]
+    training_run_id = f"{checkpoint_id}-{session_id}-train"
     model_data = []
     try:
         print("model_id: ", model_id)
@@ -166,7 +168,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
                 socketio.sleep(0.01)
     # add some functionality to save training data
     if (model_checkpoint == "-1"):
-        model_checkpoint = session_id
+        model_checkpoint = None
     try:
         print("model_id: ", model_id)
         con = sqlite3.connect(DATABASE_PATH)
@@ -174,7 +176,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
         cur.execute("""INSERT INTO training_runs (
                         id,
                         model_id,
-                        checkpoint,
+                        base_checkpoint,
                         training_dataset,
                         cv_dataset,
                         test_dataset,
@@ -222,16 +224,17 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
 
         cursor.execute("""
             INSERT INTO checkpoints (
-                id, model_id, training_run_id, name, notes, final_loss, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                id, parent_id, model_id, training_run_id, name, notes, final_loss, timestamp
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            session_id,
+            checkpoint_id,
+            model_checkpoint,
             model_id,
             training_run_id,
             None,
             None,
             training_data[-1][3],
-            None
+            session_id
         ))
 
         con.commit()
@@ -242,7 +245,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
 
     finally:
         con.close()
-    state_filename = session_id
+    state_filename = checkpoint_id
     try:
         os.mkdir(os.path.join("MLApp", state_dict_dir, model_id))
     except OSError as e:
@@ -254,7 +257,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
 
 def test_loop(session_id, dataset_id, model_id, model_checkpoint, data_loader, loss_function, split):
     model_data = []
-    run_id = f"{model_id}-{session_id}-{split}"
+    run_id = f"{model_checkpoint}-{session_id}-{split}"
     loss_instance = loss_function
     match loss_function:
         case 'MSE':
@@ -300,7 +303,7 @@ def test_loop(session_id, dataset_id, model_id, model_checkpoint, data_loader, l
         cur.execute("""INSERT INTO training_runs (
                         id,
                         model_id,
-                        checkpoint,
+                        base_checkpoint,
                         training_dataset,
                         cv_dataset,
                         test_dataset,

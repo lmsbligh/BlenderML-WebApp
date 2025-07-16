@@ -23,22 +23,35 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import AccordionCheckpoints from '../AccordionCheckpoints/AccordionCheckpoints.js';
 
-const AccordionModels = ({ modelData, handleCheckpointChange }) => {
-
+const AccordionModels = ({ modelData, handleCheckpointChange, formCheckpoints }) => {
+    const [selectedCheckpoints, setSelectedCheckpoints] = useImmer([])
     return (
-        <Box>
+        <Box >
+            {formCheckpoints.length > 0 ?
+                <Box sx={{ padding: '10px' }}>
+                    <Typography>Selected checkpoints:</Typography>
+                    {formCheckpoints.map((checkpoint) => (
+
+                        <Card sx={{ padding: '10px', marginTop: '10px' }}>
+                            <Tooltip><IconButton aria-label="delete" color="error" onClick={() => {handleCheckpointChange(checkpoint.modelId, checkpoint.checkpointId)}} ><DeleteIcon /></IconButton></Tooltip>
+                            <Typography>Checkpoint ID: {checkpoint.checkpointId == '-1' ? "New checkpoint" : checkpoint.checkpointId}</Typography>
+                            <Typography>Model ID: {checkpoint.modelId}</Typography>
+                        </Card>
+                    ))}
+                </Box>
+                : null}
             <Accordion expandIcon={<ExpandMoreIcon />}>
-                <AccordionSummary>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography>Select models:</Typography>
                 </AccordionSummary>
-                <AccordionDetails sx={{padding: '5px'}}>
-                    {modelData ? modelData.map((model) =>(
-                        <Paper variant='outlined' sx={{margin: '5px', display: 'flex', flexDirection: 'column', padding: '5px'}}>
+                <AccordionDetails sx={{ padding: '5px' }}>
+                    {modelData ? modelData.map((model) => (
+                        <Paper variant='outlined' sx={{ margin: '5px', display: 'flex', flexDirection: 'column', padding: '5px' }}>
                             <Typography>Model name: {model.modelName}</Typography>
                             <Typography>Model ID: {model.value}</Typography>
-                            <AccordionCheckpoints modelId={model.value} handleCheckpointChange={handleCheckpointChange}/>
+                            <AccordionCheckpoints modelId={model.value} handleCheckpointChange={handleCheckpointChange} setSelectedCheckpoints={setSelectedCheckpoints} formCheckpoints={formCheckpoints}/>
                         </Paper>
-                        
+
                     )) : <Typography>Error!</Typography>}
                 </AccordionDetails>
             </Accordion>

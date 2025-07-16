@@ -87,6 +87,9 @@ export const handleTextFieldChange = ({ eve, setState }) => {
 export const validateForm = ({ formElement, elementParent = null }) => {
 
     //console.log(formElement.constructor.name)
+    if (!formElement) {
+        return
+    }
     switch (formElement.constructor.name) {
         case "Array":
             var errorArray = []
@@ -129,10 +132,10 @@ export const validateField = ({ key, setFormState }) => {
         return produce(prevForm, (draft) => {
             console.log("!!!validate field: ", draft)
             const field = draft[key].type
-            if (field?.type !== "Validation") { 
+            if (draft[key].type !== "Validation") {
                 console.log("!!is not validation")
                 return
-            };
+            }
             if (draft[key].required && draft[key].value == "") {
                 draft[key].error = true
             }
@@ -233,25 +236,25 @@ export class Validation {
 }
 
 export const validateBatchSize = (input, setTrainingForm, datasetSize) => {
-        let value;
-        if (input && input.target) {
-            value = input.target.value
-        }
-        else {
-            value = input
-        }
-        if (Number(value) >= datasetSize) {
-            setTrainingForm((prevVal) => {
-                return produce(prevVal, (draft) => {
-                    draft['batchSize'].error = true
-                })
-            })
-        }
-        else {
-            setTrainingForm((prevVal) => {
-                return produce(prevVal, (draft) => {
-                    draft['batchSize'].error = false
-                })
-            })
-        }
+    let value;
+    if (input && input.target) {
+        value = input.target.value
     }
+    else {
+        value = input
+    }
+    if (Number(value) >= datasetSize) {
+        setTrainingForm((prevVal) => {
+            return produce(prevVal, (draft) => {
+                draft['batchSize'].error = true
+            })
+        })
+    }
+    else {
+        setTrainingForm((prevVal) => {
+            return produce(prevVal, (draft) => {
+                draft['batchSize'].error = false
+            })
+        })
+    }
+}

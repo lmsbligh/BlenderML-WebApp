@@ -27,14 +27,39 @@ const TrainingHyperparams = ({ trainingForm, datasetSize, saveCallback }) => {
     const [localForm, setLocalForm] = useImmer(structuredClone(hyperparamSubset))
     const [optimizerOptions, setOptimizerOptions] = React.useState([{ "value": 0, "label": "Gradient descent" }, { "value": 1, "label": "ADAM" }]);
     const [selectedOptimizer, setSelectedOptimizer] = React.useState(optimizerOptions[1]);
-    const [lossOptions, setLossOptions] = React.useState([{ "value": 0, "label": "MSE" }, { "value": 1, "label": "MAE" }]);
-    const [selectedLoss, setSelectedLoss] = React.useState(lossOptions[0]);
+
     React.useEffect(() => {
         console.log("localForm: ", localForm)
     }, [localForm])
     React.useEffect(() => {
-        saveCallback(() => localForm);
+        saveCallback(() => {
+            validateBatchSize(localForm.batchSize.value)
+            return localForm
+        });
     }, [localForm]);
+    const validateBatchSize = (input) => {
+        let value;
+        if (input && input.target) {
+            value = input.target.value
+        }
+        else {
+            value = input
+        }
+        if (Number(value) >= datasetSize) {
+            setLocalForm((prevVal) => {
+                return produce(prevVal, (draft) => {
+                    draft['batchSize'].error = true
+                })
+            })
+        }
+        else {
+            setLocalForm((prevVal) => {
+                return produce(prevVal, (draft) => {
+                    draft['batchSize'].error = false
+                })
+            })
+        }
+    }
     return (
         <>
             <TextField
@@ -85,20 +110,6 @@ const TrainingHyperparams = ({ trainingForm, datasetSize, saveCallback }) => {
                     validateField({ key: 'optimizer', setFormState: setLocalForm })
                 }}
                 optimizerOptions={optimizerOptions}
-            />
-            <SelectorLoss
-                error={trainingForm.lossFunction.error}
-                selectedLoss={selectedLoss}
-                handleChange={(event) => {
-                    handleSelectorFormChange({
-                        eve: event,
-                        setSelector: setSelectedLoss,
-                        setForm: setLocalForm,
-                        options: lossOptions
-                    })
-                    validateField({ key: 'lossFunction', setFormState: setLocalForm })
-                }}
-                lossOptions={lossOptions}
             />
         </>)
 

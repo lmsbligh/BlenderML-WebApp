@@ -15,7 +15,7 @@ import { fetchData } from '../../utils.js';
 import TrainingChart from '../TrainingChart/TrainingChart.js';
 
 
-const CheckpointCard = ({ id, model_id, handleCheckpointChange }) => {
+const CheckpointCard = ({ id, model_id, handleCheckpointChange, formCheckpoints }) => {
     const [trainingTree, setTrainingTree] = React.useState([]);
     const [testMetrics, setTestMetrics] = React.useState([]);
     const [testSessions, setTestSessions] = React.useState([]);
@@ -27,13 +27,16 @@ const CheckpointCard = ({ id, model_id, handleCheckpointChange }) => {
         fetchData(`/checkpoint_test_sessions/${id}`, setTestSessions)
     }, []);
     React.useEffect(() => {
+        console.log("testSessions: ", testSessions)
         testSessions.map((option) => {
             appendData(`/training_metrics/${option.id}`, setTestMetrics)
         })
 
     }, [testSessions])
 
-
+    React.useEffect(() => {
+        console.log("trainingTree: ", trainingTree)
+    }, [trainingTree])
     React.useEffect(() => {
         console.log(`${id} testMetrics: `, testMetrics)
     }, [testMetrics])
@@ -41,11 +44,13 @@ const CheckpointCard = ({ id, model_id, handleCheckpointChange }) => {
 
     }
 
+    const checked = formCheckpoints.some(item => item.checkpointId === id && item.modelId === model_id)
+    
     return (
         <Paper variant='outlined' >
-            {console.log("CheckpointCard: ", id)}
+            {console.log("!!!checked: ", checked)}
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Tooltip title="Select for training"><Checkbox data-model-id={model_id} data-checkpoint-id={id} onChange={(event) => handleCheckpointChange(model_id, id)} /></Tooltip>
+                <Tooltip title="Select for training"><Checkbox data-model-id={model_id} checked={checked} data-checkpoint-id={id} onChange={(event) => handleCheckpointChange(model_id, id)} /></Tooltip>
                 <Tooltip><IconButton aria-label="delete" color="error" ><DeleteIcon /></IconButton></Tooltip>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>

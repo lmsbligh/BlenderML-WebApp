@@ -22,34 +22,31 @@ import TrainingChart from '../TrainingChart/TrainingChart.js';
 import CheckpointCard from '../CheckpointCard/CheckpointCard.js';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-const AccordionCheckpoints = ({ modelId, handleCheckpointChange }) => {
+const AccordionCheckpoints = ({ modelId, handleCheckpointChange, formCheckpoints }) => {
 
     const [checkpointOptions, setCheckpointOptions] = React.useState([]);
     const [newCheckpoint, setNewcheckpoint] = React.useState(false);
     React.useEffect(() => {
         fetchData(`checkpoints/${modelId}`, setCheckpointOptions)
     }, []);
+    const checked = formCheckpoints.some(item => item.checkpointId === "-1" && item.modelId === modelId)
 
-    const handleNewCheckboxChange = (event) => {
-        setNewcheckpoint(event.target.checked)
-        handleCheckpointChange(event.target.getAttribute('data-model-id'), event.target.getAttribute('data-checkpoint-id'))
-    }
     return (
         <Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}> 
-                <Tooltip title="Select for training with fresh, randomly assigned weights."><Checkbox onChange={(event) => handleCheckpointChange(modelId, "-1")}/> </Tooltip>
+                <Tooltip title="Select for training with fresh, randomly assigned weights."><Checkbox onChange={(event) => handleCheckpointChange(modelId, "-1")} checked={checked}/> </Tooltip>
                 <Typography >Create new checkpoint</Typography></Box>
-
-            <Accordion expandIcon={<ExpandMoreIcon />}>
-                <AccordionSummary>
+        {checkpointOptions.length > 0 ? <Accordion expandIcon={<ExpandMoreIcon />}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography>Select checkpoints:</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     {checkpointOptions ? checkpointOptions.map((checkpoint) => (
-                        <CheckpointCard id={checkpoint.id} model_id={modelId} handleCheckpointChange={handleCheckpointChange}/>
+                        <CheckpointCard key={`${checkpoint.modelId}-${checkpoint.checkpointId}`} checkpointId={checkpoint.id} modelId={modelId} handleCheckpointChange={handleCheckpointChange} formCheckpoints={formCheckpoints}/>
                     )) : null}
                 </AccordionDetails>
-            </Accordion>
+            </Accordion> : null}
+            
 
         </Box>
     )
