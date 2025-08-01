@@ -29,6 +29,9 @@ const AccordionCheckpoints = ({ modelId, handleCheckpointChange, formCheckpoints
     React.useEffect(() => {
         fetchData(`checkpoints/${modelId}`, setCheckpointOptions)
     }, []);
+    React.useEffect(() => {
+        console.log("checkpointOptions: ", checkpointOptions)
+    }, [checkpointOptions])
     const checked = formCheckpoints.some(item => item.checkpointId === "-1" && item.modelId === modelId)
 
     return (
@@ -42,7 +45,7 @@ const AccordionCheckpoints = ({ modelId, handleCheckpointChange, formCheckpoints
                 </AccordionSummary>
                 <AccordionDetails>
                     {checkpointOptions ? checkpointOptions.map((checkpoint) => (
-                        <CheckpointCard key={`${checkpoint.modelId}-${checkpoint.checkpointId}`} checkpointId={checkpoint.id} modelId={modelId} handleCheckpointChange={handleCheckpointChange} formCheckpoints={formCheckpoints}/>
+                        <CheckpointCard key={`${checkpoint.model_id}-${checkpoint.id}`} checkpoint={checkpoint} handleCheckpointChange={handleCheckpointChange} formCheckpoints={formCheckpoints}/>
                     )) : null}
                 </AccordionDetails>
             </Accordion> : null}

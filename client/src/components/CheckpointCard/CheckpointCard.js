@@ -15,16 +15,16 @@ import { fetchData } from '../../utils.js';
 import TrainingChart from '../TrainingChart/TrainingChart.js';
 
 
-const CheckpointCard = ({ id, model_id, handleCheckpointChange, formCheckpoints }) => {
+const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints }) => {
     const [trainingTree, setTrainingTree] = React.useState([]);
     const [testMetrics, setTestMetrics] = React.useState([]);
     const [testSessions, setTestSessions] = React.useState([]);
-
+    console.log("local checkpoint: ", checkpoint.id)
     React.useEffect(() => {
-        fetchData(`/training_tree/${id}`, setTrainingTree)
+        fetchData(`/training_tree/${checkpoint.id}`, setTrainingTree)
     }, []);
     React.useEffect(() => {
-        fetchData(`/checkpoint_test_sessions/${id}`, setTestSessions)
+        fetchData(`/checkpoint_test_sessions/${checkpoint.id}`, setTestSessions)
     }, []);
     React.useEffect(() => {
         console.log("testSessions: ", testSessions)
@@ -38,24 +38,24 @@ const CheckpointCard = ({ id, model_id, handleCheckpointChange, formCheckpoints 
         console.log("trainingTree: ", trainingTree)
     }, [trainingTree])
     React.useEffect(() => {
-        console.log(`${id} testMetrics: `, testMetrics)
+        console.log(`${checkpoint.id} testMetrics: `, testMetrics)
     }, [testMetrics])
     const delFunction = (event) => {
 
     }
 
-    const checked = formCheckpoints.some(item => item.checkpointId === id && item.modelId === model_id)
+    const checked = formCheckpoints.some(item => item.checkpointId === checkpoint.id && item.modelId === checkpoint.model_id)
     
     return (
         <Paper variant='outlined' >
             {console.log("!!!checked: ", checked)}
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Tooltip title="Select for training"><Checkbox data-model-id={model_id} checked={checked} data-checkpoint-id={id} onChange={(event) => handleCheckpointChange(model_id, id)} /></Tooltip>
+                <Tooltip title="Select for training"><Checkbox data-model-id={checkpoint.model_id} checked={checked} data-checkpoint-id={checkpoint.id} onChange={(event) => handleCheckpointChange(checkpoint.model_id, checkpoint.id)} /></Tooltip>
                 <Tooltip><IconButton aria-label="delete" color="error" ><DeleteIcon /></IconButton></Tooltip>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
-                <Typography>Checkpoint: {id} </Typography>
-                <Typography>Base Model: {model_id} </Typography>
+                <Typography>Checkpoint: {checkpoint.id} </Typography>
+                <Typography>Base Model: {checkpoint.model_id} </Typography>
                 {testSessions.length > 0 ?
                     <Accordion>
                         <AccordionSummary expandIcon={<SpeedIcon color='primary' />} sx={{

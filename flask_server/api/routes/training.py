@@ -76,8 +76,8 @@ def checkpoint_test_sessions(checkpoint_id):
         con.close()
 
 
-@bp.route("/training_sessions", methods=["GET"])
-def training_sessions():
+@bp.route("/sessions", methods=["GET"])
+def sessions():
     con = sqlite3.connect(DATABASE_PATH)
     cur = con.cursor()
 

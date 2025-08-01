@@ -23,6 +23,7 @@ import { fetchData, handleSelectorFormChange, handleTextFieldChange, pushData, v
 import SelectorOptimizer from '../components/SelectorOptimizer/SelectorOptimizer.js';
 import SelectorLoss from '../components/SelectorLoss/SelectorLoss.js';
 import TrainingChart from '../components/TrainingChart/TrainingChart';
+import TestChart from '../components/TestChart/TestChart';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingDownOutlinedIcon from '@mui/icons-material/TrendingDownOutlined';
 import CheckpointCard from '../components/CheckpointCard/CheckpointCard.js';
@@ -110,12 +111,12 @@ export default function Training() {
     const [checkpointOptions, setCheckpointOptions] = React.useState([]);
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
 
-    const [chartData, setChartData] = React.useState([]);
+    const [trainingChartData, setTrainingChartData] = React.useState([]);
+    const [testChartData, setTestChartData] = React.useState([]);
 
     const [trainingLog, setTrainingLog] = React.useState([]);
 
-    const [trainingSessions, setTrainingSessions] = useImmer([]);
-
+    const [sessions, setSessions] = useImmer([]);
     const socket = io('http://localhost:5000')
     const [isTraining, setIsTraining] = React.useState(false)
     const fetchHyperparams = React.useRef(() => ({}));
@@ -126,7 +127,7 @@ export default function Training() {
     React.useEffect(() => {
         socket.on("training_update", (data) => {
             setTrainingLog(prev => [...prev, `Epoch ${data.epoch}, Batch ${data.batch}: Loss ${data.loss}`]);
-            setChartData(prev => [...prev, {
+            setTrainingChartData(prev => [...prev, {
                 step: `E${data.epoch}-B${data.batch}`,
                 loss: data.loss
             }]);
@@ -148,13 +149,12 @@ export default function Training() {
     }, [selectedModel]);
 
     React.useEffect(() => {
-        fetchData('/training_sessions', setTrainingSessions)
-
+        fetchData('/sessions', setSessions)
     }, [])
 
     React.useEffect(() => {
-        console.log("trainingSessions: ", trainingSessions)
-    }, [trainingSessions])
+        console.log("trainingSessions: ", sessions)
+    }, [sessions])
 
 
     // React.useEffect(() => {
@@ -308,7 +308,7 @@ export default function Training() {
     }
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}><Grid container>
-            <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
+            <Grid item sm={4} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
                 <CssBaseline />
                 {/* {modelData ? <SelectorModel
                     error={trainingForm.model.error}
@@ -438,11 +438,11 @@ export default function Training() {
                     Cancel
                 </Button> : null}
             </Grid>
-            <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
+            <Grid item sm={4} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
                 <Box>
-                    {chartData.length > 0 ? <><Box sx={{ mt: 4 }}>
+                    {trainingChartData.length > 0 ? <><Box sx={{ mt: 4 }}>
                         <Typography variant="h6">Training Loss Over Time</Typography>
-                        <TrainingChart data={chartData} />
+                        <TrainingChart data={trainingChartData} />
                     </Box></> : null}
                     <Box sx={{ mt: 2 }}>
                         {trainingLog.length > 0 ? <><Typography variant="h6">Training Progress</Typography>
@@ -457,11 +457,37 @@ export default function Training() {
                     </Box>
                 </Box>
                 <Box>
-                    {trainingSessions ?
-                        <SessionAnalysis trainingSessions={trainingSessions} modelData={modelData ? modelData : null} />
+                    {sessions ?
+                        <SessionAnalysis trainingSessions={sessions} modelData={modelData ? modelData : null} split='train' />
                         : null}
                 </Box>
 
+
+            </Grid>
+            <Grid item sm={4} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
+                <Box>
+                    {testChartData.length > 0 ? <><Box sx={{ mt: 4 }}>
+                        <Typography variant="h6">Test Loss</Typography>
+                        <TestChart data={testChartData} />
+                        
+                    </Box></> : null}
+                    <Box sx={{ mt: 2 }}>
+                        {trainingLog.length > 0 ? <><Typography variant="h6">Training Progress</Typography>
+                            <List dense>
+                                {trainingLog.map((entry, idx) => (
+                                    <ListItem key={idx}>
+                                        <Typography>{entry}</Typography>
+                                    </ListItem>
+                                ))}
+                            </List> </> : null}
+
+                    </Box>
+                </Box>
+                <Box>
+                    {sessions ?
+                        <SessionAnalysis trainingSessions={sessions} modelData={modelData ? modelData : null} split='test' />
+                        : null}
+                </Box>
 
             </Grid>
         </Grid>

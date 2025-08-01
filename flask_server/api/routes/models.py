@@ -196,6 +196,7 @@ def get_checkpoints(model_id):
         for row in rows:
             row_dict = dict(row)
             data.append(row_dict)
+        data.reverse()
         return data
 
     except sqlite3.Error as e:
