@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingDownOutlinedIcon from '@mui/icons-material/TrendingDownOutlined';
-
+import { modelIdToColor } from '../../utils';
 import React from 'react';
 import { appendData } from '../../utils';
 
@@ -38,11 +38,7 @@ function TrainingSessionCard({ session, models, chartData, setChartData}) {
         });
 
     }
-    function modelIdToColor(modelId) {
-        const hash = Array.from(modelId).reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        const hue = hash % 360;  // wrap around color wheel
-        return `hsl(${hue}, 70%, 70%)`;  // adjust saturation/lightness for pastel feel
-    }
+
 
     return (
         <ListItem key={session.id}>

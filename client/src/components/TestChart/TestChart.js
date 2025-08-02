@@ -1,7 +1,8 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'; import { appendData, fetchData } from '../../utils';
+import { BarChart, Cell, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'; import { appendData, fetchData } from '../../utils';
 import { useImmer } from 'use-immer';
 import produce from "immer";
+import { Box, Typography } from '@mui/material';
 
 function mergeRunsToBarData(runs) {
     const merged = {};
@@ -36,25 +37,27 @@ export default function TestChart({ data = null, id = null }) {
             setRawData(data)
         }
     }, [data, id])
-    function parseStep(step, datasetSize) {
-        const match = step.match(/E(\d+)-B(\d+)/);
-        if (!match) return 0;
-        const epoch = parseInt(match[1]);
-        const batch = parseInt(match[2]);
-        return (epoch - 1) * datasetSize + batch;  // or customize as needed
-    }
+    // function parseStep(step, datasetSize) {
+    //     const match = step.match(/E(\d+)-B(\d+)/);
+    //     if (!match) return 0;
+    //     const epoch = parseInt(match[1]);
+    //     const batch = parseInt(match[2]);
+    //     return (epoch - 1) * datasetSize + batch;  // or customize as needed
+    // }
     React.useEffect(() => {
+        if (rawData.length === 0) {
+            return
+        }
+        else {
+            console.log("RAW DATA: ", rawData)
+        }
         setProcessedData((prevVals) => {
             return produce(prevVals, (draft) => {
                 draft.length = 0;  // clear existing
                 rawData.forEach(run => {
                     draft.push({
-                        ...run,
-                        data: run.data.map((entry, i) => ({
-                            ...entry,
-                            stepLabel: entry.step,
-                            step: parseStep(entry.step, run.datasetSize)
-                        }))
+                        runId: run.runId,
+                        loss: run.data[0].loss
                     });
                 });
             });
@@ -67,30 +70,50 @@ export default function TestChart({ data = null, id = null }) {
     React.useEffect(() => {
         console.log("raw data: ", processedData)
     }, [rawData])
-
-
+    const barCount = processedData.length;
+    const fontSize = Math.max(8, Math.min(5, 360 / barCount));
     return (
-        <ResponsiveContainer width="100%" height={300} >
-            <BarChart data={mergeRunsToBarData(processedData)}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" dataKey="step" tickFormatter={(value, index) => {
-                    const flattened = processedData.flatMap(run => run.data);
-                    return flattened[index]?.stepLabel ?? value;
-                }} label={{ value: 'Minibatch', position: 'insideBottom', offset: -5 }}
-                    domain={processedData ? [Math.min(processedData.flatMap(run => run.data.map(d => d.step))), Math.max(processedData.flatMap(run => run.data.map(d => d.step)))] : null} />
-                <YAxis label={{ value: 'Loss', angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Legend />
-                {processedData ? processedData.map((run, i) => (
-                    <Bar
-                        key={run.runId}
-                        dataKey={`Run${run.runId}`}
-                        data={run.data}
-                        name={`Run ${run.runId}`}
-                        fill={`hsl(${i * 60}, 65%, 70%)`} // Different color per run
-                    />)) : null}
+        <Box sx={{
+            position: 'sticky',
+            top: '64px', // distance from the top of the viewport
+            zIndex: 1,
+            backgroundColor: 'white', // helps avoid content bleed
+            padding: '10px'
+        }}>
+            <Typography sx={{ mb: 1, textAlign: "center" }}>
+                Test Run Loss
+            </Typography>
+            <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={processedData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                        dataKey="runId"
+                        type="category"
+                        label={{ value: 'Run ID', position: 'insideBottom', offset: -5 }}
+                        angle={0}
+                        tick={{ fontSize }}
+                        fontSize={10}
+                        interval={0}
+                        textAnchor="middle"
+                    />
+                    <YAxis
+                        label={{ value: 'Loss', angle: -90, position: 'insideLeft' }}
+                        domain={[0, Math.max(...processedData.map(run => run.loss)) * 1.1]}
+                        tickFormatter={(value) => value.toFixed(3)}
+                    />
+                    <Tooltip />
 
-            </BarChart>
-        </ResponsiveContainer>
+                    <Bar dataKey="loss" name="Final Loss">
+                        {processedData.map((entry, index) => (
+                            <Cell
+                                key={`cell-${index}`}
+                                fill={`hsl(${index * 60}, 65%, 70%)`}
+                            />
+                        ))}
+                    </Bar>
+                </BarChart>
+            </ResponsiveContainer>
+        </Box>
+
     );
 }

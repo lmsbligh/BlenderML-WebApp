@@ -16,36 +16,42 @@ const defaultTheme = createTheme();
 
 function App() {
 
-    const [selectedTab, setSelectedTab] = React.useState('GENERATE_MATERIALS');
-    const handleSelectorPageChange = (event, newSelectedTab) => {
-      setSelectedTab(newSelectedTab);
-    };
-    const availabeTabs = ['MODEL_SELECTION', 'CREATE_MODEL', 'TRAINING', 'GENERATE_MATERIALS']
+  const [selectedTab, setSelectedTab] = React.useState('GENERATE_MATERIALS');
+  const handleSelectorPageChange = (event, newSelectedTab) => {
+    setSelectedTab(newSelectedTab);
+  };
+  const availabeTabs = ['MODEL_SELECTION', 'CREATE_MODEL', 'TRAINING', 'GENERATE_MATERIALS']
 
-    const [appData, setAppData] = React.useState([]);
+  const [appData, setAppData] = React.useState([]);
 
 
   return (
-      <div>
-        <Box sx={{ width: '100%', }}>
-          <Tabs
-            value={selectedTab}
-            onChange={handleSelectorPageChange}
-            textColor="secondary"
-            indicatorColor="secondary"
-            aria-label="secondary tabs example"
-          >
-            <Tab value="GENERATE_MATERIALS" label="Generate Materials" />
-            <Tab value="CREATE_MODEL" label="Create Model" />
-            <Tab value="TRAINING" label="Training" />
-            <Tab value="DATASET_GENERATOR" label="Generate Dataset" />
+    <div>
+      <Box sx={{
+        width: '100%', position: 'sticky',
+        top: '0px', // distance from the top of the viewport
+        zIndex: 2,
+        backgroundColor: 'white', // helps avoid content bleed
+        padding: '10px'
+      }}>
+        <Tabs
+          value={selectedTab}
+          onChange={handleSelectorPageChange}
+          textColor="secondary"
+          indicatorColor="secondary"
+          aria-label="secondary tabs example"
+        >
+          <Tab value="GENERATE_MATERIALS" label="Generate Materials" />
+          <Tab value="CREATE_MODEL" label="Create Model" />
+          <Tab value="TRAINING" label="Training" />
+          <Tab value="DATASET_GENERATOR" label="Generate Dataset" />
 
-          </Tabs>
-        </Box>
-        <Box sx={{ width: '100%', p: 1}}>
+        </Tabs>
+      </Box>
+      <Box sx={{ width: '100%', p: 1 }}>
         <ThemeProvider theme={defaultTheme}>
           <CssBaseline />
-          { (() => {
+          {(() => {
             switch (selectedTab) {
               case "DATASET_GENERATOR":
                 return <DatasetGenerator />
@@ -59,10 +65,10 @@ function App() {
                 return <Typography>Default</Typography>;
             }
           })()
-        }
-        </ThemeProvider>        
-        </Box>
-      </div>
+          }
+        </ThemeProvider>
+      </Box>
+    </div>
   )
 }
 

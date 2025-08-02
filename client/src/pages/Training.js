@@ -440,10 +440,10 @@ export default function Training() {
             </Grid>
             <Grid item sm={4} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
                 <Box>
-                    {trainingChartData.length > 0 ? <><Box sx={{ mt: 4 }}>
+                    {/* {trainingChartData.length > 0 ? <><Box sx={{ mt: 4 }}>
                         <Typography variant="h6">Training Loss Over Time</Typography>
                         <TrainingChart data={trainingChartData} />
-                    </Box></> : null}
+                    </Box></> : null} */}
                     <Box sx={{ mt: 2 }}>
                         {trainingLog.length > 0 ? <><Typography variant="h6">Training Progress</Typography>
                             <List dense>
@@ -466,11 +466,11 @@ export default function Training() {
             </Grid>
             <Grid item sm={4} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
                 <Box>
-                    {testChartData.length > 0 ? <><Box sx={{ mt: 4 }}>
+                    {/* {testChartData.length > 0 ? <><Box sx={{ mt: 4 }}>
                         <Typography variant="h6">Test Loss</Typography>
                         <TestChart data={testChartData} />
                         
-                    </Box></> : null}
+                    </Box></> : null} */}
                     <Box sx={{ mt: 2 }}>
                         {trainingLog.length > 0 ? <><Typography variant="h6">Training Progress</Typography>
                             <List dense>

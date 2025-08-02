@@ -24,15 +24,8 @@ export default function DatasetGenerator() {
         "datasetSize": '10',
         "CVPercentage": '20',
         "TestSetPercentage": '20',
-        "skyboxPath": '',
         "imageWidth": '250',
         "imageHeight": '250',
-        "meshes": {
-            "cube": false,
-            "sphere": false,
-            "monkey": false,
-            "car": false
-        },
         "randomOrientation": false
     }
 
@@ -77,13 +70,6 @@ export default function DatasetGenerator() {
                 required: true,
                 helper: ""
             }),
-            "skyboxPath": new Validation({
-                value: "",
-                error: false,
-                regex: "",
-                required: false,
-                helper: ""
-            }),
             "imageWidth": new Validation({
                 value: "",
                 error: false,
@@ -97,18 +83,6 @@ export default function DatasetGenerator() {
                 regex: /^(?:[1-9]\d{0,2}|1000)$/,
                 required: true,
                 helper: "Please enter a number between 1 and 1000."
-            }),
-            "meshes": new Validation({
-                value: {
-                    "cube": false,
-                    "sphere": false,
-                    "monkey": false,
-                    "car": false
-                },
-                error: false,
-                regex: "",
-                required: false,
-                helper: ""
             }),
             "randomOrientation": new Validation({
                 value: false,

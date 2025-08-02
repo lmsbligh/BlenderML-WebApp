@@ -258,3 +258,9 @@ export const validateBatchSize = (input, setTrainingForm, datasetSize) => {
         })
     }
 }
+
+export const modelIdToColor = (modelId) => {
+    const hash = Array.from(modelId).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const hue = hash % 360;  // wrap around color wheel
+    return `hsl(${hue}, 70%, 70%)`;  // adjust saturation/lightness for pastel feel
+}

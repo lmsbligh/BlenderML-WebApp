@@ -86,3 +86,17 @@ LAYER_FORM = {
         "helper": "Please enter an integer from 0 to 1000."
     }
 }
+CHECKPOINT_FORM = {
+    "name": {
+        "data_type": str,
+        "regex": r"^[A-Za-z0-9 -]{1,30}$",
+        "required": True,
+        "helper": "Please enter an alphanumeric name of up to 15 characters."
+    },
+    "description": {
+        "data_type": str,
+        "regex": r"^[A-Za-z0-9 -,.:/]{1,150}$",
+        "required": False,
+        "helper": "Please enter an alphanumeric description of up to 150 characters."
+    }
+}

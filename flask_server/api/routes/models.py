@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 from flask import Blueprint, abort, current_app, jsonify, request
-from ..forms.model_forms import MODEL_FORM, LAYER_FORM
+from ..forms.model_forms import MODEL_FORM, LAYER_FORM, CHECKPOINT_FORM
 from ..utils import validate_form
 import sqlite3
 
@@ -188,7 +188,7 @@ def get_checkpoints(model_id):
 
     try:
         cur.execute("""
-        SELECT * FROM checkpoints 
+        SELECT * FROM checkpoints
         WHERE model_id = ?
         """, (model_id,))
         rows = cur.fetchall()
@@ -224,3 +224,40 @@ def delete_dataset(model_ID, checkpoint_ID):
         return jsonify({"error": f"{str(e)}"})
 
     return jsonify({"body": "Checkpoint deleted successfully!"}), 200
+
+
+@bp.route('/checkpoint_update_fields/<string:checkpoint_ID>', methods=["POST"])
+def checkpoint_update_fields(checkpoint_ID):
+    DATABASE_PATH = current_app.config["DATABASE_PATH"]
+    global MODELS_LIST
+
+    print("DATABASE_PATH", DATABASE_PATH)
+    con = sqlite3.connect(DATABASE_PATH)
+    con.row_factory = sqlite3.Row  # Allows row to be treated as a dictionary
+    cur = con.cursor()
+
+    fields_to_save = json.loads(request.data.decode('utf-8'))
+
+    name = fields_to_save['name']
+    description = fields_to_save['description']
+
+    try:
+        print("checkpoint fields_to_save: ", fields_to_save)
+        validate_form(fields_to_save, CHECKPOINT_FORM)
+    except ValueError as ve:
+        print(jsonify({"error": str(ve)}), 400)
+        return jsonify({"error": str(ve)}), 400
+
+    try:
+        cur.execute("""
+            UPDATE checkpoints
+            SET name = ?, description = ?
+            WHERE id = ?
+        """, (name, description, checkpoint_ID))
+
+    except sqlite3.Error as e:
+        print("Database error:", e)
+        return None
+    finally:
+        con.commit()
+        con.close()

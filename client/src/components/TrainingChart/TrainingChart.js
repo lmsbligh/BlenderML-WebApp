@@ -3,6 +3,7 @@ import { LineChart, Line, Brush, XAxis, YAxis, CartesianGrid, Tooltip, Responsiv
 import { appendData, fetchData } from '../../utils';
 import { useImmer } from 'use-immer';
 import produce from "immer";
+import { Box, Typography } from '@mui/material';
 
 export default function TrainingChart({ data = null, id = null }) {
     const [rawData, setRawData] = useImmer([])
@@ -52,28 +53,40 @@ export default function TrainingChart({ data = null, id = null }) {
 
 
     return (
-        <ResponsiveContainer width="100%" height={300} >
-            <LineChart data={processedData.flatMap(run => run.data)}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" dataKey="step" tickFormatter={(value, index) => {
-                    const flattened = processedData.flatMap(run => run.data);
-                    return flattened[index]?.stepLabel ?? value;
-                }} label={{ value: 'Minibatch', position: 'insideBottom', offset: -5 }} 
-                domain={processedData ? [Math.min(processedData.flatMap(run => run.data.map(d => d.step))),Math.max(processedData.flatMap(run => run.data.map(d => d.step)))] : null}/>
-                <YAxis label={{ value: 'Loss', angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Legend />
-                {processedData ? processedData.map((run, i) => (
-                    <Line
-                        key={run.runId}
-                        type="monotone"
-                        dataKey="loss"
-                        data={run.data}
-                        name={`Run ${run.runId}`}
-                        stroke={`hsl(${i * 60}, 65%, 70%)`} // Different color per run
-                    />)) : null}
+        <Box sx={{
+            position: 'sticky',
+            top: '64px', // distance from the top of the viewport
+            zIndex: 1,
+            backgroundColor: 'white', // helps avoid content bleed
+            padding: '10px'
+        }}>
+            <Typography sx={{ mb: 1, textAlign: "center" }}>
+                Training Session Running Loss
+            </Typography>
 
-            </LineChart>
-        </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={300} >
+                <LineChart data={processedData.flatMap(run => run.data)}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" dataKey="step" tickFormatter={(value, index) => {
+                        const flattened = processedData.flatMap(run => run.data);
+                        return flattened[index]?.stepLabel ?? value;
+                    }} label={{ value: 'Minibatch', position: 'insideBottom', offset: -5 }}
+                        domain={processedData ? [Math.min(processedData.flatMap(run => run.data.map(d => d.step))), Math.max(processedData.flatMap(run => run.data.map(d => d.step)))] : null} />
+                    <YAxis label={{ value: 'Loss', angle: -90, position: 'insideLeft' }} />
+                    <Tooltip />
+                    <Legend />
+                    {processedData ? processedData.map((run, i) => (
+                        <Line
+                            key={run.runId}
+                            type="monotone"
+                            dataKey="loss"
+                            data={run.data}
+                            name={`Run ${run.runId}`}
+                            stroke={`hsl(${i * 60}, 65%, 70%)`} // Different color per run
+                        />)) : null}
+
+                </LineChart>
+            </ResponsiveContainer>
+        </Box>
     );
 }

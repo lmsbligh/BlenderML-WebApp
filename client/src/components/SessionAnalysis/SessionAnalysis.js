@@ -29,32 +29,29 @@ function SessionAnalysis({ trainingSessions, modelData, split }) {
     }, [trainingSessions])
     const split_enum = split === "train" ? [split] : ["test", "CV"]
 
-    function mergeRunsToBarData(runs) {
-        const merged = {};
-        runs.forEach((run, runIndex) => {
-            const runKey = `Run${run.runId}`;
-            if (!run || !run.data) return;
-            run.data.forEach(entry => {
-                const key = entry.step;
-                if (!merged[key]) {
-                    merged[key] = {
-                        step: entry.step,
-                        stepLabel: entry.stepLabel
-                    };
-                }
-                merged[key][runKey] = entry.loss;
-            });
-        });
-        return Object.values(merged);
+    const parseSessionId = (id) => {
+        // converts session_id into date time object for sorting
+        const [day, month, year, hourMin, second] = id.split(/[-]/);
+        const hour = hourMin.slice(0, 2)
+        const minute = hourMin.slice(2, 4)
+        const dateObj = new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
+        console.log(dateObj)
+        return dateObj
     }
     return (
 
         <>
-            <Typography>Training Session Analysis</Typography>
-            {chartData.length > 0 ? split === "train" ? <TrainingChart data={chartData} /> : <TestChart data={mergeRunsToBarData(chartData)} /> : null}
-            {trainingSessions ? trainingSessions.filter((session) => (split_enum.includes(session.split))).map((session, i) => (
-                <TrainingSessionCard session={session} models={modelData ? modelData : null} chartData={chartData} setChartData={setChartData} />
-            )) : null}
+            <Typography>{split === "train" ? "Training" : "Test"} Session Analysis</Typography>
+            {chartData.length > 0 ? split === "train" ? <TrainingChart data={chartData} /> : <TestChart data={chartData} /> : null}
+            {
+                trainingSessions ?
+                    trainingSessions.filter((session) => (split_enum.includes(session.split)))
+                        .sort((a, b) => parseSessionId(b.session_id) - parseSessionId(a.session_id)).map((session, i) => (
+                            <TrainingSessionCard key={session.id}session={session} models={modelData ? modelData : null} chartData={chartData} setChartData={setChartData} />
+                        ))
+                    :
+                    null
+            }
         </>
     )
 }
