@@ -130,7 +130,6 @@ export const validateForm = ({ formElement, elementParent = null }) => {
 export const validateField = ({ key, setFormState }) => {
     setFormState((prevForm) => {
         return produce(prevForm, (draft) => {
-            console.log("!!!validate field: ", draft)
             const field = draft[key].type
             if (draft[key].type !== "Validation") {
                 console.log("!!is not validation")

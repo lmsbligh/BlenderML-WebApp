@@ -33,13 +33,6 @@ import TrainingHyperparams from '../components/TrainingHyperparams/TrainingHyper
 export default function Training() {
 
     const [trainingForm, setTrainingForm] = useImmer(structuredClone({
-        // "model": new Validation({
-        //     value: "",
-        //     error: false,
-        //     regex: "",
-        //     required: true,
-        //     helper: "Please select a model."
-        // }),
         "checkpoints": [],
         "trainDataset": new Validation({
             value: "",
@@ -111,7 +104,7 @@ export default function Training() {
     const [checkpointOptions, setCheckpointOptions] = React.useState([]);
     const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
 
-    const [trainingChartData, setTrainingChartData] = React.useState([]);
+    const [trainingChartData, setTrainingChartData] = useImmer([]);
     const [testChartData, setTestChartData] = React.useState([]);
 
     const [trainingLog, setTrainingLog] = React.useState([]);
@@ -127,17 +120,33 @@ export default function Training() {
     React.useEffect(() => {
         socket.on("training_update", (data) => {
             setTrainingLog(prev => [...prev, `Epoch ${data.epoch}, Batch ${data.batch}: Loss ${data.loss}`]);
-            setTrainingChartData(prev => [...prev, {
-                step: `E${data.epoch}-B${data.batch}`,
-                loss: data.loss
-            }]);
+            setTrainingChartData((prevVal) =>
+                produce(prevVal, (draft) => {
+                    if (draft.length === 0) {
+                        draft.push({
+                            datasetSize: data.datasetSize,
+                            data: [{
+                                step: `E${data.epoch}-B${data.batch}`,
+                                loss: data.loss
+                            }]
+                        });
+                    } else {
+                        draft[0].data.push({
+                            step: `E${data.epoch}-B${data.batch}`,
+                            loss: data.loss
+                        });
+                    }
+                })
+            );
         });
         return () => {
             socket.off("training_update");
             socket.off("connect");
         };
     }, []);
-
+    React.useEffect(() => {
+        console.log("trainingChartData: ", trainingChartData)
+    }, [trainingChartData]);
     React.useEffect(() => {
         fetchData('datasets', setDatasetOptions)
         fetchData('models', setModelData)
@@ -300,6 +309,7 @@ export default function Training() {
             let formValid = validateForm({ formElement: formToPush })
             if (!formValid && trainingMode.selected) {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                setTrainingChartData([])
                 setIsTraining(true)
                 setTrainingLog([]);
                 pushData('submit_training', formToPush)
@@ -310,34 +320,9 @@ export default function Training() {
         <Box sx={{ display: 'flex', flexDirection: 'column' }}><Grid container>
             <Grid item sm={4} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
                 <CssBaseline />
-                {/* {modelData ? <SelectorModel
-                    error={trainingForm.model.error}
-                    helperText={trainingForm.model.error ? trainingForm.model.helper : ''}
-                    selectedModel={selectedModel}
-                    modelOptions={modelData}
-                    handleChange={(event) => {
-                        handleSelectorFormChange({
-                            eve: event,
-                            setSelector: setSelectedModel,
-                            setForm: setTrainingForm,
-                            options: modelData
-                        })
-                        validateField({ key: 'model', setFormState: setTrainingForm })
-                    }}
-
-                /> : null} */}
+                {trainingChartData.length > 0 ? <TrainingChart data={trainingChartData} /> : null}
 
                 <AccordionModels modelData={modelData} handleCheckpointChange={handleCheckpointChange} formCheckpoints={trainingForm.checkpoints} />
-                {/* {selectedModel ? (<div>
-                    <Accordion expandIcon={<ExpandMoreIcon />}>
-                        <AccordionSummary>
-                            <Typography>Select checkpoints:</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            {checkpointOptions.map((option) => (<CheckpointCard key={option.id} {...option} callback={handleCheckpointChange}  />))}
-                        </AccordionDetails>
-                    </Accordion>
-                </div>) : null} */}
                 <SelectorDataset
                     error={trainingForm.trainDataset.error}
                     datasetType={"train"}
@@ -440,23 +425,6 @@ export default function Training() {
             </Grid>
             <Grid item sm={4} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
                 <Box>
-                    {/* {trainingChartData.length > 0 ? <><Box sx={{ mt: 4 }}>
-                        <Typography variant="h6">Training Loss Over Time</Typography>
-                        <TrainingChart data={trainingChartData} />
-                    </Box></> : null} */}
-                    <Box sx={{ mt: 2 }}>
-                        {trainingLog.length > 0 ? <><Typography variant="h6">Training Progress</Typography>
-                            <List dense>
-                                {trainingLog.map((entry, idx) => (
-                                    <ListItem key={idx}>
-                                        <Typography>{entry}</Typography>
-                                    </ListItem>
-                                ))}
-                            </List> </> : null}
-
-                    </Box>
-                </Box>
-                <Box>
                     {sessions ?
                         <SessionAnalysis trainingSessions={sessions} modelData={modelData ? modelData : null} split='train' />
                         : null}
@@ -465,24 +433,6 @@ export default function Training() {
 
             </Grid>
             <Grid item sm={4} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
-                <Box>
-                    {/* {testChartData.length > 0 ? <><Box sx={{ mt: 4 }}>
-                        <Typography variant="h6">Test Loss</Typography>
-                        <TestChart data={testChartData} />
-                        
-                    </Box></> : null} */}
-                    <Box sx={{ mt: 2 }}>
-                        {trainingLog.length > 0 ? <><Typography variant="h6">Training Progress</Typography>
-                            <List dense>
-                                {trainingLog.map((entry, idx) => (
-                                    <ListItem key={idx}>
-                                        <Typography>{entry}</Typography>
-                                    </ListItem>
-                                ))}
-                            </List> </> : null}
-
-                    </Box>
-                </Box>
                 <Box>
                     {sessions ?
                         <SessionAnalysis trainingSessions={sessions} modelData={modelData ? modelData : null} split='test' />

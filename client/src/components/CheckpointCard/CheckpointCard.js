@@ -11,18 +11,17 @@ import SpeedIcon from '@mui/icons-material/Speed';
 import EditIcon from '@mui/icons-material/Edit';
 import HubIcon from '@mui/icons-material/Hub';
 import SaveIcon from '@mui/icons-material/Save';
-
+import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import { appendData, handleTextFieldChange, pushData, validateField, validateForm } from '../../utils.js';
 import { fetchData, Validation, validateValidator } from '../../utils.js';
 import TrainingChart from '../TrainingChart/TrainingChart.js';
 
 
-const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints }) => {
+const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, updateCheckpoints }) => {
 
     const defaultFields = {
         "name": new Validation({ required: false, regex: /^[A-Za-z0-9 -]{1,30}$/, helper: "Please enter an alphanumeric name for the checkpoint." }),
-        "description": new Validation({ required: false, regex: /^[A-Za-z0-9 /+()!?,.:;-]{1,150}$/, helper: "Please enter an alphanumeric description for the checkpoint." }),
-        "layers": []
+        "description": new Validation({ required: false, regex: /^[A-Za-z0-9 /+()!?<>£$^%*#'@",.:;\n-]{1,150}$/, helper: "Please enter an alphanumeric description for the checkpoint." }),
     }
     const [trainingTree, setTrainingTree] = React.useState([]);
     const [testMetrics, setTestMetrics] = React.useState([]);
@@ -31,10 +30,19 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints })
 
     const [editName, setEditName] = React.useState(true)
     const [editDescription, setEditDescription] = React.useState(true)
-    console.log("local checkpoint: ", checkpoint)
     React.useEffect(() => {
         fetchData(`/training_tree/${checkpoint.id}`, setTrainingTree)
+
     }, []);
+    React.useEffect(() => {
+        setLocalFields((prevVals) => {
+            return produce(prevVals, (draft) => {
+                draft.name.value = checkpoint.name ? checkpoint.name : ""
+                draft.description.value = checkpoint.description ? checkpoint.description : ""
+            })
+        })
+
+    }, [checkpoint]);
     React.useEffect(() => {
         fetchData(`/checkpoint_test_sessions/${checkpoint.id}`, setTestSessions)
     }, []);
@@ -55,67 +63,98 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints })
     const delFunction = (event) => {
 
     }
-    const handleFieldSave = (event) => {
-        for (let key in localFields) {
-            validateField({ key: key, setFormState: setLocalFields })
-        }
+    const handleFieldSave = (key) => {
+        console.log("CheckpointCard: handleFieldSave():")
+        console.log("CheckpointCard: handleFieldSave(): localFields", localFields)
+        console.log("CheckpointCard: handleFieldSave(): key", key)
+        validateField({ key: key, setFormState: setLocalFields })
 
         setTimeout(() => {
 
             let formToPush = {
-                name: localFields.name.value,
-                description: localFields.description.value
+                [key]: localFields[key].value,
             }
 
             let formValid = validateForm({ formElement: localFields })
             if (!formValid) {
+                console.log("CheckpointCard: formValid is false:")
                 pushData(`/checkpoint_update_fields/${checkpoint.id}`, formToPush)
+                // setLocalFields((prevVals) => {
+                //     return produce(prevVals, (draft) => {
+                //         draft[key].value = checkpoint[key] ? checkpoint.name : ""
+                //     })
+                // })
+            }
+            else {
+                console.log("CheckpointCard: formValid is true:")
             }
         }, 0)
     }
     const checked = formCheckpoints.some(item => item.checkpointId === checkpoint.id && item.modelId === checkpoint.model_id)
-
+    
+    const delCheckpoint = () => {
+            pushData(`delete_checkpoint/${checkpoint.model_id}/${checkpoint.id}`).then(() => {
+                updateCheckpoints()
+            })
+        }
     return (
         <Paper variant='outlined' >
-            {console.log("!!!checked: ", checked)}
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Tooltip title="Select for training"><Checkbox data-model-id={checkpoint.model_id} checked={checked} data-checkpoint-id={checkpoint.id} onChange={(event) => handleCheckpointChange(checkpoint.model_id, checkpoint.id)} /></Tooltip>
-                <Tooltip><IconButton aria-label="delete" color="error" ><DeleteIcon /></IconButton></Tooltip>
+                <Tooltip><IconButton onClick={() => delCheckpoint()} aria-label="delete" color="error" ><DeleteIcon /></IconButton></Tooltip>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Typography>Checkpoint Name: {!editName ? localFields.name.value : checkpoint.name} </Typography>
+                    <Typography >Checkpoint Name: {editName ? localFields.name.value : ""} </Typography>
                     {editName ?
                         <IconButton aria-label="edit" name="name" color="primary" onClick={() => setEditName(!editName)} ><EditIcon /></IconButton>
                         :
                         <>
-                            <TextField label="Checkpoint Name" name='name' helperText={localFields.name.helper} error={localFields.name.error} onChange={(event) => {
+                            <TextField label="Checkpoint Name" name='name' helperText={localFields.name.error ? localFields.name.helper : ""} error={localFields.name.error} onChange={(event) => {
                                 handleTextFieldChange({ eve: event, setState: setLocalFields });
                                 validateField({ key: 'name', setFormState: setLocalFields });
                             }} value={localFields.name.value || ''} size="small" autofocus />
-                            <IconButton aria-label="save" name="name" color={localFields.name.error ? "default" : "primary"} onClick={(event) => {
-                                if (!localFields.name.error) {
-                                    setEditName(!editName)
-                                    handleFieldSave(event)
-                                }
-                                
-                            }} ><SaveIcon /></IconButton>
+                            <IconButton aria-label="save" name="name" color={localFields.name.error ? "default" : "primary"}
+                                onClick={(event) => {
+                                    if (!localFields.name.error) {
+                                        setEditName(!editName)
+                                        handleFieldSave("name")
+                                    }
+                                }} >
+                                <SaveIcon />
+                            </IconButton>
+                            <IconButton aria-label="cancel" name="cancel" color={localFields.name.error ? "default" : "primary"}
+                                onClick={() => setEditName(!editName)} >
+                                <DoNotDisturbIcon />
+                            </IconButton>
                         </>}
 
 
                 </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Typography>Checkpoint description: {localFields.description.value && !editDescription ? localFields.description.value : checkpoint.description} </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <Typography sx={{ whiteSpace: 'pre-line' }}>Checkpoint description: {editDescription ? localFields.description.value : ""} </Typography>
                     {editDescription ?
                         <IconButton aria-label="edit" color="primary" onClick={() => setEditDescription(!editDescription)} ><EditIcon /></IconButton>
 
                         :
                         <>
-                            <TextField label="Checkpoint Description" name='description' helperText={localFields.description.helper} error={localFields.description.error} onChange={(event) => {
+                            <TextField multiline fullWidth maxRows={10} minRows= {1} label="Checkpoint Description" name='description' helperText={localFields.description.error ? localFields.description.helper : ""} error={localFields.description.error} onChange={(event) => {
                                 handleTextFieldChange({ eve: event, setState: setLocalFields });
                                 validateField({ key: 'description', setFormState: setLocalFields });
                             }} value={localFields.description.value || ''} size="small" autofocus />
-                            <IconButton aria-label="save" color={localFields.description.error ? "default" : "primary"} onClick={() => localFields.description.error ? null : setEditDescription(!editDescription)} ><SaveIcon /></IconButton>
+                            <IconButton aria-label="save" color={localFields.description.error ? "default" : "primary"}
+                                onClick={(event) => {
+                                    if (!localFields.description.error) {
+                                        setEditDescription(!editDescription)
+                                        handleFieldSave("description")
+                                    }
+                                }} >
+                                <SaveIcon />
+                            </IconButton>
+                            <IconButton aria-label="cancel" name="cancel" color={localFields.name.error ? "default" : "primary"}
+                                onClick={() => setEditDescription(!editDescription)} >
+                                <DoNotDisturbIcon />
+                            </IconButton>
                         </>}
                 </Box>
 
@@ -137,7 +176,6 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints })
                         <AccordionDetails>
                             {testSessions.map((option) => {
                                 const matchingMetric = testMetrics.find((metric) => metric.runId === option.id)
-                                console.log("matching metric: ", matchingMetric)
                                 if (option.cv_dataset) {
                                     return <Paper variant="outlined" sx={{ padding: "5px", margin: "5px" }}>
                                         <Typography>CV set: {option.cv_dataset}</Typography>

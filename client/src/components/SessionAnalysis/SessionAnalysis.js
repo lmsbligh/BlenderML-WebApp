@@ -35,7 +35,6 @@ function SessionAnalysis({ trainingSessions, modelData, split }) {
         const hour = hourMin.slice(0, 2)
         const minute = hourMin.slice(2, 4)
         const dateObj = new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
-        console.log(dateObj)
         return dateObj
     }
     return (

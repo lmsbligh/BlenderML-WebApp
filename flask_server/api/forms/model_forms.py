@@ -87,16 +87,16 @@ LAYER_FORM = {
     }
 }
 CHECKPOINT_FORM = {
-    "name": {
+    "name": {"name": {
         "data_type": str,
         "regex": r"^[A-Za-z0-9 -]{1,30}$",
         "required": True,
         "helper": "Please enter an alphanumeric name of up to 15 characters."
-    },
-    "description": {
+    }},
+    "description": {"description": {
         "data_type": str,
-        "regex": r"^[A-Za-z0-9 -,.:/]{1,150}$",
+        "regex": r"^[A-Za-z0-9 /+()!?<>£$^%*#'@\",.:;\n-]{1,150}$",
         "required": False,
         "helper": "Please enter an alphanumeric description of up to 150 characters."
-    }
+    }}
 }

@@ -4,25 +4,6 @@ import { useImmer } from 'use-immer';
 import produce from "immer";
 import { Box, Typography } from '@mui/material';
 
-function mergeRunsToBarData(runs) {
-    const merged = {};
-    runs.forEach((run, runIndex) => {
-        const runKey = `Run${run.runId}`;
-        if (!run || !run.data) return;
-        run.data.forEach(entry => {
-            const key = entry.step;
-            if (!merged[key]) {
-                merged[key] = {
-                    step: entry.step,
-                    stepLabel: entry.stepLabel
-                };
-            }
-            merged[key][runKey] = entry.loss;
-        });
-    });
-    return Object.values(merged);
-}
-
 export default function TestChart({ data = null, id = null }) {
     const [rawData, setRawData] = useImmer([])
     const [processedData, setProcessedData] = useImmer([])
@@ -37,13 +18,7 @@ export default function TestChart({ data = null, id = null }) {
             setRawData(data)
         }
     }, [data, id])
-    // function parseStep(step, datasetSize) {
-    //     const match = step.match(/E(\d+)-B(\d+)/);
-    //     if (!match) return 0;
-    //     const epoch = parseInt(match[1]);
-    //     const batch = parseInt(match[2]);
-    //     return (epoch - 1) * datasetSize + batch;  // or customize as needed
-    // }
+
     React.useEffect(() => {
         if (rawData.length === 0) {
             return

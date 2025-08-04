@@ -207,8 +207,10 @@ def get_checkpoints(model_id):
 
 
 @bp.route('/delete_checkpoint/<string:model_ID>/<string:checkpoint_ID>', methods=["POST"])
-def delete_dataset(model_ID, checkpoint_ID):
+def delete_checkpoint(model_ID, checkpoint_ID):
+    print("delete_checkpoint():")
     MODELS_DIR_PATH = current_app.config["MODELS_DIR_PATH"]
+    DATABASE_PATH = current_app.config["DATABASE_PATH"]
     checkpoint_full_path = os.path.realpath(
         os.path.join(MODELS_DIR_PATH, model_ID, checkpoint_ID))
 
@@ -219,7 +221,15 @@ def delete_dataset(model_ID, checkpoint_ID):
             abort(403)
         else:
             print(f"deleting file: {checkpoint_full_path}")
-            os.remove(checkpoint_full_path)
+            os.remove(checkpoint_full_path+".pth")
+            con = sqlite3.connect(DATABASE_PATH)
+            cur = con.cursor()
+            cur.execute('DELETE FROM checkpoints WHERE id = ?',
+                        (checkpoint_ID,))
+
+            con.commit()
+            con.close()
+
     except Exception as e:
         return jsonify({"error": f"{str(e)}"})
 
@@ -238,22 +248,27 @@ def checkpoint_update_fields(checkpoint_ID):
 
     fields_to_save = json.loads(request.data.decode('utf-8'))
 
-    name = fields_to_save['name']
-    description = fields_to_save['description']
-
+    # name = fields_to_save['name']
+    # description = fields_to_save['description']
+    keys = list(fields_to_save.keys())
     try:
         print("checkpoint fields_to_save: ", fields_to_save)
-        validate_form(fields_to_save, CHECKPOINT_FORM)
+        validate_form(fields_to_save, CHECKPOINT_FORM[keys[0]])
     except ValueError as ve:
         print(jsonify({"error": str(ve)}), 400)
         return jsonify({"error": str(ve)}), 400
 
     try:
-        cur.execute("""
-            UPDATE checkpoints
-            SET name = ?, description = ?
-            WHERE id = ?
-        """, (name, description, checkpoint_ID))
+        for key in keys:
+            if key in ["name", "description"]:
+                cur.execute(f"""
+                    UPDATE checkpoints
+                    SET {key} = ?
+                    WHERE id = ?
+                """, (fields_to_save[key], checkpoint_ID))
+            else:
+                raise ValueError(
+                    f"Unsafe column name: '{key}' is not allowed in UPDATE statement.")
 
     except sqlite3.Error as e:
         print("Database error:", e)
@@ -261,3 +276,4 @@ def checkpoint_update_fields(checkpoint_ID):
     finally:
         con.commit()
         con.close()
+        return jsonify({"message": "Checkpoint updated successfully"}), 200

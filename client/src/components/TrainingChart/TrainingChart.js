@@ -27,21 +27,25 @@ export default function TrainingChart({ data = null, id = null }) {
         return (epoch - 1) * datasetSize + batch;  // or customize as needed
     }
     React.useEffect(() => {
-        setProcessedData((prevVals) => {
-            return produce(prevVals, (draft) => {
-                draft.length = 0;  // clear existing
-                rawData.forEach(run => {
-                    draft.push({
-                        ...run,
-                        data: run.data.map((entry, i) => ({
-                            ...entry,
-                            stepLabel: entry.step,
-                            step: parseStep(entry.step, run.datasetSize)
-                        }))
+        console.log("rawData: ", rawData)
+        if (rawData.length > 0) {
+            setProcessedData((prevVals) => {
+                return produce(prevVals, (draft) => {
+                    draft.length = 0;  // clear existing
+                    rawData.forEach(run => {
+                        draft.push({
+                            ...run,
+                            data: run.data.map((entry, i) => ({
+                                ...entry,
+                                stepLabel: entry.step,
+                                step: parseStep(entry.step, run.datasetSize)
+                            }))
+                        });
                     });
                 });
-            });
-        })
+            })
+        }
+
     }, [rawData])
 
     React.useEffect(() => {
@@ -74,7 +78,7 @@ export default function TrainingChart({ data = null, id = null }) {
                         domain={processedData ? [Math.min(processedData.flatMap(run => run.data.map(d => d.step))), Math.max(processedData.flatMap(run => run.data.map(d => d.step)))] : null} />
                     <YAxis label={{ value: 'Loss', angle: -90, position: 'insideLeft' }} />
                     <Tooltip />
-                    <Legend />
+                    {processedData.length > 1 ? <Legend /> : null}
                     {processedData ? processedData.map((run, i) => (
                         <Line
                             key={run.runId}

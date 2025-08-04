@@ -34,6 +34,7 @@ const AccordionModels = ({ modelData, handleCheckpointChange, formCheckpoints })
 
                         <Card sx={{ padding: '10px', marginTop: '10px' }}>
                             <Tooltip><IconButton aria-label="delete" color="error" onClick={() => {handleCheckpointChange(checkpoint.modelId, checkpoint.checkpointId)}} ><DeleteIcon /></IconButton></Tooltip>
+                            
                             <Typography>Checkpoint ID: {checkpoint.checkpointId == '-1' ? "New checkpoint" : checkpoint.checkpointId}</Typography>
                             <Typography>Model ID: {checkpoint.modelId}</Typography>
                         </Card>

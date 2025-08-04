@@ -132,6 +132,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
         case 'MAE':
             loss_instance = nn.L1Loss()
     training_data = []
+    dataset_size = len(data_loader.dataset)
     for epoch in range(epochs):  # loop over the dataset
         running_loss = 0.0
         print(f"Epoch: {epoch}/{epochs}")
@@ -158,6 +159,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
                 print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 20:.6f}')
                 running_loss = 0.0
                 batch_data = {
+                    'datasetSize': dataset_size,
                     'epoch': epoch + 1,
                     'batch': i + 1,
                     'loss': loss.item()
@@ -224,7 +226,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
 
         cursor.execute("""
             INSERT INTO checkpoints (
-                id, parent_id, model_id, training_run_id, name, notes, final_loss, timestamp
+                id, parent_id, model_id, training_run_id, name, description, final_loss, timestamp
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             checkpoint_id,

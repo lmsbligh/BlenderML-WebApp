@@ -203,7 +203,7 @@ export default function DatasetGenerator() {
             })
         })
     }
-    const handleProfileSave = (event) => {
+    const handleProfileSave = () => {
         //event.preventDefault();
         for (let key in profileForm) {
             validateField({ key: key, setFormState: setProfileForm })
@@ -247,8 +247,8 @@ export default function DatasetGenerator() {
         return {...selectedDatasetProfile, ...updatedProfile}
     }
 
-    const handleGenerateDataset = (event) => {
-        const updatedProfile = handleProfileSave(event)
+    const handleGenerateDataset = () => {
+        const updatedProfile = handleProfileSave()
         if (!validateForm({ formElement: profileForm })) {
             try {
                 fetch('submit_generate_dataset', {

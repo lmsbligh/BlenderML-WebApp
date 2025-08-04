@@ -33,7 +33,10 @@ const AccordionCheckpoints = ({ modelId, handleCheckpointChange, formCheckpoints
         console.log("checkpointOptions: ", checkpointOptions)
     }, [checkpointOptions])
     const checked = formCheckpoints.some(item => item.checkpointId === "-1" && item.modelId === modelId)
-
+    const updateCheckpoints = () => {
+        console.log("updateCheckpoints ran!")
+        fetchData(`checkpoints/${modelId}`, setCheckpointOptions)
+    }
     return (
         <Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}> 
@@ -45,7 +48,7 @@ const AccordionCheckpoints = ({ modelId, handleCheckpointChange, formCheckpoints
                 </AccordionSummary>
                 <AccordionDetails>
                     {checkpointOptions ? checkpointOptions.map((checkpoint) => (
-                        <CheckpointCard key={`${checkpoint.model_id}-${checkpoint.id}`} checkpoint={checkpoint} handleCheckpointChange={handleCheckpointChange} formCheckpoints={formCheckpoints}/>
+                        <CheckpointCard key={`${checkpoint.model_id}-${checkpoint.id}`} checkpoint={checkpoint} handleCheckpointChange={handleCheckpointChange} formCheckpoints={formCheckpoints} updateCheckpoints={updateCheckpoints}/>
                     )) : null}
                 </AccordionDetails>
             </Accordion> : null}
