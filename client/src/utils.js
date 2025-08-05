@@ -263,3 +263,16 @@ export const modelIdToColor = (modelId) => {
     const hue = hash % 360;  // wrap around color wheel
     return `hsl(${hue}, 70%, 70%)`;  // adjust saturation/lightness for pastel feel
 }
+
+export const handleOpenDelDialog = (setDelDialog) => {
+    console.log("handleOpenDelDioalog")
+    setDelDialog(true)
+}
+export const handleCloseDelDialog = ({del, setDelDialog, delFunction=null}) => {
+    console.log("handleCloseDelDialog: del: ", del)
+    console.log("handleCloseDelDialog: delFunction: ", delFunction)
+    if (del && typeof delFunction === 'function') {
+        delFunction()
+    }
+    setDelDialog(false)
+}

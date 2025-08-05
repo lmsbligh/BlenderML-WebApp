@@ -27,9 +27,8 @@ def validate_form(data, required_fields):
                     data[field] = int(data[field])
                 if field_vals["data_type"] == dict:
                     data[field] = ast.literal_eval(data[field])
-            except:
-                raise ValueError(
-                    f"Field {field} must be of type {field_vals['data_type']}")
+            except Exception as e:
+                print("!error: ", e)
 
     def val_entry(entry, val):
         print(f"entry: {entry}, val: {val}")
@@ -76,4 +75,7 @@ def validate_form(data, required_fields):
 
     # Additional sanity checks
     for entry, val in data.items():
-        val_entry(entry=entry, val=val)
+        try:
+            val_entry(entry=entry, val=val)
+        except Exception as e:
+            print("Error! : ", e)

@@ -12,9 +12,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import HubIcon from '@mui/icons-material/Hub';
 import SaveIcon from '@mui/icons-material/Save';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
-import { appendData, handleTextFieldChange, pushData, validateField, validateForm } from '../../utils.js';
+import { appendData, handleCloseDelDialog, handleOpenDelDialog, handleTextFieldChange, pushData, validateField, validateForm } from '../../utils.js';
 import { fetchData, Validation, validateValidator } from '../../utils.js';
 import TrainingChart from '../TrainingChart/TrainingChart.js';
+import DeleteDialog from '../DeleteDialog/DeleteDialog.js';
 
 
 const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, updateCheckpoints }) => {
@@ -91,17 +92,24 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
         }, 0)
     }
     const checked = formCheckpoints.some(item => item.checkpointId === checkpoint.id && item.modelId === checkpoint.model_id)
-    
+
     const delCheckpoint = () => {
-            pushData(`delete_checkpoint/${checkpoint.model_id}/${checkpoint.id}`).then(() => {
-                updateCheckpoints()
-            })
-        }
+        pushData(`delete_checkpoint/${checkpoint.model_id}/${checkpoint.id}`).then(() => {
+            updateCheckpoints()
+        })
+    }
+    const [delDialog, setDelDialog] = React.useState(false);
+
     return (
         <Paper variant='outlined' >
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Tooltip title="Select for training"><Checkbox data-model-id={checkpoint.model_id} checked={checked} data-checkpoint-id={checkpoint.id} onChange={(event) => handleCheckpointChange(checkpoint.model_id, checkpoint.id)} /></Tooltip>
-                <Tooltip><IconButton onClick={() => delCheckpoint()} aria-label="delete" color="error" ><DeleteIcon /></IconButton></Tooltip>
+                <Tooltip>
+                    <DeleteDialog id={"checkpoint"} open={delDialog} handleClose={handleCloseDelDialog} setDelDialog={setDelDialog} delFunction={delCheckpoint} />
+                    <IconButton onClick={() => { handleOpenDelDialog(setDelDialog) }} aria-label="delete" color="error" >
+                        <DeleteIcon />
+                    </IconButton>
+                </Tooltip>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -138,7 +146,7 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
 
                         :
                         <>
-                            <TextField multiline fullWidth maxRows={10} minRows= {1} label="Checkpoint Description" name='description' helperText={localFields.description.error ? localFields.description.helper : ""} error={localFields.description.error} onChange={(event) => {
+                            <TextField multiline fullWidth maxRows={10} minRows={1} label="Checkpoint Description" name='description' helperText={localFields.description.error ? localFields.description.helper : ""} error={localFields.description.error} onChange={(event) => {
                                 handleTextFieldChange({ eve: event, setState: setLocalFields });
                                 validateField({ key: 'description', setFormState: setLocalFields });
                             }} value={localFields.description.value || ''} size="small" autofocus />

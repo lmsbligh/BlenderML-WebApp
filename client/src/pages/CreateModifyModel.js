@@ -15,8 +15,9 @@ import SelectorModel from '../components/SelectorModel/SelectorModel.js';
 import LayerCard from '../components/LayerCard/LayerCard.js';
 import ModelPropertiesModifier from '../components/ModelPropertiesModifier/ModelPropertiesModifier.js';
 
-import { fetchData, validateForm, pushData, Validation, Layer, validateField } from '../utils.js'
+import { fetchData, validateForm, pushData, Validation, Layer, validateField, handleCloseDelDialog } from '../utils.js'
 import { grey } from '@mui/material/colors';
+import DeleteDialog from '../components/DeleteDialog/DeleteDialog.js';
 const defaultTheme = createTheme();
 
 
@@ -41,7 +42,8 @@ function CreateModifyModel() {
     //Local states
     const [selectedModel, setSelectedModel] = useImmer('');
     const [modelData, setModelData] = useImmer([]);
-    const [modelCheckpoints, setModelCheckpoints] = useImmer([])
+    const [modelCheckpoints, setModelCheckpoints] = useImmer([]);
+    const [delModelDialog, setDelModelDialog] = React.useState(false);
     React.useEffect(() => {
         fetchData('models', setModelData)
     }, []);
@@ -323,8 +325,18 @@ function CreateModifyModel() {
                                     ) : ''
                                 }
                             </Box>{
-                                selectedModel ? <><Button variant="contained" style={{ width: '150px' }} onClick={handleModelSave}>Save</Button>
-                                    <Button variant="contained" color='error' style={{ width: '150px' }} onClick={handleModelDelete}>Delete</Button></> : null
+                                selectedModel ?
+                                    <>
+                                        <Button variant="contained" style={{ width: '150px' }} onClick={handleModelSave}>Save</Button>
+                                        <DeleteDialog
+                                                            id="model"
+                                                            open={delModelDialog}
+                                                            handleClose={handleCloseDelDialog}
+                                                            setDelDialog={setDelModelDialog}
+                                                            delFunction={() => handleModelDelete()}
+                                                        />
+                                        <Button variant="contained" color='error' style={{ width: '150px' }} onClick={() => setDelModelDialog(true)}>Delete</Button>
+                                    </> : null
                             }
 
                         </FormControl>

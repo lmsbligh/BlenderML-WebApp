@@ -8,6 +8,7 @@ import sqlite3
 
 
 bp = Blueprint('models', __name__)
+MODELS_LIST = []
 
 
 @bp.route("/layer_types")
@@ -51,7 +52,6 @@ def get_models():
     Returns: List model in JSONs.
     """
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
-    global MODELS_LIST
 
     print("DATABASE_PATH", DATABASE_PATH)
     con = sqlite3.connect(DATABASE_PATH)
@@ -108,10 +108,15 @@ def submit_model():
         MODELS_LIST[ind] = model_to_save
     else:
         MODELS_LIST.append(model_to_save)
-    cur.execute('INSERT INTO models (value, modelName, input, output, description, layers) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(value) DO UPDATE SET modelName = excluded.modelName, input = excluded.input, output = excluded.output, description = excluded.description, layers = excluded.layers;',
-                (model_to_save['value'], model_to_save['modelName'], model_to_save['input'], model_to_save['output'], model_to_save['description'], json.dumps(model_to_save['layers'])))
-    con.commit()
-    con.close()
+    try:
+        print("saving model: ", model_to_save)
+        cur.execute('INSERT INTO models (value, modelName, input, output, description, layers) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(value) DO UPDATE SET modelName = excluded.modelName, input = excluded.input, output = excluded.output, description = excluded.description, layers = excluded.layers;',
+                    (model_to_save['value'], model_to_save['modelName'], model_to_save['input'], model_to_save['output'], model_to_save['description'], json.dumps(model_to_save['layers'])))
+        con.commit()
+        con.close()
+    except ValueError as ve:
+        print(jsonify({"error": str(ve)}), 400)
+        return jsonify({"error": str(ve)}), 400
     return jsonify({"body": "success!"}), 200
 
 

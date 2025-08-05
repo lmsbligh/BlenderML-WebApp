@@ -5,8 +5,6 @@ from torchvision import datasets
 from MLApp.parameters import device
 
 
-
-
 class ImageDataset(datasets.VisionDataset):
     """Ineherits Torch's datasets.VisionDataset.  
 
@@ -24,7 +22,6 @@ class ImageDataset(datasets.VisionDataset):
             root, transform=transform, target_transform=target_transform)
         self.targets = targets
         self.image_dir = root
-        # self.images =
 
     def __getitem__(self, key):
         """Loads and returns an image from the dataset. Allows
@@ -41,7 +38,8 @@ class ImageDataset(datasets.VisionDataset):
             Torch tensor containing the material parameter labels.
         """
         if isinstance(key, int):
-            image_path = os.path.join(self.image_dir, f"{self.targets[key][0]}.jpg")
+            image_path = os.path.join(
+                self.image_dir, f"{self.targets[key][0]}.jpg")
             image_path = os.path.normpath(image_path)
             image = PIL.Image.open(image_path)
             target = torch.FloatTensor(self.targets[key][1:])
@@ -59,6 +57,6 @@ class ImageDataset(datasets.VisionDataset):
             raise TypeError("Unsupported key type")
 
     def __len__(self):
-        """Returns number of iamges in dataset.
+        """Returns number of images in dataset.
         """
         return len(self.targets)

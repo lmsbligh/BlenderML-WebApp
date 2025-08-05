@@ -56,7 +56,7 @@ export default function Training() {
             helper: "Please select a test dataset."
         }),
         "epochs": new Validation({
-            value: 100,
+            value: 1,
             error: false,
             regex: /^(?:[1-9]\d{0,2}|1000)$/,
             required: true,
@@ -165,10 +165,6 @@ export default function Training() {
         console.log("trainingSessions: ", sessions)
     }, [sessions])
 
-
-    // React.useEffect(() => {
-    //     console.log("chartData: ", chartData)
-    // }, [chartData])
     React.useEffect(() => {
         console.log("selectedTrainDataset: ", selectedTrainDataset)
     }, [selectedTrainDataset])
