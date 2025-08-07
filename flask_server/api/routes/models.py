@@ -2,6 +2,10 @@ import json
 import os
 import shutil
 from flask import Blueprint, abort, current_app, jsonify, request
+import pprint
+
+import torch
+from MLApp.custom_torch.custom_net import CustomNet
 from ..forms.model_forms import MODEL_FORM, LAYER_FORM, CHECKPOINT_FORM
 from ..utils import validate_form
 import sqlite3
@@ -110,8 +114,8 @@ def submit_model():
         MODELS_LIST.append(model_to_save)
     try:
         print("saving model: ", model_to_save)
-        cur.execute('INSERT INTO models (value, modelName, input, output, description, layers) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(value) DO UPDATE SET modelName = excluded.modelName, input = excluded.input, output = excluded.output, description = excluded.description, layers = excluded.layers;',
-                    (model_to_save['value'], model_to_save['modelName'], model_to_save['input'], model_to_save['output'], model_to_save['description'], json.dumps(model_to_save['layers'])))
+        cur.execute('INSERT INTO models (value, modelName, input, output, description, layers, imageWidth, imageHeight) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(value) DO UPDATE SET modelName = excluded.modelName, input = excluded.input, output = excluded.output, description = excluded.description, layers = excluded.layers, imageWidth = excluded.imageWidth, imageHeight = excluded.imageHeight;',
+                    (model_to_save['value'], model_to_save['modelName'], model_to_save['input'], model_to_save['output'], model_to_save['description'], json.dumps(model_to_save['layers']), model_to_save['imageWidth'], model_to_save['imageHeight']))
         con.commit()
         con.close()
     except ValueError as ve:
@@ -282,3 +286,37 @@ def checkpoint_update_fields(checkpoint_ID):
         con.commit()
         con.close()
         return jsonify({"message": "Checkpoint updated successfully"}), 200
+
+
+@bp.route('/layer_dimension_requirement', methods=["POST"])
+def layer_dimension_requirement():
+    # assumes last layer is current layer.
+    data = json.loads(request.data.decode('utf-8'))
+    print("layer_dimension_requirement(): data: ")
+    pprint.pp(data)
+    layers = data['layers']
+    input_image_res = data['input_image_res']
+
+    if (len(layers) > 2):
+        if (layers[-1]['layer_type'] == 'Dense' and layers[-3]['layer_type'] == 'CNN'):
+            net = CustomNet(layers[:-1])
+            test_image = torch.rand(
+                1, 3, input_image_res['x'], input_image_res['y'])
+
+            def flatten(x):
+                return x.view(x.size(0), -1)
+            output_vector = net(test_image)
+            flat_output_vector = flatten(output_vector)
+            print("current layer: ", layers[-1])
+            print("output_vector.shape: ", output_vector.shape)
+            print("flat_output_vector.shape: ", flat_output_vector.shape)
+
+            print("input_image_res['x']: ", input_image_res['x'])
+            print("input_image_res['y']: ",  input_image_res['y'])
+            output_shape = flat_output_vector.shape[1]
+            print("required input shape: ", output_shape)
+            return jsonify({"required_input_size": output_shape}), 200
+        else:
+            return jsonify({"required_input_size": None}), 200
+    else:
+        return jsonify({"required_input_size": None}), 200

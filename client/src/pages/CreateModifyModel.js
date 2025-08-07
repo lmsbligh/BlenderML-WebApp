@@ -26,11 +26,15 @@ function CreateModifyModel() {
     const defaultModel = {
         "modelName": '',
         "description": "",
+        "imageWidth": 500,
+        "imageHeight": 500, 
         "layers": [{ layer_type: 'Dense', activation: 'Linear', x_0: '', x_1: '', x_2: '', x_3: '', padding: '' }]
     }
     const defaultForm = {
         "modelName": new Validation({ required: true, regex: /^[A-Za-z0-9 -]{1,30}$/, helper: "Please enter an alphanumeric name for your model." }),
         "description": new Validation({ regex: /^[A-Za-z0-9 -]{1,150}$/, helper: "Please enter an alphanumeric description for your model." }),
+        "imageWidth": new Validation({ required: true, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 to 1000." }),
+        "imageHeight": new Validation({ required: true, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 to 1000." }),
         "layers": []
     }
     const [modelForm, setModelForm] = useImmer(structuredClone(defaultForm));
@@ -55,9 +59,11 @@ function CreateModifyModel() {
             return produce(modelForm, (draft) => {
                 draft['modelName'].value = selectedModel.modelName
                 draft['description'].value = selectedModel.description
+                draft['imageHeight'].value = selectedModel.imageHeight
+                draft['imageWidth'].value = selectedModel.imageWidth
                 var new_layers = []
                 selectedModel.layers.forEach(layer => {
-                    // console.log("layer: ", layer)
+                    console.log("layer: ", layer)
                     new_layers.push(
                         new Layer({
                             layer_type: layer.layer_type,
@@ -68,6 +74,7 @@ function CreateModifyModel() {
                             padding: layer.padding,
                             activation: layer.activation,
                         }))
+                    console.log("new_layers: ", new_layers)
                 });
                 draft['layers'] = new_layers;
             })
@@ -214,11 +221,14 @@ function CreateModifyModel() {
                 }
             })
             // console.log("formInvalid ? : ", formInvalid)
+            
             if (!formInvalid) {
                 const modelToPush = {
                     value: selectedModel.value,
                     input: '',
                     output: '',
+                    imageHeight: updatedTextFields.imageHeight.value,
+                    imageWidth: updatedTextFields.imageWidth.value,
                     modelName: updatedTextFields.modelName.value,
                     description: updatedTextFields.description.value,
                     layers: updatedLayersObject
@@ -314,12 +324,13 @@ function CreateModifyModel() {
                                             key={option.id}
                                             layerUpdater={updateLayer}
                                             layer={option}
-                                            prevLayer={ind > 0 ? modelForm.layers[ind - 1] : null}
+                                            layers={modelForm.layers}
                                             index={ind}
                                             saveCallback={(callback) => (layerCallbacks[ind] = callback)}
                                             delFunction={handleLayerDelete}
                                             moveFunction={handleLayerMove}
                                             addLayerFunction={handleLayerAdd}
+                                            inputImageRes={{x: modelForm.imageWidth, y: modelForm.imageHeight}}
                                         />
                                     }
                                     ) : ''
