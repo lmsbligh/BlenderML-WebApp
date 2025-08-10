@@ -94,18 +94,17 @@ export default function Training() {
         "helper": "Please select a training, CV or test set."
     })
     const [modelData, setModelData] = useImmer([]);
-    const [selectedModel, setSelectedModel] = React.useState('');
+    // const [selectedModel, setSelectedModel] = React.useState('');
 
     const [datasetOptions, setDatasetOptions] = React.useState([]);
     const [selectedTrainDataset, setSelectedTrainDataset] = React.useState('');
     const [selectedCVDataset, setSelectedCVDataset] = React.useState('');
     const [selectedTestDataset, setSelectedTestDataset] = React.useState('');
 
-    const [checkpointOptions, setCheckpointOptions] = React.useState([]);
-    const [selectedCheckpoint, setSelectedCheckpoint] = React.useState('');
+    // const [checkpointOptions, setCheckpointOptions] = React.useState([]);
 
     const [trainingChartData, setTrainingChartData] = useImmer([]);
-    const [testChartData, setTestChartData] = React.useState([]);
+    // const [testChartData, setTestChartData] = React.useState([]);
 
     const [trainingLog, setTrainingLog] = React.useState([]);
 
@@ -152,10 +151,10 @@ export default function Training() {
         fetchData('models', setModelData)
     }, []);
 
-    React.useEffect(() => {
-        if (!selectedModel) return;
-        fetchData(`checkpoints/${selectedModel.value}`, setCheckpointOptions)
-    }, [selectedModel]);
+    // React.useEffect(() => {
+    //     if (!selectedModel) return;
+    //     fetchData(`checkpoints/${selectedModel.value}`, setCheckpointOptions)
+    // }, [selectedModel]);
 
     React.useEffect(() => {
         fetchData('/sessions', setSessions)
@@ -168,9 +167,27 @@ export default function Training() {
     React.useEffect(() => {
         console.log("selectedTrainDataset: ", selectedTrainDataset)
     }, [selectedTrainDataset])
+
     React.useEffect(() => {
         console.log("trainingForm: ", trainingForm)
     }, [trainingForm])
+
+    React.useEffect(() => {
+        console.log("trainingForm.checkpoints: ", trainingForm.checkpoints)
+        if (trainingForm.checkpoints.length > 0) {
+            pushData('/get_compatible_datasets', trainingForm.checkpoints)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json(); // or response.json(), depending on your server response
+                })
+                .then(data => {
+                    console.log("server returned the following compatible datatsets:", data)
+                })
+        }
+
+    }, [trainingForm.checkpoints])
 
     const checkDatasetSelected = (event) => {
         console.log("checkDatasetSelected ran")
@@ -312,6 +329,7 @@ export default function Training() {
             }
         }, 0)
     }
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}><Grid container>
             <Grid item sm={4} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>

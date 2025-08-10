@@ -296,26 +296,37 @@ def layer_dimension_requirement():
     pprint.pp(data)
     layers = data['layers']
     input_image_res = data['input_image_res']
-
-    if (len(layers) > 2):
-        if (layers[-1]['layer_type'] == 'Dense' and layers[-3]['layer_type'] == 'CNN'):
+    if (len(layers) > 1):
+        if (layers[-1]['layer_type'] == 'Dense' and layers[-2]['layer_type'] == 'Dense'):
+            return jsonify({"required_input_size": int(layers[-2]['x_1']), "helper": "This must match the output of the previous layer."}), 200
+        if (layers[-1]['layer_type'] == 'Dense' and layers[-2]['layer_type'] == 'CNN'):
             net = CustomNet(layers[:-1])
             test_image = torch.rand(
-                1, 3, input_image_res['x'], input_image_res['y'])
+                1, 3, int(input_image_res['x']), int(input_image_res['y']))
 
             def flatten(x):
                 return x.view(x.size(0), -1)
             output_vector = net(test_image)
             flat_output_vector = flatten(output_vector)
-            print("current layer: ", layers[-1])
-            print("output_vector.shape: ", output_vector.shape)
-            print("flat_output_vector.shape: ", flat_output_vector.shape)
-
-            print("input_image_res['x']: ", input_image_res['x'])
-            print("input_image_res['y']: ",  input_image_res['y'])
             output_shape = flat_output_vector.shape[1]
             print("required input shape: ", output_shape)
-            return jsonify({"required_input_size": output_shape}), 200
+            return jsonify({"required_input_size": output_shape,
+                            "helper": "This is determined by image resolution."}), 200
+
+    if (len(layers) > 2):
+        if (layers[-1]['layer_type'] == 'Dense' and layers[-3]['layer_type'] == 'CNN'):
+            net = CustomNet(layers[:-1])
+            test_image = torch.rand(
+                1, 3, int(input_image_res['x']), int(input_image_res['y']))
+
+            def flatten(x):
+                return x.view(x.size(0), -1)
+            output_vector = net(test_image)
+            flat_output_vector = flatten(output_vector)
+            output_shape = flat_output_vector.shape[1]
+            print("required input shape: ", output_shape)
+            return jsonify({"required_input_size": output_shape,
+                            "helper": "This is determined by image resolution."}), 200
         else:
             return jsonify({"required_input_size": None}), 200
     else:

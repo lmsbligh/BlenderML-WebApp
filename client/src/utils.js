@@ -51,9 +51,20 @@ export const handleSelectorFormChange = ({ eve, setSelector, setForm, options })
 export const handleTextFieldChange = ({ eve, setState }) => {
     setState((prevVals) => {
         return produce(prevVals, (draft) => {
-            console.log(draft[eve.target.name])
+            console.log("eve.target.name: ", eve.target.name)
+            console.log(draft[eve.target.name].value)
             console.log(eve.target.value)
-            draft[eve.target.name].value = eve.target.value;
+            if (!draft[eve.target.name].regex.test(eve.target.value) && eve.target.value !== '') {
+                draft[eve.target.name].error = true
+            }
+            else {
+
+                console.log("handleTextFieldChange pass")
+                draft[eve.target.name].error = false
+
+                draft[eve.target.name].value = eve.target.value;
+            }
+
         })
     })
 }
@@ -145,6 +156,9 @@ export const validateField = ({ key, setFormState }) => {
                 if (!draft[key].regex.test(draft[key].value)) {
                     draft[key].error = true
                 }
+                else {
+                    draft[key].error = false
+                }
             }
         })
     })
@@ -153,8 +167,8 @@ export class Layer {
     constructor({ layer_type = 'Dense', activation = 'Linear', x_0 = '', x_1 = '', x_2 = '', x_3 = '', padding = '' } = {}) {
         this.id = uuidv4().slice(0, 8);
         this.layer_type = layer_type;
-        this.x_0 = new Validation({ value: x_0, required: true, regex: /^(?:0|[1-9]\d{0,2}|1000000)$/, helper: "Please enter an integer from 0 to 1000000." });
-        this.x_1 = new Validation({ value: x_1, required: true, regex: /^(?:0|[1-9]\d{0,2}|1000000)$/, helper: "Please enter an integer from 0 to 1000000." });
+        this.x_0 = new Validation({ value: x_0, required: true, regex: /^(?:1|[1-9]\d{0,5}|1000000)$/, helper: "Please enter an integer from 1 to 1000000." });
+        this.x_1 = new Validation({ value: x_1, required: true, regex: /^(?:1|[1-9]\d{0,5}|1000000)$/, helper: "Please enter an integer from 1 to 1000000." });
         this.x_2 = new Validation({ value: x_2, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 sto 1000." });
         this.x_3 = new Validation({ value: x_3, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 sto 1000." });
         this.padding = new Validation({ value: padding, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 to 1000." });
@@ -185,7 +199,7 @@ export const validateLayerDimensions = (layer, prevLayer) => {
         else {
             layer_error = false
             // console.log("2NO layer missmatch error!!!!")
-            
+
         }
     }
     else {
@@ -268,7 +282,7 @@ export const handleOpenDelDialog = (setDelDialog) => {
     console.log("handleOpenDelDioalog")
     setDelDialog(true)
 }
-export const handleCloseDelDialog = ({del, setDelDialog, delFunction=null}) => {
+export const handleCloseDelDialog = ({ del, setDelDialog, delFunction = null }) => {
     console.log("handleCloseDelDialog: del: ", del)
     console.log("handleCloseDelDialog: delFunction: ", delFunction)
     if (del && typeof delFunction === 'function') {

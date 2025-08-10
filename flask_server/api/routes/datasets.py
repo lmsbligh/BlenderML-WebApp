@@ -92,6 +92,58 @@ def get_datasets(profile_id=None):
         con.close()
 
 
+@bp.route('/get_compatible_datasets', methods=["POST"])
+def get_compatible_datasets():
+    """
+    Fetches all available datasets.
+
+    Route: /datasets.
+
+    Returns: List of datasets in JSON.
+    """
+    checkpoints = json.loads(request.data.decode('utf-8'))
+    print("checkpoints: ", checkpoints)
+    DATABASE_PATH = current_app.config["DATABASE_PATH"]
+    global DATASET_LIST
+
+    con = sqlite3.connect(DATABASE_PATH)
+    con.row_factory = sqlite3.Row  # Allows row to be treated as a dictionary
+    cur = con.cursor()
+
+    checkpoint_img_dims = []
+    compatible_datasets = []
+    for checkpoint in checkpoints:
+        try:
+            query = "SELECT imageHeight, imageWidth FROM models WHERE value = ?"
+            cur.execute(query, (checkpoint['modelId'],))
+            rows = cur.fetchall()
+            for row in rows:
+                row_dict = dict(row)
+                checkpoint_img_dims.append(row_dict)
+        except sqlite3.Error as e:
+            print("Database error:", e)
+
+    def all_same(img_dims):
+        return all(x == img_dims[0] for x in img_dims)
+
+    print("checkpoint_img_dims: ", checkpoint_img_dims)
+    if all_same(checkpoint_img_dims):
+        try:
+            query = "SELECT * FROM datasets WHERE imageWidth = ? AND imageHeight = ?"
+            cur.execute(
+                query, (checkpoint_img_dims[0]['imageWidth'], checkpoint_img_dims[0]['imageHeight'],))
+            rows = cur.fetchall()
+            for row in rows:
+                row_dict = dict(row)
+                compatible_datasets.append(row_dict)
+        except sqlite3.Error as e:
+            print("Database error:", e)
+        print(compatible_datasets)
+    else:
+        print("Error: Models with different input image resolutions selected.")
+    return compatible_datasets
+
+
 @bp.route('/submit_dataset_profile', methods=["POST"])
 def submit_dataset_profile():
     """

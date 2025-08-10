@@ -40,8 +40,9 @@ const LayerCard = ({ layerUpdater, layer, layers, index, saveCallback, delFuncti
     //     layerUpdater(localLayer)
     // }, [localLayer])
     React.useEffect(() => {
+        console.log("updated LayerCard Layers:", layers)
         let layersToPush = []
-        layers.slice(0, index+1).map((ind_layer) => {
+        layers.slice(0, index + 1).map((ind_layer) => {
             layersToPush.push({
                 "id": ind_layer.id,
                 "activation": ind_layer.activation,
@@ -68,14 +69,15 @@ const LayerCard = ({ layerUpdater, layer, layers, index, saveCallback, delFuncti
                 (json) => {
                     console.log("LayerCard: /layer_dimension_requirement response: ", json)
                     if (json.required_input_size) {
-                        setX_0_req(json.required_input_size)
+                        setX_0_req({ value: json.required_input_size, helper: json.helper })
+
                     }
                 }
             )
             .catch(error => {
                 console.error("Error fetching required input size:", error);
             });
-    }, [layers])
+    }, [layers, inputImageRes])
 
     React.useEffect(() => {
         console.log("LayerCard x_0_req: ", x_0_req)
@@ -104,13 +106,13 @@ const LayerCard = ({ layerUpdater, layer, layers, index, saveCallback, delFuncti
         })
     }
 
-    React.useEffect(() => {
-        if (localLayer && prevLayer) {
-            const [x_0_error, x_0_helper] = validateLayerDimensions(localLayer, prevLayer);
-            console.log("x_0_error: ", x_0_error)
-            updateLayerError(x_0_error, x_0_helper);
-        }
-    }, [prevLayer])
+    // React.useEffect(() => {
+    //     if (localLayer && prevLayer) {
+    //         const [x_0_error, x_0_helper] = validateLayerDimensions(localLayer, prevLayer);
+    //         console.log("x_0_error: ", x_0_error)
+    //         updateLayerError(x_0_error, x_0_helper);
+    //     }
+    // }, [prevLayer])
     // console.log(localLayer.padding)
     return (
         <Paper variant='outlined' >
@@ -125,42 +127,48 @@ const LayerCard = ({ layerUpdater, layer, layers, index, saveCallback, delFuncti
                 <SelectorLayerType layerType={localLayer.layer_type} handleChange={handleLayerTypeChange} />
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px' }}>
-                <TextField
-                    name="x_0"
-                    label="x_0"
-                    error={localLayer.x_0.error}
-                    helperText={x_0_req ? "This is determined by image resolution." : localLayer.x_0.error ? (localLayer.x_0.conditionalHelper ? localLayer.x_0.conditionalHelper : localLayer.x_0.helper) : ''}
-                    value={x_0_req ? x_0_req : localLayer.x_0.value}
-                    onBlur={() => {
-                        layerUpdater(localLayer);
-                        const [x_0_error, x_0_helper] = validateLayerDimensions(localLayer, prevLayer);
-                        console.log("x_0_error: ", x_0_error)
-                        updateLayerError(x_0_error, x_0_helper);
-                    }}
-                    disabled={x_0_req}
-                    onChange={
-                        (event) => {
-                            if (!x_0_req) {
-                                handleTextFieldChange({ eve: event, setState: setLocalLayer });
-                                validateField({ key: 'x_0', setFormState: setLocalLayer });
-                            }
-                            
-                        }} />
-                <TextField
-                    name="x_1"
-                    label="x_1"
-                    error={localLayer.x_1.error}
-                    helperText={localLayer.x_1.error ? localLayer.x_1.helper : ''}
-                    value={localLayer.x_1.value}
-                    onBlur={() => layerUpdater(localLayer)}
-                    onChange={
-                        (event) => {
-                            handleTextFieldChange({ eve: event, setState: setLocalLayer });
-                            validateField({ key: 'x_1', setFormState: setLocalLayer });
-                            validateLayerDimensions(localLayer, prevLayer)
-                        }} />
+                {localLayer.layer_type === 'Pooling' ?
+                    null
+                    :
+                    <><TextField
+                        name="x_0"
+                        label={localLayer.layer_type === "CNN" ? "Input channels" : "Input size"}
+                        error={localLayer.x_0.error}
+                        helperText={x_0_req ? x_0_req.helper : localLayer.x_0.error ? (localLayer.x_0.conditionalHelper ? localLayer.x_0.conditionalHelper : localLayer.x_0.helper) : ''}
+                        value={x_0_req ? x_0_req.value : localLayer.x_0.value}
+                        onBlur={() => {
+                            layerUpdater(localLayer);
+                            // const [x_0_error, x_0_helper] = validateLayerDimensions(localLayer, prevLayer);
+                            // console.log("x_0_error: ", x_0_error)
+                            // updateLayerError(x_0_error, x_0_helper);
+                        }}
+                        disabled={x_0_req}
+                        onChange={
+                            (event) => {
+                                if (!x_0_req) {
+                                    handleTextFieldChange({ eve: event, setState: setLocalLayer });
+                                    validateField({ key: 'x_0', setFormState: setLocalLayer });
+                                }
+
+                            }} />
+                        <TextField
+                            name="x_1"
+                            label={localLayer.layer_type === "CNN" ? "Number of filters" : "Output size"}
+                            error={localLayer.x_1.error}
+                            helperText={localLayer.x_1.error ? localLayer.x_1.helper : ''}
+                            value={localLayer.x_1.value}
+                            onBlur={() => layerUpdater(localLayer)}
+                            onChange={
+                                (event) => {
+                                    handleTextFieldChange({ eve: event, setState: setLocalLayer });
+                                    validateField({ key: 'x_1', setFormState: setLocalLayer });
+                                    validateLayerDimensions(localLayer, prevLayer)
+                                }} />
+                    </>
+                }
+
             </Box>
-            <TextField
+            {/* <TextField
                 name="padding"
                 label="padding"
                 error={localLayer.padding.error}
@@ -171,10 +179,13 @@ const LayerCard = ({ layerUpdater, layer, layers, index, saveCallback, delFuncti
                         handleTextFieldChange({ eve: event, setState: setLocalLayer })
                         validateField({ key: 'padding', setFormState: setLocalLayer });
                     }}
-                sx={{ display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px' }} />
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
-                <SelectorLayerActivation activationType={localLayer.activation} handleChange={handleActivationTypeChange} />
-            </Box>
+                sx={{ display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px' }} /> */}
+            {localLayer.layer_type === 'Pooling' ?
+                null : 
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
+                    <SelectorLayerActivation activationType={localLayer.activation} handleChange={handleActivationTypeChange} />
+                </Box>}
+
             <Tooltip title="Move down."><IconButton color='primary' onClick={() => moveFunction(index, +1)}><VerticalAlignBottomIcon /></IconButton></Tooltip>
             <Tooltip title="Add succeeding layer."><IconButton color='primary' onClick={() => addLayerFunction(index, +1)}><AddIcon /></IconButton></Tooltip>
 

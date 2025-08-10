@@ -258,13 +258,14 @@ function CreateModifyModel() {
 
 
     }
-    const textFieldUnblur = (newModelForm) => {
+    
+    const onBlurTextField = (newModelForm) => {
         console.log(newModelForm)
         setModelForm((prevModelForm) => {
             return produce(prevModelForm, (draft) => {
-
                 draft.modelName.value = newModelForm.modelName.value;
-
+                draft.imageWidth.value = newModelForm.imageWidth.value;
+                draft.imageHeight.value = newModelForm.imageHeight.value;
                 draft.description.value = newModelForm.description.value;
             });
         })
@@ -275,6 +276,7 @@ function CreateModifyModel() {
     React.useEffect(() => {
         console.log(selectedModel)
     }, [selectedModel])
+
     const updateLayer = (newLayer) => {
         console.log("updateLayer ran")
         setModelForm((prevModelForm) => {
@@ -310,7 +312,7 @@ function CreateModifyModel() {
                                     // selectedModel ? console.log("selectedModel.value:", selectedModel.value) : console.log("selectedModel is null")
                                 }
                                 {selectedModel ? <ModelPropertiesModifier
-                                    updateTextField={textFieldUnblur}
+                                    onBlurTextField={onBlurTextField}
                                     modelForm={modelForm}
                                     saveCallback={(saveFunction) => (handleTextFieldSave = saveFunction)} />
                                     : null}

@@ -3,7 +3,7 @@ import { useImmer } from 'use-immer';
 import { Paper, TextField, Box } from '@mui/material/';
 import { handleTextFieldChange, validateField } from '../../utils';
 
-function ModelPropertiesModifier({ updateTextField, modelForm, saveCallback }) {
+function ModelPropertiesModifier({ onBlurTextField, modelForm, saveCallback }) {
     const [draftModelForm, setDraftModel] = useImmer(modelForm);
     React.useEffect(() => {
         console.log("modelProperties savecallback")
@@ -36,7 +36,7 @@ function ModelPropertiesModifier({ updateTextField, modelForm, saveCallback }) {
                             validateField({ key: 'modelName', setFormState: setDraftModel })
                         }}
                         onBlur={() => {
-                            updateTextField(draftModelForm)
+                            onBlurTextField(draftModelForm)
                             validateField({ key: 'modelName', setFormState: setDraftModel })
                         }}
                         value={draftModelForm.modelName.value}
@@ -51,7 +51,7 @@ function ModelPropertiesModifier({ updateTextField, modelForm, saveCallback }) {
                             validateField({ key: 'description', setFormState: setDraftModel })
                         }}
                         onBlur={() => {
-                            updateTextField(draftModelForm)
+                            onBlurTextField(draftModelForm)
                             validateField({ key: 'description', setFormState: setDraftModel })
                         }}
                         value={draftModelForm.description.value}
@@ -69,7 +69,7 @@ function ModelPropertiesModifier({ updateTextField, modelForm, saveCallback }) {
                             validateField({ key: 'imageWidth', setFormState: setDraftModel })
                         }}
                         onBlur={() => {
-                            updateTextField(draftModelForm)
+                            onBlurTextField(draftModelForm)
                             validateField({ key: 'imageWidth', setFormState: setDraftModel })
                         }}
                         value={draftModelForm.imageWidth.value}
@@ -86,7 +86,7 @@ function ModelPropertiesModifier({ updateTextField, modelForm, saveCallback }) {
                             validateField({ key: 'imageHeight', setFormState: setDraftModel })
                         }}
                         onBlur={() => {
-                            updateTextField(draftModelForm)
+                            onBlurTextField(draftModelForm)
                             validateField({ key: 'imageHeight', setFormState: setDraftModel })
                         }}
                         value={draftModelForm.imageHeight.value}
