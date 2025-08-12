@@ -70,7 +70,11 @@ const LayerCard = ({ layerUpdater, layer, layers, index, saveCallback, delFuncti
                     console.log("LayerCard: /layer_dimension_requirement response: ", json)
                     if (json.required_input_size) {
                         setX_0_req({ value: json.required_input_size, helper: json.helper })
-
+                        setLocalLayer((localLayerData) => {
+                            return produce(localLayerData, (draft) => {
+                                draft.x_0.value = json.required_input_size
+                            })
+                        });
                     }
                 }
             )
@@ -181,7 +185,7 @@ const LayerCard = ({ layerUpdater, layer, layers, index, saveCallback, delFuncti
                     }}
                 sx={{ display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px' }} /> */}
             {localLayer.layer_type === 'Pooling' ?
-                null : 
+                null :
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
                     <SelectorLayerActivation activationType={localLayer.activation} handleChange={handleActivationTypeChange} />
                 </Box>}

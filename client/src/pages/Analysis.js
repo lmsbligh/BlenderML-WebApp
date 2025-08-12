@@ -344,121 +344,31 @@ export default function Training() {
     }
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}><Grid container>
-            <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
-                <CssBaseline />
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Grid container>
+                    <CssBaseline />
 
 
-                <AccordionModels modelData={modelData} handleCheckpointChange={handleCheckpointChange} formCheckpoints={trainingForm.checkpoints} />
-                {datasetOptions.length > 0 ?
-                    <Paper variant={'outlined'} sx={{ paddingTop: '10px' }}>
-                        <SelectorDataset
-                            error={trainingForm.trainDataset.error}
-                            datasetType={"train"}
-                            helperText={trainingForm.trainDataset.error ? trainingForm.trainDataset.helper : ''}
-                            selectedDataset={selectedTrainDataset}
-                            handleChange={(event) => {
-                                handleSelectorFormChange({
-                                    eve: event,
-                                    setSelector: setSelectedTrainDataset,
-                                    setForm: setTrainingForm,
-                                    options: datasetOptions
-                                })
-                                checkDatasetSelected(event)
-                                validateField({ key: 'trainDataset', setFormState: setTrainingForm })
 
-                            }}
-                            datasetOptions={datasetOptions} />
-                        <SelectorDataset
-                            datasetType={"CV"}
 
-                            error={trainingForm.CVDataset.error}
-                            helperText={trainingForm.CVDataset.error ? trainingForm.CVDataset.helper : ''}
-                            selectedDataset={selectedCVDataset}
-                            handleChange={(event) => {
-                                handleSelectorFormChange({
-                                    eve: event,
-                                    setSelector: setSelectedCVDataset,
-                                    setForm: setTrainingForm,
-                                    options: datasetOptions
-                                })
-                                checkDatasetSelected(event)
-                                validateField({ key: 'CVDataset', setFormState: setTrainingForm })
+                    <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
+                        <Box>
+                            {sessions ?
+                                <SessionAnalysis trainingSessions={sessions} modelData={modelData ? modelData : null} split='train' />
+                                : null}
+                        </Box>
 
-                            }}
-                            datasetOptions={datasetOptions} />
-                        <SelectorDataset
-                            datasetType={"test"}
-                            error={trainingForm.testDataset.error}
-                            helperText={trainingForm.testDataset.error ? trainingForm.testDataset.helper : ''}
-                            selectedDataset={selectedTestDataset}
-                            handleChange={(event) => {
-                                handleSelectorFormChange({
-                                    eve: event,
-                                    setSelector: setSelectedTestDataset,
-                                    setForm: setTrainingForm,
-                                    options: datasetOptions
-                                })
-                                checkDatasetSelected(event)
-                                validateField({ key: 'testDataset', setFormState: setTrainingForm })
 
-                            }}
-                            datasetOptions={datasetOptions} />
-                    </Paper>
-                    : !compatibleDatasets ? <Typography color={"#d32f2f !important"} sx={{ fontSize: "0.75rem", color: theme.palette.error.main }}>Only models with the same input image resolution can be trained in one session.</Typography> : null}
-                {selectedTrainDataset ?
-                    <TrainingHyperparams trainingForm={trainingForm} datasetSize={selectedTrainDataset.datasetSize} saveCallback={(fn) => {
-                        fetchHyperparams.current = fn;
-                    }} />
-                    : null}
+                    </Grid>
+                    <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
+                        <Box>
+                            {sessions ?
+                                <SessionAnalysis trainingSessions={sessions} modelData={modelData ? modelData : null} split='test' />
+                                : null}
+                        </Box>
 
-                {trainingMode.selected ? null : <FormHelperText sx={{ color: 'error.main' }}>{trainingMode.helper}</FormHelperText>}
-
-                <SelectorLoss
-                    error={trainingForm.lossFunction.error}
-                    selectedLoss={selectedLoss}
-                    handleChange={(event) => {
-                        handleSelectorFormChange({
-                            eve: event,
-                            setSelector: setSelectedLoss,
-                            setForm: setTrainingForm,
-                            options: lossOptions
-                        })
-                        validateField({ key: 'lossFunction', setFormState: setTrainingForm })
-                    }}
-                    lossOptions={lossOptions}
-                />
-
-                <Button
-                    variant='contained'
-                    style={{ alignSelf: 'center', width: '150px' }}
-                    onClick={handleTrain}
-                    disabled={!trainingMode.selected}
-                >
-                    Train/Test
-                </Button>
-                {isTraining ? <Button
-                    variant='contained'
-                    color='error'
-                    style={{ alignSelf: 'center', width: '150px', marginTop: '10px' }}
-                    onClick={() => {
-                        fetch("/cancel_training", { method: "POST" }).then(
-                            (response => {
-                                if (response.ok) {
-                                    setIsTraining(false)
-                                }
-                            })
-                        );
-                    }}
-                >
-                    Cancel
-                </Button> : null}
+                    </Grid>
             </Grid>
-
-            <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
-                {trainingChartData.length > 0 ? <TrainingChart data={trainingChartData} /> : null}
-            </Grid>
-        </Grid>
         </Box>
     )
 }

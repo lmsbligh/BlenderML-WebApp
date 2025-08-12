@@ -139,9 +139,10 @@ def get_compatible_datasets():
         except sqlite3.Error as e:
             print("Database error:", e)
         print(compatible_datasets)
+        return compatible_datasets
     else:
         print("Error: Models with different input image resolutions selected.")
-    return compatible_datasets
+        return []
 
 
 @bp.route('/submit_dataset_profile', methods=["POST"])

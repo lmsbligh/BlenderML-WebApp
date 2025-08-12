@@ -3,6 +3,7 @@ import GenerateMaterials from './pages/GenerateMaterials'
 import DatasetGenerator from './pages/DatasetGenerator'
 import CreateModifyModel from './pages/CreateModifyModel'
 import Training from './pages/Training'
+import Analysis from './pages/Analysis'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import CssBaseline from '@mui/material/CssBaseline';
@@ -44,6 +45,7 @@ function App() {
           <Tab value="GENERATE_MATERIALS" label="Generate Materials" />
           <Tab value="CREATE_MODEL" label="Create Model" />
           <Tab value="TRAINING" label="Training" />
+          <Tab value="ANALYSIS" label="Analysis" />
           <Tab value="DATASET_GENERATOR" label="Generate Dataset" />
 
         </Tabs>
@@ -61,6 +63,8 @@ function App() {
                 return <Training />;
               case "GENERATE_MATERIALS":
                 return <GenerateMaterials />;
+              case "ANALYSIS":
+                return <Analysis />
               default:
                 return <Typography>Default</Typography>;
             }
