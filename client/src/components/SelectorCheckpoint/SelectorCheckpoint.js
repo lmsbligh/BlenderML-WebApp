@@ -7,10 +7,10 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 
 
-function SelectorCheckpoint({ helperText, error, selectedCheckpoint, handleChange, checkpointOptions }) {
+function SelectorCheckpoint({ helperText, error, selectedCheckpoint, handleChange, checkpointOptions, forGeneration = false }) {
     return (
         <FormControl sx={{ width: "100%" }}>
-            {!selectedCheckpoint && <InputLabel >Select a checkpoint</InputLabel>}                  
+            {!selectedCheckpoint && <InputLabel >Select a checkpoint</InputLabel>}
 
             <Select
                 labelId="Checkpoint-Selector-Label"
@@ -21,11 +21,14 @@ function SelectorCheckpoint({ helperText, error, selectedCheckpoint, handleChang
                 onChange={handleChange}
                 renderValue={() => selectedCheckpoint ? selectedCheckpoint : <Typography>"Select a checkpoint"</Typography>} // Show the label as the selected text
             >
-                <MenuItem key={-1} value={"None"}>
-                    <Typography variant="body2">
+                {!forGeneration ?
+                    <MenuItem key={-1} value={"None"}>
+                        <Typography variant="body2">
                             None
-                    </Typography>
-                </MenuItem>
+                        </Typography>
+                    </MenuItem> : null
+                }
+
                 {checkpointOptions.map(option => (
                     <MenuItem key={option.id} value={option.id}>
                         <Typography variant="body2">
@@ -34,9 +37,9 @@ function SelectorCheckpoint({ helperText, error, selectedCheckpoint, handleChang
                     </MenuItem>
                 ))}
             </Select>
-            
-            <FormHelperText sx={{color: 'error.main'}}>{helperText}</FormHelperText>
-            
+
+            <FormHelperText sx={{ color: 'error.main' }}>{helperText}</FormHelperText>
+
         </FormControl>
     );
 }

@@ -105,7 +105,7 @@ export default function GenerateMaterials() {
                 })
             }
         }
-        
+
 
     }
 
@@ -123,7 +123,7 @@ export default function GenerateMaterials() {
                 "image_url": generateMaterialForm.image_url.value,
                 "image_path": generateMaterialForm.image_path.value,
                 "checkpoint": generateMaterialForm.checkpoint.value
-                }
+            }
             try {
                 fetch('generate_material', {
                     method: 'POST',
@@ -180,6 +180,7 @@ export default function GenerateMaterials() {
                         modelOptions={modelData} /> : null}
                 {selectedModel ? <SelectedModel selectedModel={selectedModel} /> : null}
                 <SelectorCheckpoint
+                    forGeneration={true}
                     selectedCheckpoint={selectedCheckpoint}
                     error={generateMaterialForm.checkpoint.error}
                     helperText={generateMaterialForm.checkpoint.error ? generateMaterialForm.checkpoint.helper : ''}
@@ -201,8 +202,12 @@ export default function GenerateMaterials() {
                         height="300"
                         image={generateMaterialForm.image_url.value}
                         alt="Placeholder" />
-                </Card>
-                <Button variant="contained" style={{ width: '100%' }} onClick={handleGenerateMaterial}>Generate</Button>
+                </Card>'
+                {selectedCheckpoint ? 
+                    <Button variant="contained" style={{ width: '100%' }} onClick={handleGenerateMaterial}>Generate</Button>
+                    : 
+                    <Button variant="contained" disabled style={{ width: '100%' }} onClick={handleGenerateMaterial}>Generate</Button>}
+
 
             </Box>
             <Box sx={{
@@ -232,7 +237,7 @@ export default function GenerateMaterials() {
                         </Typography>
                     </CardContent>
                 </Card>
-                <Button variant="contained" disabled style={{ color: 'grey', width: '100%' }}>Download Material</Button>
+                {/* <Button variant="contained" disabled style={{ color: 'grey', width: '100%' }}>Download Material</Button> */}
 
             </Box>
         </Box>

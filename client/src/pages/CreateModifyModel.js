@@ -293,7 +293,6 @@ function CreateModifyModel() {
         })
     }
     return (
-        <ThemeProvider theme={defaultTheme} >
             <Box sx={{ display: 'flex' }}>
                 <Grid container>
                     <Grid item sm={6} xs={12} sx={{
@@ -385,7 +384,6 @@ function CreateModifyModel() {
                     </Grid>
                 </Grid>
             </Box>
-        </ThemeProvider>
     )
 }
 

@@ -50,6 +50,7 @@ const AccordionModels = ({ modelData, handleCheckpointChange, formCheckpoints })
                         <Paper variant='outlined' sx={{ margin: '5px', display: 'flex', flexDirection: 'column', padding: '5px' }}>
                             <Typography>Model name: {model.modelName}</Typography>
                             <Typography>Model ID: {model.value}</Typography>
+                            <Typography>Input resolution: {model.imageWidth}x{model.imageHeight} </Typography>
                             <AccordionCheckpoints modelId={model.value} handleCheckpointChange={handleCheckpointChange} setSelectedCheckpoints={setSelectedCheckpoints} formCheckpoints={formCheckpoints}/>
                         </Paper>
 

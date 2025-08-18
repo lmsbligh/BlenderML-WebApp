@@ -48,9 +48,7 @@ function SelectorLayerActivation({ activationType, handleChange }) {
                         availableActivations.map(option => (
 
                             <MenuItem key={option.value} value={option.value}>
-                                <Card>
                                     <Typography>{option.activation}</Typography>
-                                </Card>
                             </MenuItem>
                         )) : null
                 }

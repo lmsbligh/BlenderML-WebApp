@@ -24,27 +24,19 @@ function SelectorDatasetProfile ({ selectedDatasetProfile, handleChange, profile
                   }}
             >
                 {profileOptions.length > 0 ? profileOptions.map(option => (
-                    <MenuItem key={option.value} value={option.value}>        
-                        <Card sx={{ width: "100%"}}>
-                            <CardContent>
+                    <MenuItem key={option.value} value={option.value} sx={{display: 'flex', flexDirection: 'row'}}>        
                                 <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                     {option.datasetName}
                                 </Typography>
                                 <Typography variant="body2">
                                     {option.description}
                                 </Typography>
-                            </CardContent>
-                        </Card>
                     </MenuItem>
                 )) : null}
                 <MenuItem key={-1} value={-1}>        
-                    <Card sx={{ width: "100%"}}>
-                        <CardContent>
                             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                 New Dataset Profile
                             </Typography>
-                        </CardContent>
-                    </Card>
                 </MenuItem>
             </Select>
         </FormControl>
