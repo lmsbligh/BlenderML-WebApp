@@ -27,12 +27,12 @@ function CreateModifyModel() {
         "modelName": '',
         "description": "",
         "imageWidth": 500,
-        "imageHeight": 500, 
+        "imageHeight": 500,
         "layers": [{ layer_type: 'Dense', activation: 'Linear', x_0: '', x_1: '', x_2: '', x_3: '', padding: '' }]
     }
     const defaultForm = {
         "modelName": new Validation({ required: true, regex: /^[A-Za-z0-9 -]{1,30}$/, helper: "Please enter an alphanumeric name for your model." }),
-        "description": new Validation({ regex: /^[A-Za-z0-9 -]{1,150}$/, helper: "Please enter an alphanumeric description for your model." }),
+        "description": new Validation({ regex: /^[A-Za-z0-9 -,.:/]{1,600}$/, helper: "Please enter an alphanumeric description for your model." }),
         "imageWidth": new Validation({ required: true, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 to 1000." }),
         "imageHeight": new Validation({ required: true, regex: /^(?:0|[1-9]\d{0,2}|1000)$/, helper: "Please enter an integer from 0 to 1000." }),
         "layers": []
@@ -221,7 +221,7 @@ function CreateModifyModel() {
                 }
             })
             // console.log("formInvalid ? : ", formInvalid)
-            
+
             if (!formInvalid) {
                 const modelToPush = {
                     value: selectedModel.value,
@@ -258,7 +258,7 @@ function CreateModifyModel() {
 
 
     }
-    
+
     const onBlurTextField = (newModelForm) => {
         console.log(newModelForm)
         setModelForm((prevModelForm) => {
@@ -293,97 +293,92 @@ function CreateModifyModel() {
         })
     }
     return (
-            <Box sx={{ display: 'flex' }}>
-                <Grid container>
-                    <Grid item sm={6} xs={12} sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        rowGap: "5px",
-                        columnGap: "5px",
-                        paddingRight: "10px",
-                        paddingLeft: "10px"
-                    }}>
-                        <CssBaseline />
-                        <FormControl fullWidth>
-                            {modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleModelSelectorChange} modelOptions={modelData} isModify={true} /> : null}
-                            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '10px', paddingTop: '10px' }}>
-                                {
-                                    // selectedModel ? console.log("selectedModel.value:", selectedModel.value) : console.log("selectedModel is null")
-                                }
-                                {selectedModel ? <ModelPropertiesModifier
-                                    onBlurTextField={onBlurTextField}
-                                    modelForm={modelForm}
-                                    saveCallback={(saveFunction) => (handleTextFieldSave = saveFunction)} />
-                                    : null}
-                                {
+        <Grid paddingTop={9} container>
+            <Grid item sm={6} xs={12} sx={{
+                display: "flex",
+                flexDirection: "column",
+                rowGap: "5px",
+                columnGap: "5px",
+                padding: 3
+            }}>
+                <CssBaseline />
+                <FormControl fullWidth>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 4 }}>
+                        {modelData ? <SelectorModel selectedModel={selectedModel} handleChange={handleModelSelectorChange} modelOptions={modelData} isModify={true} /> : null}
 
-                                    modelForm && selectedModel ? modelForm.layers.map((option, ind) => {
+                        {selectedModel ? <ModelPropertiesModifier
+                            onBlurTextField={onBlurTextField}
+                            modelForm={modelForm}
+                            saveCallback={(saveFunction) => (handleTextFieldSave = saveFunction)} />
+                            : null}
+                        {
 
-                                        // console.log("LayerCard about to be run");
-                                        // console.log("LayerCard from layer: ", option)
-                                        return <LayerCard
-                                            key={option.id}
-                                            layerUpdater={updateLayer}
-                                            layer={option}
-                                            layers={modelForm.layers}
-                                            index={ind}
-                                            saveCallback={(callback) => (layerCallbacks[ind] = callback)}
-                                            delFunction={handleLayerDelete}
-                                            moveFunction={handleLayerMove}
-                                            addLayerFunction={handleLayerAdd}
-                                            inputImageRes={{x: modelForm.imageWidth, y: modelForm.imageHeight}}
-                                        />
-                                    }
-                                    ) : ''
-                                }
-                            </Box>{
-                                selectedModel ?
-                                    <>
-                                        <Button variant="contained" style={{ width: '150px' }} onClick={handleModelSave}>Save</Button>
-                                        <DeleteDialog
-                                                            id="model"
-                                                            open={delModelDialog}
-                                                            handleClose={handleCloseDelDialog}
-                                                            setDelDialog={setDelModelDialog}
-                                                            delFunction={() => handleModelDelete()}
-                                                        />
-                                        <Button variant="contained" color='error' style={{ width: '150px' }} onClick={() => setDelModelDialog(true)}>Delete</Button>
-                                    </> : null
+                            modelForm && selectedModel ? modelForm.layers.map((option, ind) => {
+
+                                // console.log("LayerCard about to be run");
+                                // console.log("LayerCard from layer: ", option)
+                                return <LayerCard
+                                    key={option.id}
+                                    layerUpdater={updateLayer}
+                                    layer={option}
+                                    layers={modelForm.layers}
+                                    index={ind}
+                                    saveCallback={(callback) => (layerCallbacks[ind] = callback)}
+                                    delFunction={handleLayerDelete}
+                                    moveFunction={handleLayerMove}
+                                    addLayerFunction={handleLayerAdd}
+                                    inputImageRes={{ x: modelForm.imageWidth, y: modelForm.imageHeight }}
+                                />
                             }
+                            ) : ''
+                        }
+                    </Box>{
+                        selectedModel ?
+                            <Box sx={{ position: 'sticky', bottom: '8px', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', gap: 4, paddingTop: 4 }}>
+                                <Button variant="contained" color='error' style={{ width: '100%' }} onClick={() => setDelModelDialog(true)}>Delete</Button>
+                                <Button variant="contained" style={{ width: '100%' }} onClick={handleModelSave}>Save</Button>
+                                <DeleteDialog
+                                    id="model"
+                                    open={delModelDialog}
+                                    handleClose={handleCloseDelDialog}
+                                    setDelDialog={setDelModelDialog}
+                                    delFunction={() => handleModelDelete()}
+                                />
+                            </Box> : null
+                    }
 
-                        </FormControl>
-                    </Grid>
-                    <Grid item sm={6} xs={12} sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "flex-start",
-                        paddingLeft: "10px",
-                        paddingRight: "10px"
-                    }}>
-                        <List disablePadding sx={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            flexDirection: "column",
-                            justifyContent: "flex-start",
-                            gap: "10px",
-                            padding: "10px",
-                            border: 1,
-                            borderColor: 'rgba(0, 0, 0, 0.23)',
-                            borderRadius: 1
-                        }}>
-                            <Typography sx={{ alignSelf: "flex-start" }}>Existing checkpoints for this model:</Typography>
-                            {modelCheckpoints ? modelCheckpoints.map((option, ind) => {
-                                return <Card key={option} sx={{ padding: "10px" }}>
-                                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
-                                        <Typography sx={{ alignSelf: "center" }} color="text.primary">Checkpoint: {option.id}</Typography>
-                                        <IconButton aria-label="delete" color="primary" onClick={() => { delCheckpoint(option.id) }}><DeleteIcon /></IconButton>
-                                    </Box>
-                                </Card>
-                            }) : null}
-                        </List>
-                    </Grid>
-                </Grid>
-            </Box>
+                </FormControl>
+            </Grid>
+            {modelCheckpoints.length > 0 ? <Grid item sm={6} xs={12} sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-start",
+                paddingLeft: "10px",
+                paddingRight: "10px"
+            }}>
+                <List disablePadding sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    flexDirection: "column",
+                    justifyContent: "flex-start",
+                    gap: "10px",
+                    padding: "10px",
+                    border: 1,
+                    borderColor: 'rgba(0, 0, 0, 0.23)',
+                    borderRadius: 1
+                }}>
+                    <Typography sx={{ alignSelf: "flex-start" }}>Existing checkpoints for this model:</Typography>
+                    {modelCheckpoints ? modelCheckpoints.map((option, ind) => {
+                        return <Card key={option} sx={{ padding: "10px" }}>
+                            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
+                                <Typography sx={{ alignSelf: "center" }} color="text.primary">Checkpoint: {option.id}</Typography>
+                                <IconButton aria-label="delete" color="primary" onClick={() => { delCheckpoint(option.id) }}><DeleteIcon /></IconButton>
+                            </Box>
+                        </Card>
+                    }) : null}
+                </List>
+            </Grid> : null}
+        </Grid>
     )
 }
 

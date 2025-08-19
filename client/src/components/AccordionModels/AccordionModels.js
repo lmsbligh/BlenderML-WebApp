@@ -26,17 +26,29 @@ import AccordionCheckpoints from '../AccordionCheckpoints/AccordionCheckpoints.j
 const AccordionModels = ({ modelData, handleCheckpointChange, formCheckpoints }) => {
     const [selectedCheckpoints, setSelectedCheckpoints] = useImmer([])
     return (
-        <Box >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {formCheckpoints.length > 0 ?
-                <Box sx={{ padding: '10px' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <Typography>Selected checkpoints:</Typography>
                     {formCheckpoints.map((checkpoint) => (
-
-                        <Card sx={{ padding: '10px', marginTop: '10px' }}>
-                            <Tooltip><IconButton aria-label="delete" color="error" onClick={() => {handleCheckpointChange(checkpoint.modelId, checkpoint.checkpointId)}} ><DeleteIcon /></IconButton></Tooltip>
-                            
-                            <Typography>Checkpoint ID: {checkpoint.checkpointId == '-1' ? "New checkpoint" : checkpoint.checkpointId}</Typography>
-                            <Typography>Model ID: {checkpoint.modelId}</Typography>
+                        <Card key={checkpoint.model_id+checkpoint.id}sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Box>
+                                {console.log("!checkpoint: ", checkpoint)}
+                                {
+                                    checkpoint.name ?
+                                        <Typography>
+                                            Checkpoint name: {checkpoint.name}
+                                        </Typography>
+                                        :
+                                        <Typography>
+                                            Checkpoint ID: {checkpoint.checkpointId == '-1' ? "New checkpoint" : checkpoint.checkpointId}
+                                        </Typography>
+                                }
+                                <Typography>
+                                    Model ID: {checkpoint.model_id}
+                                </Typography>
+                            </Box>
+                            <IconButton aria-label="delete" color="error" onClick={() => { handleCheckpointChange({model_id: checkpoint.model_id, id: checkpoint.id}) }} ><DeleteIcon /></IconButton>
                         </Card>
                     ))}
                 </Box>
@@ -45,13 +57,13 @@ const AccordionModels = ({ modelData, handleCheckpointChange, formCheckpoints })
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography>Select models:</Typography>
                 </AccordionSummary>
-                <AccordionDetails sx={{ padding: '5px' }}>
+                <AccordionDetails >
                     {modelData ? modelData.map((model) => (
-                        <Paper variant='outlined' sx={{ margin: '5px', display: 'flex', flexDirection: 'column', padding: '5px' }}>
+                        <Paper variant='outlined' sx={{ gap: 3, marginTop: 3, display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
                             <Typography>Model name: {model.modelName}</Typography>
                             <Typography>Model ID: {model.value}</Typography>
                             <Typography>Input resolution: {model.imageWidth}x{model.imageHeight} </Typography>
-                            <AccordionCheckpoints modelId={model.value} handleCheckpointChange={handleCheckpointChange} setSelectedCheckpoints={setSelectedCheckpoints} formCheckpoints={formCheckpoints}/>
+                            <AccordionCheckpoints modelId={model.value} handleCheckpointChange={handleCheckpointChange} setSelectedCheckpoints={setSelectedCheckpoints} formCheckpoints={formCheckpoints} />
                         </Paper>
 
                     )) : <Typography>Error!</Typography>}

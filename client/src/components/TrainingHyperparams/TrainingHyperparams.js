@@ -66,6 +66,14 @@ const TrainingHyperparams = ({ trainingForm, datasetSize, saveCallback }) => {
                 error={localForm.epochs.error}
                 name="epochs"
                 label="Epochs"
+                sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "text.secondary",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                    },
+                }}
                 helperText={localForm.epochs.error ? localForm.epochs.helper : ''}
                 value={localForm.epochs.value}
                 onChange={(event) => {
@@ -77,6 +85,14 @@ const TrainingHyperparams = ({ trainingForm, datasetSize, saveCallback }) => {
                 error={localForm.batchSize.error}
                 name="batchSize"
                 label="Batch Size"
+                sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "text.secondary",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                    },
+                }}
                 helperText={localForm.batchSize.error ? localForm.batchSize.helper : ''}
                 value={localForm.batchSize.value}
                 onChange={(event) => {
@@ -91,6 +107,14 @@ const TrainingHyperparams = ({ trainingForm, datasetSize, saveCallback }) => {
                 helperText={localForm.learningRate.error ? localForm.learningRate.helper : ''}
                 name="learningRate"
                 label="Learning rate"
+                sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "text.secondary",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                    },
+                }}
                 value={localForm.learningRate.value}
                 onChange={(event) => {
                     handleTextFieldChange({ eve: event, setState: setLocalForm })
@@ -100,6 +124,14 @@ const TrainingHyperparams = ({ trainingForm, datasetSize, saveCallback }) => {
             <SelectorOptimizer
                 error={localForm.optimizer.error}
                 selectedOptimizer={selectedOptimizer}
+                sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "text.secondary",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                    }
+                }}
                 handleChange={(event) => {
                     handleSelectorFormChange({
                         eve: event,

@@ -13,7 +13,7 @@ MODEL_FORM = {
     },
     "description": {
         "data_type": str,
-        "regex": r"^[A-Za-z0-9 -,.:/]{1,150}$",
+        "regex": r"^[A-Za-z0-9 -,.:/]{1,600}$",
         "required": False,
         "helper": "Please enter an alphanumeric description of up to 150 characters."
     },

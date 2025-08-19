@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Typography, Card, CardContent, TextField, FormHelperText, colors } from '@mui/material';
+import { Typography, Card, CardContent, TextField, FormHelperText, colors, textFieldClasses } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -10,13 +10,21 @@ import { red } from '@mui/material/colors';
 
 function SelectorModel({ helperText, error, selectedModel, handleChange, modelOptions, isModify }) {
     return (
-        <FormControl sx={{ width: "100%" }}>
-            {!selectedModel && <InputLabel >Select a model</InputLabel>}
+        <FormControl sx={{ width: "100%" }} variant='outlined'>
+            {!selectedModel && <InputLabel >Select a Model</InputLabel>}
             <Select
                 labelId="Model-Selector-Label"
                 id="simple-select"
                 name="model"
                 error={error}
+                sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "text.secondary",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                    }
+                }}
                 value={selectedModel ? selectedModel.value : ''}
                 onChange={handleChange}
                 renderValue={() => selectedModel ? selectedModel.modelName : "Select a model" // Show the label as the selected text
@@ -44,11 +52,11 @@ function SelectorModel({ helperText, error, selectedModel, handleChange, modelOp
                         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                             New Model
                         </Typography>
-                    </MenuItem> 
+                    </MenuItem>
                     : null}
 
             </Select>
-            <FormHelperText sx={{ color: 'error.main' }}>{helperText}</FormHelperText>
+            <FormHelperText sx={{ color: 'error.main', m: 0 }}>{helperText}</FormHelperText>
         </FormControl>
     );
 }

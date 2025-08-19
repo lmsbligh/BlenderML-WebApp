@@ -37,9 +37,10 @@ function SelectorLayerType({ layerType, handleChange }) {
     return (
         <FormControl sx={{ width: "100%" }}>
             {
-                <InputLabel id="Layer-Type-Selector-Label"> Layer Type </InputLabel>}
+            <InputLabel id="Layer-Type-Selector-Label"> Layer Type </InputLabel>}
             <Select
                 labelId="Layer-Type-Selector-Label"
+                label="Layer Type"
                 id="simple-select"
                 value={selectedLayerType?.value || ''}
                 renderValue={() => selectedLayerType.layer_type}

@@ -10,12 +10,11 @@ import FormControl from '@mui/material/FormControl';
 function SelectorDatasetProfile ({ selectedDatasetProfile, handleChange, profileOptions}){
     
     return (   
-        <FormControl sx={{ width: "100%", padding: "5px" }}> 
+        <FormControl> 
             {!selectedDatasetProfile && <InputLabel >Select a dataset profile</InputLabel>}                  
             <Select
                 labelId="Dataset-Profile-Selector-Label"
                 id="simple-select"
-                sx={{width: "100%"}}
                 value={selectedDatasetProfile.value ? selectedDatasetProfile.value : 'Select a profile'}
                 onChange={handleChange}
                 renderValue={(selected) => {

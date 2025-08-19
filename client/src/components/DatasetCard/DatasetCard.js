@@ -39,7 +39,7 @@ export default function DatasetCard({ dataset, delDataset }) {
                     delFunction={() => delDataset(dataset.value)}
                 />
 
-                <IconButton aria-label="delete" color="primary" onClick={() => { setDelDatasetDialog(true) }}><DeleteIcon /></IconButton>
+                <IconButton aria-label="delete" color="error" onClick={() => { setDelDatasetDialog(true) }}><DeleteIcon /></IconButton>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
                 <Typography color="text.primary">Split: {dataset.split}</Typography>

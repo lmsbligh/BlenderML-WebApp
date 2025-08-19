@@ -10,7 +10,9 @@ const paletteTokens = {
     backgroundPaper: "#d6d6d6e0",
     textPrimary: "#000000",
     textSecondary: "#353434",
-    outline: "#48a15b",
+    outlineSelected: "#48a15b",
+    outlinePrimary: "#000000",
+    outlineSecondary: "#353434",
     menuEven: "#f5f5f5",
     menuOdd: "#e0e0e0",
     menuHover: "#d6d6d6",
@@ -23,7 +25,9 @@ const paletteTokens = {
     backgroundPaper: "#1e1e1e",
     textPrimary: "#ffffff",
     textSecondary: "#b0b0b0",
-    outline: "#48a15b",
+    outlineSelected: "#48a15b",
+    outlinePrimary: "#ffffff",
+    outlineSecondary: "#b0b0b0",
     menuEven: "#1e1e1e",
     menuOdd: "#121212",
     menuHover: "#3a8049",
@@ -48,7 +52,8 @@ const getTheme = (mode = "light") => {
         secondary: colors.textSecondary,
       },
       outline: {
-        paper: colors.outline,
+        paper: colors.outlinePrimary,
+        input: colors.outlineSecondary
       },
     },
     typography: {
@@ -58,6 +63,7 @@ const getTheme = (mode = "light") => {
       body1: { fontSize: "1rem" },
       body2: { fontSize: "0.875rem" },
     },
+    spacing: 2,
     components: {
       MuiMenuItem: {
         styleOverrides: {
@@ -82,10 +88,34 @@ const getTheme = (mode = "light") => {
       MuiButton: {
         styleOverrides: {
           root: {
+            size: "large",
             borderRadius: 4,
             textTransform: "none",
           },
         },
+      },
+      MuiIconButton: {
+        defaultProps: {
+          size: "small",
+        },
+        styleOverrides: {
+          root: {
+            padding: 1,
+          },
+        },
+      },
+      MuiSelect: {
+        defaultProps: {
+          size: "small",
+        }
+      },
+      MuiFormControl: {
+        defaultProps: {
+          size: "small",
+          padding: 3,
+          gap: 3,
+          fullWidth: true,  // cleaner than width: 100% in sx
+        }
       },
       MuiTabs: {
         styleOverrides: {
@@ -114,20 +144,46 @@ const getTheme = (mode = "light") => {
       MuiPaper: {
         styleOverrides: {
           root: {
-            backgroundImage: "none",
-            border: `1px solid ${colors.textSecondary}`,
+            border: `1px solid ${colors.outlineSecondary}`,
+            padding: 6,
+            gap: 3
           },
         },
       },
+      MuiImageList: {
+        styleOverrides: {
+          root: {
+            padding: 6,
+            gap: 3,
+            margin: 0
+          }
+        }
+      },
+
       MuiTextField: {
         defaultProps: {
           variant: "outlined",
           size: "small",
+          width: "100%"
         },
+        styleOverrides: {
+          root: {
+            width: "100%"
+          }
+        }
       },
       MuiOutlinedInput: {
         styleOverrides: {
+          notchedOutline: {
+            borderColor: `${colors.outlineSecondary}`,
+          },
           root: {
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: `${colors.primary}`,
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: `${colors.primary}`,
+            },
             backgroundColor: colors.backgroundPaper,
           },
         },
@@ -135,11 +191,48 @@ const getTheme = (mode = "light") => {
       MuiAccordion: {
         styleOverrides: {
           root: {
+            padding: 3,
             boxShadow: "none",
             border: `1px solid ${colors.textSecondary}`,
+            borderRadius: '4px',
+            '&:not(:last-child)': { marginBottom: 1 }, // = theme.spacing(4) * 1
+            // prevent extra margin when expanded
+            '&.Mui-expanded': { margin: 0 },
           },
         },
       },
+      MuiAccordionSummary: {
+        styleOverrides: {
+          root: {
+            minHeight: 3,                // align with TextField size="small" (≈40px)
+            '&.Mui-expanded': { minHeight: 40 },
+            '& .MuiAccordionSummary-content': {
+              margin: 0,
+              alignItems: 'center',
+              gap: 3,
+              padding: 3
+            },
+          },
+          expandIconWrapper: {
+            color: 'text.secondary',
+            '&.Mui-expanded': { transform: 'rotate(180deg)' },
+          },
+        },
+      },
+      MuiAccordionDetails: {
+        styleOverrides: {
+          root: {
+            padding: 3,
+            borderColor: 'divider',
+          },
+        },
+      },
+      MuiSlider: {
+        styleOverrides: {
+          root: {
+          }
+        }
+      }
     },
   });
 };

@@ -345,27 +345,16 @@ export default function Training() {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Grid container>
-                    <CssBaseline />
-
-
-
-
-                    <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
-                        <Box>
+            <Grid paddingTop={9} container>
+                    <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: 3, padding: 3, alignContent: "space-around" }}>
                             {sessions ?
                                 <SessionAnalysis trainingSessions={sessions} modelData={modelData ? modelData : null} split='train' />
                                 : null}
-                        </Box>
-
-
                     </Grid>
-                    <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
-                        <Box>
+                    <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: 3, padding: 3, alignContent: "space-around" }}>
                             {sessions ?
                                 <SessionAnalysis trainingSessions={sessions} modelData={modelData ? modelData : null} split='test' />
                                 : null}
-                        </Box>
 
                     </Grid>
             </Grid>

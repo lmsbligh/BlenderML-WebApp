@@ -15,6 +15,14 @@ function SelectorOtimizer({ selectedOptimizer, handleChange, optimizerOptions })
                 label="Optimizer"
                 id="simple-select"
                 name="optimizer"
+                sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "text.secondary",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                    }
+                }}
                 onChange={handleChange}
                 value={selectedOptimizer ? selectedOptimizer.label : ''}
                 renderValue={() => selectedOptimizer ? selectedOptimizer.label : "Select an optimizer" // Show the label as the selected text

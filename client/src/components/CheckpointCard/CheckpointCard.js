@@ -91,7 +91,7 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
             }
         }, 0)
     }
-    const checked = formCheckpoints.some(item => item.checkpointId === checkpoint.id && item.modelId === checkpoint.model_id)
+    const checked = formCheckpoints.some(item => item.id === checkpoint.id && item.model_id === checkpoint.model_id)
 
     const delCheckpoint = () => {
         pushData(`delete_checkpoint/${checkpoint.model_id}/${checkpoint.id}`).then(() => {
@@ -101,9 +101,9 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
     const [delDialog, setDelDialog] = React.useState(false);
 
     return (
-        <Paper variant='outlined' >
+        <Paper variant='outlined' sx={{ marginTop: 3, gap: 3, display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }} >
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Tooltip title="Select for training"><Checkbox data-model-id={checkpoint.model_id} checked={checked} data-checkpoint-id={checkpoint.id} onChange={(event) => handleCheckpointChange(checkpoint.model_id, checkpoint.id)} /></Tooltip>
+                <Tooltip title="Select for training"><Checkbox data-model-id={checkpoint.model_id} checked={checked} data-checkpoint-id={checkpoint.id} onChange={(event) => handleCheckpointChange(checkpoint)} /></Tooltip>
                 <Tooltip>
                     <DeleteDialog id={"checkpoint"} open={delDialog} handleClose={handleCloseDelDialog} setDelDialog={setDelDialog} delFunction={delCheckpoint} />
                     <IconButton onClick={() => { handleOpenDelDialog(setDelDialog) }} aria-label="delete" color="error" >
@@ -111,7 +111,7 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
                     </IconButton>
                 </Tooltip>
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 3 }}>
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Typography >Checkpoint Name: {editName ? localFields.name.value : ""} </Typography>
                     {editName ?
@@ -170,7 +170,7 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
                 <Typography>Checkpoint ID: {checkpoint.id} </Typography>
                 <Typography>Base Model: {checkpoint.model_id} </Typography>
                 {testSessions.length > 0 ?
-                    <Accordion>
+                    <Accordion sx={{ padding: 0 }}>
                         <AccordionSummary expandIcon={<SpeedIcon color='primary' />} sx={{
                             '& .MuiAccordionSummary-expandIconWrapper': {
                                 transform: 'none !important',
@@ -180,12 +180,12 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
                             },
                         }}>
                             Show test history
-                        </AccordionSummary>
+                        </AccordionSummary >
                         <AccordionDetails>
                             {testSessions.map((option) => {
                                 const matchingMetric = testMetrics.find((metric) => metric.runId === option.id)
                                 if (option.cv_dataset) {
-                                    return <Paper variant="outlined" sx={{ padding: "5px", margin: "5px" }}>
+                                    return <Paper variant="outlined" sx={{ bgcolor: 'background.default' }}>
                                         <Typography>CV set: {option.cv_dataset}</Typography>
                                         <Typography>Loss function: {option.loss_function}</Typography>
                                         <Typography>Loss: {matchingMetric ? matchingMetric.data?.[0].loss : 'N/A'}</Typography>
@@ -193,7 +193,7 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
 
                                 }
                                 if (option.test_dataset) {
-                                    return <Paper variant="outlined" sx={{ padding: "5px", margin: "5px" }}>
+                                    return <Paper variant="outlined" sx={{ bgcolor: 'background.default' }}>
                                         <Typography>Test set: {option.test_dataset}</Typography>
                                         <Typography>Loss function: {option.loss_function}</Typography>
                                         <Typography>Loss: {matchingMetric ? matchingMetric.data?.[0].loss : 'N/A'}</Typography>
@@ -203,15 +203,12 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
                         </AccordionDetails>
                     </Accordion> : null}
                 <Accordion>
-                    <AccordionSummary
-                        expandIcon={<HubIcon color='primary' />}
-                    >
+                    <AccordionSummary expandIcon={<HubIcon color='primary' />}>
                         Show training history.
                     </AccordionSummary>
                     <AccordionDetails>
-                        <List >
                             {trainingTree ? trainingTree.map((option) => (option.training_dataset ?
-                                <Paper key={option.id} variant="outlined" sx={{ padding: "5px", margin: "5px" }}>
+                                <Paper key={option.id} variant="outlined" sx={{display: 'flex', flexDirection: 'column', gap: 3, bgcolor: 'background.default' }}>
                                     <Typography>
                                         Checkpoint: {option.id}
                                     </Typography>
@@ -222,9 +219,7 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
                                         Dataset trained on: {option.training_dataset}
                                     </Typography>
                                     <Accordion>
-                                        <AccordionSummary
-
-                                        >
+                                        <AccordionSummary >
                                             Show hyperparameters.
                                         </AccordionSummary>
                                         <AccordionDetails>
@@ -258,7 +253,6 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
                                     </Accordion>
                                 </Paper> : null)
                             ) : null}
-                        </List>
                     </AccordionDetails>
                 </Accordion>
             </Box>

@@ -61,15 +61,16 @@ export default function TrainingChart({ data = null, id = null }) {
             position: 'sticky',
             top: '64px', // distance from the top of the viewport
             zIndex: 1,
-            backgroundColor: 'white', // helps avoid content bleed
+            backgroundColor: 'background.default', // helps avoid content bleed
             padding: '10px'
         }}>
-            <Typography sx={{ mb: 1, textAlign: "center" }}>
+            <Typography sx={{ mb: 1, textAlign: "center" }} >
                 Training Session Running Loss
             </Typography>
 
             <ResponsiveContainer width="100%" height={300} >
-                <LineChart data={processedData.flatMap(run => run.data)}>
+                <LineChart data={processedData.flatMap(run => run.data)}
+                    >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" dataKey="step" tickFormatter={(value, index) => {
                         const flattened = processedData.flatMap(run => run.data);

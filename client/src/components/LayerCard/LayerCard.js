@@ -17,28 +17,13 @@ import SelectorLayerActivation from '../SelectorLayerActivation/SelectorLayerAct
 import { fetchData, handleTextFieldChange, pushData, validateField, validateLayerDimensions } from '../../utils.js';
 
 const LayerCard = ({ layerUpdater, layer, layers, index, saveCallback, delFunction, moveFunction, addLayerFunction, inputImageRes }) => {
-    //console.log("LayerCard ran with props:", layer, index, delFunction);
-
-    // const [blocalLayer, bsetLocalLayer] = useImmer({
-    //     "activation": layer.activation,
-    //     "id": layer.id,
-    //     "layer_type": layer.layer_type,
-    //     "padding": structuredClone(layer.padding),
-    //     "x_0": structuredClone(layer.x_0),
-    //     "x_1": structuredClone(layer.x_1),
-    //     "x_2": structuredClone(layer.x_2),
-    //     "x_3": structuredClone(layer.x_3)
-    // });
     const [localLayer, setLocalLayer] = useImmer(structuredClone(layer));
     const [x_0_req, setX_0_req] = React.useState(null)
     const prevLayer = index > 0 ? layers[index - 1] : null
     React.useEffect(() => {
-        //console.log("saveCallback, localLayer: ", localLayer)
         saveCallback(() => (localLayer))
     }, [localLayer, saveCallback])
-    // React.useEffect(() => {
-    //     layerUpdater(localLayer)
-    // }, [localLayer])
+
     React.useEffect(() => {
         console.log("updated LayerCard Layers:", layers)
         let layersToPush = []
@@ -101,40 +86,27 @@ const LayerCard = ({ layerUpdater, layer, layers, index, saveCallback, delFuncti
         });
     };
 
-    const updateLayerError = (error, helper) => {
-        setLocalLayer((localLayerData) => {
-            return produce(localLayerData, (draft) => {
-                draft.x_0.error = error;
-                draft.x_0.conditionalHelper = helper;
-            })
-        })
-    }
-
-    // React.useEffect(() => {
-    //     if (localLayer && prevLayer) {
-    //         const [x_0_error, x_0_helper] = validateLayerDimensions(localLayer, prevLayer);
-    //         console.log("x_0_error: ", x_0_error)
-    //         updateLayerError(x_0_error, x_0_helper);
-    //     }
-    // }, [prevLayer])
-    // console.log(localLayer.padding)
     return (
-        <Paper variant='outlined' >
-            <Tooltip title="Move up."><IconButton color='primary' onClick={() => moveFunction(index, -1)}><VerticalAlignTopIcon /></IconButton></Tooltip>
-            <Tooltip title="Add preceding layer."><IconButton color='primary' onClick={() => addLayerFunction(index, -1)}><AddIcon /></IconButton></Tooltip>
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
-                <Typography>Layer {index + 1}</Typography>
-                <IconButton aria-label="delete" color="primary" onClick={() => delFunction(index)}><DeleteIcon /></IconButton>
+        <Paper variant='outlined'>
 
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3, paddingBottom: 3 }}>
+                <Box sx={{ display: 'flex', gap: 1, flex: 1 }}>
+                    <Tooltip title="Move up."><IconButton color='primary' onClick={() => moveFunction(index, -1)}><VerticalAlignTopIcon /></IconButton></Tooltip>
+                    <Tooltip title="Add preceding layer."><IconButton color='primary' onClick={() => addLayerFunction(index, -1)}><AddIcon /></IconButton></Tooltip>
+                </Box>
+
+                <Typography sx={{ alignSelf: 'centre' }}>Layer {index + 1}</Typography>
+                <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                    <IconButton aria-label="delete" color="primary" onClick={() => delFunction(index)}><DeleteIcon /></IconButton>
+                </Box>
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
-                <SelectorLayerType layerType={localLayer.layer_type} handleChange={handleLayerTypeChange} />
-            </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px' }}>
-                {localLayer.layer_type === 'Pooling' ?
+
+
+            {
+                localLayer.layer_type === 'Pooling' ?
                     null
                     :
-                    <><TextField
+                    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3, paddingTop: 3, paddingBottom: 3 }}><TextField
                         name="x_0"
                         label={localLayer.layer_type === "CNN" ? "Input channels" : "Input size"}
                         error={localLayer.x_0.error}
@@ -168,32 +140,25 @@ const LayerCard = ({ layerUpdater, layer, layers, index, saveCallback, delFuncti
                                     validateField({ key: 'x_1', setFormState: setLocalLayer });
                                     validateLayerDimensions(localLayer, prevLayer)
                                 }} />
-                    </>
-                }
+                    </Box>
+            }
 
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: 3, paddingBottom: 3 }}>
+                <SelectorLayerType layerType={localLayer.layer_type} handleChange={handleLayerTypeChange} />
             </Box>
-            {/* <TextField
-                name="padding"
-                label="padding"
-                error={localLayer.padding.error}
-                helperText={localLayer.padding.error ? localLayer.padding.helper : ''}
-                value={localLayer.padding.value}
-                onChange={
-                    (event) => {
-                        handleTextFieldChange({ eve: event, setState: setLocalLayer })
-                        validateField({ key: 'padding', setFormState: setLocalLayer });
-                    }}
-                sx={{ display: 'flex', flexDirection: 'row', gap: '10px', padding: '10px' }} /> */}
-            {localLayer.layer_type === 'Pooling' ?
-                null :
-                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
-                    <SelectorLayerActivation activationType={localLayer.activation} handleChange={handleActivationTypeChange} />
-                </Box>}
+
+            {
+                localLayer.layer_type === 'Pooling' ?
+                    null :
+                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: 3 }}>
+                        <SelectorLayerActivation activationType={localLayer.activation} handleChange={handleActivationTypeChange} />
+                    </Box>
+            }
 
             <Tooltip title="Move down."><IconButton color='primary' onClick={() => moveFunction(index, +1)}><VerticalAlignBottomIcon /></IconButton></Tooltip>
             <Tooltip title="Add succeeding layer."><IconButton color='primary' onClick={() => addLayerFunction(index, +1)}><AddIcon /></IconButton></Tooltip>
 
-        </Paper>
+        </Paper >
     )
 }
 

@@ -15,6 +15,14 @@ function SelectorLoss({ selectedLoss, handleChange, lossOptions }) {
                 id="simple-select"
                 name="lossFunction"
                 onChange={handleChange}
+                sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "text.secondary",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                    }
+                }}
                 value={selectedLoss ? selectedLoss.label : ''}
                 renderValue={() => selectedLoss ? selectedLoss.label : "Select a loss function" // Show the label as the selected text
                 }

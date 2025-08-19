@@ -38,7 +38,6 @@ function SessionAnalysis({ trainingSessions, modelData, split }) {
         return dateObj
     }
     return (
-
         <>
             <Typography>{split === "train" ? "Training" : "Test"} Session Analysis</Typography>
             {chartData.length > 0 ? split === "train" ? <TrainingChart data={chartData} /> : <TestChart data={chartData} /> : null}
@@ -46,7 +45,7 @@ function SessionAnalysis({ trainingSessions, modelData, split }) {
                 trainingSessions ?
                     trainingSessions.filter((session) => (split_enum.includes(session.split)))
                         .sort((a, b) => parseSessionId(b.session_id) - parseSessionId(a.session_id)).map((session, i) => (
-                            <TrainingSessionCard key={session.id}session={session} models={modelData ? modelData : null} chartData={chartData} setChartData={setChartData} />
+                            <TrainingSessionCard key={session.id} session={session} models={modelData ? modelData : null} chartData={chartData} setChartData={setChartData} />
                         ))
                     :
                     null

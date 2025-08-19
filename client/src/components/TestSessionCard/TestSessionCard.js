@@ -45,8 +45,7 @@ function TrainingSessionCard({ session, models, chartData, setChartData}) {
     // }
 
     return (
-        <ListItem key={session.id}>
-            <Card sx={{ backgroundColor: "primary", variant: "outlined", padding: "5px" }}>
+            <Card key={session.id} sx={{ backgroundColor: "primary", variant: "outlined"}}>
                 <IconButton aria-label="graph" data-run-id={session.id} color="primary"
                     onClick={(event) => { handleGraphClick(event) }
                     }>
@@ -80,7 +79,6 @@ function TrainingSessionCard({ session, models, chartData, setChartData}) {
                 {session.test_dataset ? <Typography>Test Dataset: {session.test_dataset}</Typography> : null}
                 {session.training_dataset ? <Typography>Training Dataset: {session.training_dataset}</Typography> : null}
             </Card>
-        </ListItem>
     )
 }
 

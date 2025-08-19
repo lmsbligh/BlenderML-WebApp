@@ -113,7 +113,7 @@ export default function DatasetGenerator() {
         },
     ];
     const [delProfileDialog, setDelProfileDialog] = React.useState(false);
-    
+
     function valuetext(value) {
         return `${Math.ceil(value)}%`;
     }
@@ -278,196 +278,183 @@ export default function DatasetGenerator() {
         }
     }
 
-    
+
 
     return (
-        <Box sx={{
-            width: "100%",
-            display: 'flex',
-            flexDirection: "row",
-            alignItems: "left",
-            justifyContent: 'center',
-            alignSelf: "left",
-            gap: '10px',
-        }}>
-            <Grid container>
-                <Grid item sm={6} xs={12} sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    rowGap: "5px",
-                    columnGap: "5px",
-                    paddingRight: "10px",
-                    paddingLeft: "10px"
-                }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Grid paddingTop={9} container>
+                <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: 3, padding: 3, alignContent: "space-around" }}>
                     <SelectorDatasetProfile
                         selectedDatasetProfile={selectedDatasetProfile}
                         handleChange={handleProfileChange}
                         profileOptions={profileOptions}
                     />
-                    {'value' in selectedDatasetProfile ? <Box>
-                        <TextField
-                            name="datasetName"
-                            onChange={(event) => {
-                                handleTextFieldChange({ eve: event, setState: setProfileForm })
-                                validateField({ key: 'datasetName', setFormState: setProfileForm })
-                            }}
-                            onBlur={() => { validateField({ key: 'datasetName', setFormState: setProfileForm }) }}
-                            sx={{ width: "50%", padding: "5px" }}
-                            label="Dataset Name"
-                            error={profileForm.datasetName.error}
-                            helperText={profileForm.datasetName.error ? profileForm.datasetName.helper : ''}
-                            value={profileForm.datasetName.value}></TextField>
-                        <TextField
-                            name="datasetSize"
-                            onChange={(event) => {
-                                handleTextFieldChange({ eve: event, setState: setProfileForm })
-                                validateField({ key: 'datasetSize', setFormState: setProfileForm })
-                            }}
-                            onBlur={() => { validateField({ key: 'datasetSize', setFormState: setProfileForm }) }}
-                            sx={{ width: "50%", padding: "5px" }}
-                            label="Dataset Size"
-                            error={profileForm.datasetSize.error}
-                            helperText={profileForm.datasetSize.error ? profileForm.datasetSize.helper : ''}
-                            value={profileForm.datasetSize.value}></TextField>
-
-                        <Box sx={{ position: 'relative', mt: 2, padding: "5px" }}>
-                            <InputLabel
-                                shrink
-                                sx={{
-                                    position: 'absolute',
-                                    top: '-10px',
-                                    left: '12px',
-                                    backgroundColor: 'white',
-                                    paddingX: '4px',
-                                }}
-                            >
-                                Cross Validation Set %:
-                            </InputLabel>
-
-                            <Box
-                                sx={{
-                                    border: '1px solid rgba(0, 0, 0, 0.23)',
-                                    borderRadius: '4px',
-                                    padding: '16px',
-                                    width: '50%'
-
-                                }}
-                            >
-                                <Slider
-                                    aria-label="Always visible"
-                                    label="CVPercentage"
-                                    name="CVPercentage"
-                                    onChange={sliderHandleChange}
-                                    value={Number(profileForm.CVPercentage.value)}
-                                    getAriaValueText={(value) => `${value}%`}
-                                    step={1}
-                                    min={0}
-                                    max={30}
-                                    valueLabelDisplay="auto"
-                                    marks={marks}
-                                // valueLabelFormat={(x) => Math.ceil(x * 0.3)}
-
-                                />
-                            </Box>
-                        </Box>
-                        <Box sx={{ position: 'relative', mt: 2, padding: '5px' }}>
-                            <InputLabel
-                                shrink
-                                sx={{
-                                    position: 'absolute',
-                                    top: '-10px',
-                                    left: '12px',
-                                    backgroundColor: 'white',
-                                    paddingX: '4px',
-                                }}
-                            >
-                                Test Set %:
-                            </InputLabel>
-
-                            <Box
-                                sx={{
-                                    border: '1px solid rgba(0, 0, 0, 0.23)',
-                                    borderRadius: '4px',
-                                    padding: '16px',
-                                    width: '50%'
-                                }}
-                            >
-                                <Slider
-                                    aria-label="Always visible"
-                                    label="TestSetPercentage"
-                                    name="TestSetPercentage"
-                                    onChange={sliderHandleChange}
-                                    value={Number(profileForm.TestSetPercentage.value)}
-                                    getAriaValueText={(value) => `${value}%`}
-                                    step={1}
-                                    min={0}
-                                    max={30}
-                                    valueLabelDisplay="auto"
-                                    marks={marks}
-                                />
-                            </Box>
-                        </Box>
-
-                        <Box sx={{
-                            display: "flex",
-                            flexDirection: "horizontal"
-                        }}>
+                    {'value' in selectedDatasetProfile ?
+                        <>
                             <TextField
-                                name="imageWidth"
+                                name="datasetName"
                                 onChange={(event) => {
                                     handleTextFieldChange({ eve: event, setState: setProfileForm })
-                                    validateField({ key: 'imageWidth', setFormState: setProfileForm })
+                                    validateField({ key: 'datasetName', setFormState: setProfileForm })
                                 }}
-                                label="Image width"
-                                error={profileForm.imageWidth.error}
-                                helperText={profileForm.imageWidth.error ? profileForm.imageWidth.helper : ''}
-                                value={profileForm.imageWidth.value}
-                                sx={{ padding: "5px" }}></TextField>
+                                onBlur={() => { validateField({ key: 'datasetName', setFormState: setProfileForm }) }}
+                                label="Dataset Name"
+                                error={profileForm.datasetName.error}
+                                helperText={profileForm.datasetName.error ? profileForm.datasetName.helper : ''}
+                                value={profileForm.datasetName.value}></TextField>
                             <TextField
-                                name="imageHeight"
+                                name="datasetSize"
                                 onChange={(event) => {
                                     handleTextFieldChange({ eve: event, setState: setProfileForm })
-                                    validateField({ key: 'imageHeight', setFormState: setProfileForm })
+                                    validateField({ key: 'datasetSize', setFormState: setProfileForm })
                                 }}
-                                label="Image height"
-                                error={profileForm.imageHeight.error}
-                                helperText={profileForm.imageHeight.error ? profileForm.imageHeight.helper : ''}
-                                value={profileForm.imageHeight.value}
-                                sx={{ padding: "5px" }}></TextField>
-                        </Box>
-                        <TextField
-                            name="description"
-                            multiline
-                            maxRows={4}
-                            onChange={(event) => {
-                                handleTextFieldChange({ eve: event, setState: setProfileForm })
-                                validateField({ key: 'description', setFormState: setProfileForm })
-                            }}
-                            label="Profile description"
-                            error={profileForm.description.error}
-                            helperText={profileForm.description.error ? profileForm.description.helper : ''}
-                            value={profileForm.description.value}
-                            sx={{ padding: "5px", width: "100%" }}></TextField>
-                        <FormControlLabel control={<Checkbox checked={Boolean(profileForm.randomOrientation.value || false)} onChange={handleRandomOrientationChange} sx={{ padding: "10px" }} />} label="Randomized orientation" />
-                        <Box sx={{
-                            display: "flex",
-                            flexDirection: "horizontal",
-                            justifyContent: 'space-between'
-                        }}>
-                            <Button variant="contained" sx={{ width: "49%" }} label="Save Profile" onClick={handleProfileSave}>Save Preset</Button>
-                            <DeleteDialog id={"checkpoint"} open={delProfileDialog} handleClose={handleCloseDelDialog} setDelDialog={setDelProfileDialog} delFunction={() => handleProfileDelete(selectedDatasetProfile.value)} />
-                            <Button variant="contained" color="error" sx={{ width: "49%" }} label="Delete Profile" onClick={() => setDelProfileDialog(true)}>Delete Profile</Button>
-                            <Button variant="contained" sx={{ width: "49%" }} label="Generate Dataset" onClick={handleGenerateDataset}>Generate Dataset</Button>
-                        </Box>
-                    </Box> : null}
+                                onBlur={() => { validateField({ key: 'datasetSize', setFormState: setProfileForm }) }}
+                                label="Dataset Size"
+                                error={profileForm.datasetSize.error}
+                                helperText={profileForm.datasetSize.error ? profileForm.datasetSize.helper : ''}
+                                value={profileForm.datasetSize.value}></TextField>
+
+                            <Box sx={{ position: 'relative', marginTop: 6, padding: 0 }}>
+                                <InputLabel
+                                    shrink
+                                    sx={{
+                                        position: 'absolute',
+                                        top: '-12px',
+                                        left: '12px',
+                                        backgroundColor: 'alpha(0,0,0,0)',
+                                        paddingX: '4px',
+                                    }}
+                                >
+                                    Cross Validation Set %
+                                </InputLabel>
+
+                                <Box
+                                    sx={{
+                                        border: '1px solid',
+                                        borderColor: 'outline.input',
+                                        backgroundColor: 'background.paper',
+                                        borderRadius: '4px',
+                                        padding: '16px',
+
+                                    }}
+                                >
+                                    <Slider
+                                        aria-label="Always visible"
+                                        label="CVPercentage"
+                                        name="CVPercentage"
+                                        onChange={sliderHandleChange}
+                                        value={Number(profileForm.CVPercentage.value)}
+                                        getAriaValueText={(value) => `${value}%`}
+                                        step={1}
+                                        min={0}
+                                        max={30}
+                                        valueLabelDisplay="auto"
+                                        marks={marks}
+                                    // valueLabelFormat={(x) => Math.ceil(x * 0.3)}
+
+                                    />
+                                </Box>
+                            </Box>
+                            <Box sx={{ position: 'relative', mt: 2, marginTop: 6 }}>
+                                <InputLabel
+                                    shrink
+                                    sx={{
+                                        position: 'absolute',
+                                        top: '-12px',
+                                        left: '12px',
+                                        backgroundColor: 'alpha(0,0,0,0)',
+                                        paddingX: '4px',
+                                    }}
+                                >
+                                    Test Set %
+                                </InputLabel>
+
+                                <Box
+                                    sx={{
+                                        border: '1px solid',
+                                        borderColor: 'outline.input',
+                                        backgroundColor: 'background.paper',
+                                        borderRadius: '4px',
+                                        padding: '16px',
+                                        width: '50%'
+                                    }}
+                                >
+                                    <Slider
+                                        aria-label="Always visible"
+                                        label="TestSetPercentage"
+                                        name="TestSetPercentage"
+                                        onChange={sliderHandleChange}
+                                        value={Number(profileForm.TestSetPercentage.value)}
+                                        getAriaValueText={(value) => `${value}%`}
+                                        step={1}
+                                        min={0}
+                                        max={30}
+                                        valueLabelDisplay="auto"
+                                        marks={marks}
+                                    />
+                                </Box>
+                            </Box>
+
+                            <Box sx={{
+                                display: "flex",
+                                flexDirection: "horizontal",
+                                gap: 3
+                            }}>
+                                <TextField
+                                    name="imageWidth"
+                                    onChange={(event) => {
+                                        handleTextFieldChange({ eve: event, setState: setProfileForm })
+                                        validateField({ key: 'imageWidth', setFormState: setProfileForm })
+                                    }}
+                                    label="Image width"
+                                    error={profileForm.imageWidth.error}
+                                    helperText={profileForm.imageWidth.error ? profileForm.imageWidth.helper : ''}
+                                    value={profileForm.imageWidth.value}
+                                ></TextField>
+                                <TextField
+                                    name="imageHeight"
+                                    onChange={(event) => {
+                                        handleTextFieldChange({ eve: event, setState: setProfileForm })
+                                        validateField({ key: 'imageHeight', setFormState: setProfileForm })
+                                    }}
+                                    label="Image height"
+                                    error={profileForm.imageHeight.error}
+                                    helperText={profileForm.imageHeight.error ? profileForm.imageHeight.helper : ''}
+                                    value={profileForm.imageHeight.value} />
+                            </Box>
+                            <TextField
+                                name="description"
+                                multiline
+                                maxRows={4}
+                                onChange={(event) => {
+                                    handleTextFieldChange({ eve: event, setState: setProfileForm })
+                                    validateField({ key: 'description', setFormState: setProfileForm })
+                                }}
+                                label="Profile description"
+                                error={profileForm.description.error}
+                                helperText={profileForm.description.error ? profileForm.description.helper : ''}
+                                value={profileForm.description.value} />
+
+
+                            <FormControlLabel control={<Checkbox checked={Boolean(profileForm.randomOrientation.value || false)} onChange={handleRandomOrientationChange} sx={{ padding: "10px" }} />} label="Randomized orientation" />
+                            <Box sx={{
+                                display: "flex",
+                                flexDirection: "horizontal",
+                                justifyContent: 'space-between',
+                                gap: 3
+                            }}>
+                                <Button variant="contained" color="error" sx={{ width: "49%" }} label="Delete Profile" onClick={() => setDelProfileDialog(true)}>Delete Profile</Button>
+                                <Button variant="contained" sx={{ width: "49%" }} label="Save Profile" onClick={handleProfileSave}>Save Preset</Button>
+                                <DeleteDialog id={"checkpoint"} open={delProfileDialog} handleClose={handleCloseDelDialog} setDelDialog={setDelProfileDialog} delFunction={() => handleProfileDelete(selectedDatasetProfile.value)} />
+                                <Button variant="contained" sx={{ width: "49%" }} label="Generate Dataset" onClick={handleGenerateDataset}>Generate Dataset</Button>
+                            </Box>
+                        </> : null}
                 </Grid>
                 {selectedDatasetProfile?.value ? (
                     <Grid item sm={6} xs={12} sx={{
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "flex-start",
-                        paddingLeft: "10px",
-                        paddingRight: "10px"
                     }}>
                         <Box sx={{
                             display: "flex",
@@ -479,9 +466,10 @@ export default function DatasetGenerator() {
                                 <Box sx={{
                                     display: "flex",
                                     flexWrap: "wrap",
-                                    flexDirection: "column",
+                                    flexDirection: "row",
                                     justifyContent: 'space-between',
-                                    padding: "10px",
+                                    padding: 3,
+                                    width: "100%"
                                 }}>
                                     {sampleImages.map((option, ind) => (
                                         <Card key={ind} sx={{ maxWidth: 345 }}>
@@ -500,15 +488,12 @@ export default function DatasetGenerator() {
                                 flexWrap: "wrap",
                                 flexDirection: "column",
                                 justifyContent: "flex-start",
-                                gap: "10px",
-                                padding: "10px",
-                                border: 1,
-                                borderColor: 'rgba(0, 0, 0, 0.23)',
-                                borderRadius: 1
+                                gap: 3,
+                                padding: 3,
                             }}>
                                 <Typography>Existing datasets generated by this profile: </Typography>
                                 {profileDatasets ? profileDatasets.map((dataset, ind) => (
-                                    <DatasetCard dataset={dataset} delDataset={delDataset}/>
+                                    <DatasetCard dataset={dataset} delDataset={delDataset} />
                                 )) : null}
                             </List>
                         </Box>

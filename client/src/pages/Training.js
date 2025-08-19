@@ -271,13 +271,13 @@ export default function Training() {
 
 
 
-    const handleCheckpointChange = (modelId, checkpointId) => {
-        const exists = trainingForm.checkpoints.some(obj => obj.checkpointId === checkpointId && obj.modelId === modelId)
+    const handleCheckpointChange = (newCheckpoint) => {
+        const exists = trainingForm.checkpoints.some(obj => obj.id === newCheckpoint.id && obj.model_id === newCheckpoint.model_id)
         if (exists) {
             console.log("handleCheckpointChange: if (exists = true)")
             setTrainingForm((prevVals) => {
                 return produce(prevVals, (draft) => {
-                    draft.checkpoints = draft.checkpoints.filter((entry) => !(entry.checkpointId === checkpointId && entry.modelId === modelId))
+                    draft.checkpoints = draft.checkpoints.filter((entry) => !(entry.id === newCheckpoint.id && entry.model_id === newCheckpoint.model_id))
                 })
             })
         }
@@ -285,7 +285,7 @@ export default function Training() {
             console.log("handleCheckpointChange: if (exists = false)")
             setTrainingForm((prevVals) => {
                 return produce(prevVals, (draft) => {
-                    draft.checkpoints.push({ "checkpointId": checkpointId, "modelId": modelId });
+                    draft.checkpoints.push(newCheckpoint);
                 })
             })
         }
@@ -344,121 +344,119 @@ export default function Training() {
     }
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}><Grid container>
-            <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
-                <CssBaseline />
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Grid paddingTop={9} container>
+                <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: 3, padding: 3, alignContent: "space-around" }}>
+                    <AccordionModels modelData={modelData} handleCheckpointChange={handleCheckpointChange} formCheckpoints={trainingForm.checkpoints} />
+                    {datasetOptions.length > 0 ?
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                            <SelectorDataset
+                                error={trainingForm.trainDataset.error}
+                                datasetType={"train"}
+                                helperText={trainingForm.trainDataset.error ? trainingForm.trainDataset.helper : ''}
+                                selectedDataset={selectedTrainDataset}
+                                handleChange={(event) => {
+                                    handleSelectorFormChange({
+                                        eve: event,
+                                        setSelector: setSelectedTrainDataset,
+                                        setForm: setTrainingForm,
+                                        options: datasetOptions
+                                    })
+                                    checkDatasetSelected(event)
+                                    validateField({ key: 'trainDataset', setFormState: setTrainingForm })
 
+                                }}
+                                datasetOptions={datasetOptions} />
+                            <SelectorDataset
+                                datasetType={"CV"}
 
-                <AccordionModels modelData={modelData} handleCheckpointChange={handleCheckpointChange} formCheckpoints={trainingForm.checkpoints} />
-                {datasetOptions.length > 0 ?
-                    <Paper variant={'outlined'} sx={{ paddingTop: '10px' }}>
-                        <SelectorDataset
-                            error={trainingForm.trainDataset.error}
-                            datasetType={"train"}
-                            helperText={trainingForm.trainDataset.error ? trainingForm.trainDataset.helper : ''}
-                            selectedDataset={selectedTrainDataset}
-                            handleChange={(event) => {
-                                handleSelectorFormChange({
-                                    eve: event,
-                                    setSelector: setSelectedTrainDataset,
-                                    setForm: setTrainingForm,
-                                    options: datasetOptions
-                                })
-                                checkDatasetSelected(event)
-                                validateField({ key: 'trainDataset', setFormState: setTrainingForm })
+                                error={trainingForm.CVDataset.error}
+                                helperText={trainingForm.CVDataset.error ? trainingForm.CVDataset.helper : ''}
+                                selectedDataset={selectedCVDataset}
+                                handleChange={(event) => {
+                                    handleSelectorFormChange({
+                                        eve: event,
+                                        setSelector: setSelectedCVDataset,
+                                        setForm: setTrainingForm,
+                                        options: datasetOptions
+                                    })
+                                    checkDatasetSelected(event)
+                                    validateField({ key: 'CVDataset', setFormState: setTrainingForm })
 
-                            }}
-                            datasetOptions={datasetOptions} />
-                        <SelectorDataset
-                            datasetType={"CV"}
+                                }}
+                                datasetOptions={datasetOptions} />
+                            <SelectorDataset
+                                datasetType={"test"}
+                                error={trainingForm.testDataset.error}
+                                helperText={trainingForm.testDataset.error ? trainingForm.testDataset.helper : ''}
+                                selectedDataset={selectedTestDataset}
+                                handleChange={(event) => {
+                                    handleSelectorFormChange({
+                                        eve: event,
+                                        setSelector: setSelectedTestDataset,
+                                        setForm: setTrainingForm,
+                                        options: datasetOptions
+                                    })
+                                    checkDatasetSelected(event)
+                                    validateField({ key: 'testDataset', setFormState: setTrainingForm })
 
-                            error={trainingForm.CVDataset.error}
-                            helperText={trainingForm.CVDataset.error ? trainingForm.CVDataset.helper : ''}
-                            selectedDataset={selectedCVDataset}
-                            handleChange={(event) => {
-                                handleSelectorFormChange({
-                                    eve: event,
-                                    setSelector: setSelectedCVDataset,
-                                    setForm: setTrainingForm,
-                                    options: datasetOptions
-                                })
-                                checkDatasetSelected(event)
-                                validateField({ key: 'CVDataset', setFormState: setTrainingForm })
+                                }}
+                                datasetOptions={datasetOptions} />
+                        </Box>
+                        : !compatibleDatasets ? <Typography color={"#d32f2f !important"} sx={{ fontSize: "0.75rem", color: theme.palette.error.main }}>Only models with the same input image resolution can be trained in one session.</Typography> : null}
+                    {selectedTrainDataset ?
+                        <TrainingHyperparams trainingForm={trainingForm} datasetSize={selectedTrainDataset.datasetSize} saveCallback={(fn) => {
+                            fetchHyperparams.current = fn;
+                        }} />
+                        : null}
 
-                            }}
-                            datasetOptions={datasetOptions} />
-                        <SelectorDataset
-                            datasetType={"test"}
-                            error={trainingForm.testDataset.error}
-                            helperText={trainingForm.testDataset.error ? trainingForm.testDataset.helper : ''}
-                            selectedDataset={selectedTestDataset}
-                            handleChange={(event) => {
-                                handleSelectorFormChange({
-                                    eve: event,
-                                    setSelector: setSelectedTestDataset,
-                                    setForm: setTrainingForm,
-                                    options: datasetOptions
-                                })
-                                checkDatasetSelected(event)
-                                validateField({ key: 'testDataset', setFormState: setTrainingForm })
-
-                            }}
-                            datasetOptions={datasetOptions} />
-                    </Paper>
-                    : !compatibleDatasets ? <Typography color={"#d32f2f !important"} sx={{ fontSize: "0.75rem", color: theme.palette.error.main }}>Only models with the same input image resolution can be trained in one session.</Typography> : null}
-                {selectedTrainDataset ?
-                    <TrainingHyperparams trainingForm={trainingForm} datasetSize={selectedTrainDataset.datasetSize} saveCallback={(fn) => {
-                        fetchHyperparams.current = fn;
-                    }} />
-                    : null}
-
-                {trainingMode.selected ? null : <FormHelperText sx={{ color: 'error.main' }}>{trainingMode.helper}</FormHelperText>}
-
-                <SelectorLoss
-                    error={trainingForm.lossFunction.error}
-                    selectedLoss={selectedLoss}
-                    handleChange={(event) => {
-                        handleSelectorFormChange({
-                            eve: event,
-                            setSelector: setSelectedLoss,
-                            setForm: setTrainingForm,
-                            options: lossOptions
-                        })
-                        validateField({ key: 'lossFunction', setFormState: setTrainingForm })
-                    }}
-                    lossOptions={lossOptions}
-                />
-
-                <Button
-                    variant='contained'
-                    style={{ alignSelf: 'center', width: '150px' }}
-                    onClick={handleTrain}
-                    disabled={!trainingMode.selected}
-                >
-                    Train/Test
-                </Button>
-                {isTraining ? <Button
-                    variant='contained'
-                    color='error'
-                    style={{ alignSelf: 'center', width: '150px', marginTop: '10px' }}
-                    onClick={() => {
-                        fetch("/cancel_training", { method: "POST" }).then(
-                            (response => {
-                                if (response.ok) {
-                                    setIsTraining(false)
-                                }
+                    {trainingMode.selected ? null : <FormHelperText sx={{ color: 'error.main' }}>{trainingMode.helper}</FormHelperText>}
+                    {trainingMode.selected ? <SelectorLoss
+                        error={trainingForm.lossFunction.error}
+                        selectedLoss={selectedLoss}
+                        handleChange={(event) => {
+                            handleSelectorFormChange({
+                                eve: event,
+                                setSelector: setSelectedLoss,
+                                setForm: setTrainingForm,
+                                options: lossOptions
                             })
-                        );
-                    }}
-                >
-                    Cancel
-                </Button> : null}
-            </Grid>
+                            validateField({ key: 'lossFunction', setFormState: setTrainingForm })
+                        }}
+                        lossOptions={lossOptions}
+                    /> : null}
 
-            <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
-                {trainingChartData.length > 0 ? <TrainingChart data={trainingChartData} /> : null}
+
+                    <Button
+                        variant='contained'
+                        style={{ alignSelf: 'center', width: '150px' }}
+                        onClick={handleTrain}
+                        disabled={!trainingMode.selected}
+                    >
+                        Train/Test
+                    </Button>
+                    {isTraining ? <Button
+                        variant='contained'
+                        color='error'
+                        style={{ alignSelf: 'center', width: '150px', marginTop: '10px' }}
+                        onClick={() => {
+                            fetch("/cancel_training", { method: "POST" }).then(
+                                (response => {
+                                    if (response.ok) {
+                                        setIsTraining(false)
+                                    }
+                                })
+                            );
+                        }}
+                    >
+                        Cancel
+                    </Button> : null}
+                </Grid>
+
+                <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
+                    {trainingChartData.length > 0 ? <TrainingChart data={trainingChartData} /> : null}
+                </Grid>
             </Grid>
-        </Grid>
         </Box>
     )
 }

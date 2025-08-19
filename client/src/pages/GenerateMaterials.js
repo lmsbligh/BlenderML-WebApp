@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useImmer } from 'use-immer';
 import produce from "immer";
 import Box from '@mui/material/Box';
-import { Button, Card, CardMedia } from '@mui/material/';
+import { Button, Card, CardMedia, Grid, ImageList, ImageListItem } from '@mui/material/';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import SelectorModel from '../components/SelectorModel/SelectorModel.js';
@@ -10,7 +10,7 @@ import SelectedModel from '../components/SelectedModel/SelectedModel.js'
 import FileUpload from '../components/FileUpload/FileUpload.js';
 import SelectorCheckpoint from '../components/SelectorCheckpoint/SelectorCheckpoint.js';
 import { fetchData, handleSelectorFormChange, validateField, validateForm, Validation } from '../utils.js'
-
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 export default function GenerateMaterials() {
     const [generateMaterialForm, setGenerateMaterialForm] = useImmer(structuredClone({
         "model": new Validation({
@@ -152,24 +152,15 @@ export default function GenerateMaterials() {
 
 
     return (
-        <Box sx={{
-            width: "100%",
-            display: 'flex',
-            flexDirection: "row",
-            alignItems: "left",
-            justifyContent: 'center',
-            alignSelf: "left",
-            gap: '10px'
-        }}>
-            <Box sx={{
-                width: "50%",
-                display: 'flex',
+        <Grid  paddingTop={9} container>
+            <Grid item sm={6} xs={12} sx={{
+                display: "flex",
                 flexDirection: "column",
-                alignItems: "left",
-                justifyContent: 'space-between',
-                alignSelf: "left",
-                gap: '10px'
+                padding: 3,
+                gap: 3
             }}>
+
+
 
                 {modelData ?
                     <SelectorModel
@@ -188,58 +179,44 @@ export default function GenerateMaterials() {
                     checkpointOptions={checkpointOptions}
                     data-selectorID="checkpoint" />
 
-                <FileUpload handleUpload={handleUploadFile}
-                    error={generateMaterialForm.image_url.error}
-                    helperText={generateMaterialForm.image_url.helper} />
-                <Card sx={{
-                    maxWidth: 300,
-                    marginTop: "60px",
-                    marginBottom: "60px",
-                    alignSelf: "center"
-                }}>
-                    <CardMedia
-                        component="img"
-                        height="300"
-                        image={generateMaterialForm.image_url.value}
-                        alt="Placeholder" />
-                </Card>'
-                {selectedCheckpoint ? 
-                    <Button variant="contained" style={{ width: '100%' }} onClick={handleGenerateMaterial}>Generate</Button>
-                    : 
-                    <Button variant="contained" disabled style={{ width: '100%' }} onClick={handleGenerateMaterial}>Generate</Button>}
 
 
-            </Box>
-            <Box sx={{
-                width: "50%",
-                display: 'flex',
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', gap: 4, paddingTop: 4 }}>
+                    <FileUpload handleUpload={handleUploadFile}
+                        error={generateMaterialForm.image_url.error}
+                        helperText={generateMaterialForm.image_url.helper} />
+                    {selectedCheckpoint ?
+                        <Button variant="contained" style={{ width: '100%' }} onClick={handleGenerateMaterial}>Generate</Button>
+                        :
+                        <Button variant="contained" disabled style={{ width: '100%' }} onClick={handleGenerateMaterial}>Generate</Button>}
+                </Box>
+            </Grid>
+            <Grid item sm={6} xs={12} sx={{
+                display: "flex",
                 flexDirection: "column",
-                alignItems: "left",
-                justifyContent: 'flex-end',
-                alignSelf: "left",
-                gap: '10px'
+                padding: 3,
+                gap: 3
             }}>
-                <Card sx={{
-                    maxWidth: 300,
-                    marginTop: "60px",
-                    marginBottom: "60px",
-                    alignSelf: "center"
-                }}>
-                    <CardMedia
-                        component="img"
-                        height="300"
-                        image={renderURL}
-                        alt="Placeholder" />
+                {generateMaterialForm.image_url.value ? <Card>
+
+                    <ImageList sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                        <ImageListItem sx={{ flex: 1 }}>
+                            <img src={generateMaterialForm.image_url.value} />
+                        </ImageListItem>
+                        {renderURL ? <DoubleArrowIcon color="primary" sx={{ fontSize: 75, flex: 1 }} />: null}
+                        <ImageListItem sx={{ flex: 1 }}>
+                            <img src={renderURL} />
+                        </ImageListItem>
+                    </ImageList>
+
                     <CardContent>
                         <Typography>
                             Material Properties:
                             {materialJSON}
                         </Typography>
                     </CardContent>
-                </Card>
-                {/* <Button variant="contained" disabled style={{ color: 'grey', width: '100%' }}>Download Material</Button> */}
-
-            </Box>
-        </Box>
+                </Card> : null}
+            </Grid>
+        </Grid>
     )
 }

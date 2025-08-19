@@ -32,27 +32,31 @@ const AccordionCheckpoints = ({ modelId, handleCheckpointChange, formCheckpoints
     React.useEffect(() => {
         console.log("checkpointOptions: ", checkpointOptions)
     }, [checkpointOptions])
-    const checked = formCheckpoints.some(item => item.checkpointId === "-1" && item.modelId === modelId)
+    const checked = formCheckpoints.some(item => item.id === "-1" && item.model_id === modelId)
     const updateCheckpoints = () => {
         console.log("updateCheckpoints ran!")
         fetchData(`checkpoints/${modelId}`, setCheckpointOptions)
     }
     return (
-        <Box>
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}> 
-                <Tooltip title="Select for training with fresh, randomly assigned weights."><Checkbox onChange={(event) => handleCheckpointChange(modelId, "-1")} checked={checked}/> </Tooltip>
+        <Box >
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                <Tooltip title="Select for training with fresh, randomly assigned weights."><Checkbox onChange={(event) => handleCheckpointChange({model_id: modelId, id: "-1"})} checked={checked} /> </Tooltip>
                 <Typography >Create new checkpoint</Typography></Box>
-        {checkpointOptions.length > 0 ? <Accordion expandIcon={<ExpandMoreIcon />}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Select checkpoints:</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                    {checkpointOptions ? checkpointOptions.map((checkpoint) => (
-                        <CheckpointCard key={`${checkpoint.model_id}-${checkpoint.id}`} checkpoint={checkpoint} handleCheckpointChange={handleCheckpointChange} formCheckpoints={formCheckpoints} updateCheckpoints={updateCheckpoints}/>
-                    )) : null}
-                </AccordionDetails>
-            </Accordion> : null}
-            
+            {checkpointOptions.length > 0 ?
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <Accordion expandIcon={<ExpandMoreIcon />}>
+                        <AccordionSummary sx={{padding: 3}} expandIcon={<ExpandMoreIcon />}>
+                            <Typography>Select checkpoints:</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            {checkpointOptions ? checkpointOptions.map((checkpoint) => (
+                                <CheckpointCard key={`${checkpoint.model_id}-${checkpoint.id}`} checkpoint={checkpoint} handleCheckpointChange={handleCheckpointChange} formCheckpoints={formCheckpoints} updateCheckpoints={updateCheckpoints} />
+                            )) : null}
+                        </AccordionDetails>
+                    </Accordion>
+                </Box>
+                : null}
+
 
         </Box>
     )

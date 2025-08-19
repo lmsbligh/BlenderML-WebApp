@@ -38,6 +38,7 @@ function SelectorLayerActivation({ activationType, handleChange }) {
                 <InputLabel id="Layer-Activation-Selector-Label"> Activation Function </InputLabel>}
             <Select
                 labelId="Layer-Activation-Selector-Label"
+                label="Activation Function"
                 id="simple-select"
                 value={selectedLayerActivation?.value || ''}
                 renderValue={() => selectedLayerActivation.activation}

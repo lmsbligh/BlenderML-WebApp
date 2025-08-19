@@ -52,7 +52,7 @@ export default function TestChart({ data = null, id = null }) {
             position: 'sticky',
             top: '64px', // distance from the top of the viewport
             zIndex: 1,
-            backgroundColor: 'white', // helps avoid content bleed
+            backgroundColor: 'background.default', // helps avoid content bleed
             padding: '10px'
         }}>
             <Typography sx={{ mb: 1, textAlign: "center" }}>

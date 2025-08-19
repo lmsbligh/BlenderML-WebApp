@@ -4,6 +4,7 @@ import shutil
 import sqlite3
 import time
 import uuid
+import pprint
 from flask import Blueprint, abort, current_app, jsonify, request, send_from_directory
 from MLApp.parameters import render_data_script
 from MLApp.blender_scripts.blender_launcher import launch_blender
@@ -115,7 +116,8 @@ def get_compatible_datasets():
     for checkpoint in checkpoints:
         try:
             query = "SELECT imageHeight, imageWidth FROM models WHERE value = ?"
-            cur.execute(query, (checkpoint['modelId'],))
+            pprint.pp(checkpoint)
+            cur.execute(query, (checkpoint['model_id'],))
             rows = cur.fetchall()
             for row in rows:
                 row_dict = dict(row)

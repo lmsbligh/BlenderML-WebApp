@@ -1,6 +1,6 @@
 import React from 'react';
 import { useImmer } from 'use-immer';
-import { Paper, TextField, Box } from '@mui/material/';
+import { Paper, TextField, Box, Stack } from '@mui/material/';
 import { handleTextFieldChange, validateField } from '../../utils';
 
 function ModelPropertiesModifier({ onBlurTextField, modelForm, saveCallback }) {
@@ -24,8 +24,8 @@ function ModelPropertiesModifier({ onBlurTextField, modelForm, saveCallback }) {
     }, [modelForm])
     return (
         <>
-            {draftModelForm ? <Paper variant='outlined'  >
-                <Box sx={{ display: 'flex', padding: '10px' }}>
+            {draftModelForm ? <Paper variant='outlined' sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3 }}>
                     <TextField
                         name="modelName"
                         label="Model Name"
@@ -40,25 +40,27 @@ function ModelPropertiesModifier({ onBlurTextField, modelForm, saveCallback }) {
                             validateField({ key: 'modelName', setFormState: setDraftModel })
                         }}
                         value={draftModelForm.modelName.value}
-                        sx={{ width: "100%" }} />
-                    <TextField
-                        name="description"
-                        label="Model Description"
-                        error={draftModelForm.description.error}
-                        helperText={draftModelForm.description.error ? draftModelForm.description.helper : ''}
-                        onChange={(event) => {
-                            handleTextFieldChange({ eve: event, setState: setDraftModel })
-                            validateField({ key: 'description', setFormState: setDraftModel })
-                        }}
-                        onBlur={() => {
-                            onBlurTextField(draftModelForm)
-                            validateField({ key: 'description', setFormState: setDraftModel })
-                        }}
-                        value={draftModelForm.description.value}
-                        sx={{ width: "100%" }} />
+                    />
 
                 </Box>
-                <Box sx={{ display: 'flex', padding: '10px' }}>
+                <TextField
+                    name="description"
+                    multiline
+                    label="Model Description"
+                    error={draftModelForm.description.error}
+                    helperText={draftModelForm.description.error ? draftModelForm.description.helper : ''}
+                    onChange={(event) => {
+                        handleTextFieldChange({ eve: event, setState: setDraftModel })
+                        validateField({ key: 'description', setFormState: setDraftModel })
+                    }}
+                    onBlur={() => {
+                        onBlurTextField(draftModelForm)
+                        validateField({ key: 'description', setFormState: setDraftModel })
+                    }}
+                    value={draftModelForm.description.value}
+                />
+
+                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3 }}>
                     <TextField
                         name="imageWidth"
                         label="Image Width"
@@ -73,7 +75,7 @@ function ModelPropertiesModifier({ onBlurTextField, modelForm, saveCallback }) {
                             validateField({ key: 'imageWidth', setFormState: setDraftModel })
                         }}
                         value={draftModelForm.imageWidth.value}
-                        sx={{ width: "100%" }} />
+                    />
 
 
                     <TextField
@@ -90,7 +92,7 @@ function ModelPropertiesModifier({ onBlurTextField, modelForm, saveCallback }) {
                             validateField({ key: 'imageHeight', setFormState: setDraftModel })
                         }}
                         value={draftModelForm.imageHeight.value}
-                        sx={{ width: "100%" }} />
+                    />
                 </Box>
 
             </Paper> : null}

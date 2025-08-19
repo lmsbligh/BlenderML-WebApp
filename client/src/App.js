@@ -11,7 +11,6 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 import getTheme from './theme';
 
-const defaultTheme = createTheme();
 
 function App() {
   const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;

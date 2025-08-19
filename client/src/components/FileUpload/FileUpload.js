@@ -21,6 +21,7 @@ export default function FileUpload({handleUpload, error, helperText}) {
   return (
     <><Button
       component="label"
+      sx={{ width: '100%' }}
       color={error ? "error" : "primary"}
       role={undefined}
       variant="contained"

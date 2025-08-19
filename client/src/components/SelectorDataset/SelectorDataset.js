@@ -9,12 +9,20 @@ import FormControl from '@mui/material/FormControl';
 function SelectorDataset ({ helperText, error, selectedDataset, handleChange, datasetOptions, datasetType}){
     
     return (   
-        <FormControl sx={{ width: "100%", padding: "5px" }}> 
+        <FormControl> 
             {<InputLabel >Select a {datasetType} dataset </InputLabel>}                  
             <Select
                 labelId="Dataset-Selector-Label"
+                label={`Select a ${datasetType} dataset`}
                 id="simple-select"
-                sx={{width: "100%"}}
+                sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "text.secondary",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                    }
+                }}
                 name={datasetType+"Dataset"}
                 value={selectedDataset || "-1"}
                 onChange={handleChange}

@@ -16,6 +16,14 @@ function SelectorCheckpoint({ helperText, error, selectedCheckpoint, handleChang
                 labelId="Checkpoint-Selector-Label"
                 id="simple-select"
                 name="checkpoint"
+                sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "text.secondary",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                    }
+                }}
                 error={error}
                 value={selectedCheckpoint ? selectedCheckpoint : ''}
                 onChange={handleChange}
