@@ -104,11 +104,7 @@ const getTheme = (mode = "light") => {
           },
         },
       },
-      MuiSelect: {
-        defaultProps: {
-          size: "small",
-        }
-      },
+
       MuiFormControl: {
         defaultProps: {
           size: "small",
@@ -188,14 +184,21 @@ const getTheme = (mode = "light") => {
           },
         },
       },
+      MuiSelect: {
+        defaultProps: {
+          size: "small",
+          backgroundColor: colors.backgroundPaper,
+        }
+      },
       MuiAccordion: {
         styleOverrides: {
           root: {
-            padding: 3,
+            size: "small",
+            backgroundColor: colors.backgroundPaper,
             boxShadow: "none",
             border: `1px solid ${colors.textSecondary}`,
             borderRadius: '4px',
-            '&:not(:last-child)': { marginBottom: 1 }, // = theme.spacing(4) * 1
+            '&:not(:last-child)': { marginBottom: 0 }, // = theme.spacing(4) * 1
             // prevent extra margin when expanded
             '&.Mui-expanded': { margin: 0 },
           },
@@ -232,8 +235,32 @@ const getTheme = (mode = "light") => {
           root: {
           }
         }
+      },
+      MuiCssBaseline: {
+        styleOverrides: {
+          body: {
+            /* Firefox */
+            scrollbarWidth: "thin",
+            scrollbarColor: `${colors.textSecondary} ${colors.backgroundDefault}`,
+          },
+          /* Chrome, Edge, Safari */
+          "*::-webkit-scrollbar": {
+            width: "6px",
+            height: "6px",
+          },
+          "*::-webkit-scrollbar-track": {
+            background: `${colors.backgroundDefault}`,
+          },
+          "*::-webkit-scrollbar-thumb": {
+            backgroundColor: `${colors.textSecondary}`,
+            borderRadius: "3px",
+          },
+          "*::-webkit-scrollbar-thumb:hover": {
+            backgroundColor: `${colors.textSecondary}`,
+          },
+        },
       }
-    },
+    }
   });
 };
 

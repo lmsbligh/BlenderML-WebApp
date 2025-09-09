@@ -68,8 +68,8 @@ def train(training_form):
 
     for checkpoint in training_form['checkpoints']:
         print("Checkpoint/model for loop.")
-        model_id = checkpoint['modelId']
-        model_checkpoint = checkpoint['checkpointId']
+        model_id = checkpoint['model_id']
+        model_checkpoint = checkpoint['id']
 
         # dataset_profile = dataset[:dataset.find('-')]
         # dataset_date_time = dataset[dataset.find('-')+1:]

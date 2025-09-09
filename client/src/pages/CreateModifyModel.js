@@ -6,7 +6,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
-import { Grid, Button, List, Card, Typography } from '@mui/material/';
+import { Grid, Button, List, Card, Typography, Paper } from '@mui/material/';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import { v4 as uuidv4 } from 'uuid';
@@ -48,6 +48,7 @@ function CreateModifyModel() {
     const [modelData, setModelData] = useImmer([]);
     const [modelCheckpoints, setModelCheckpoints] = useImmer([]);
     const [delModelDialog, setDelModelDialog] = React.useState(false);
+    const [delCheckpointDialog, setCheckpointDialog] = React.useState(false);
     React.useEffect(() => {
         fetchData('models', setModelData)
     }, []);
@@ -349,35 +350,44 @@ function CreateModifyModel() {
 
                 </FormControl>
             </Grid>
-            {modelCheckpoints.length > 0 ? <Grid item sm={6} xs={12} sx={{
+            <Grid item sm={6} xs={12} sx={{
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-start",
                 paddingLeft: "10px",
                 paddingRight: "10px"
             }}>
-                <List disablePadding sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    flexDirection: "column",
-                    justifyContent: "flex-start",
-                    gap: "10px",
-                    padding: "10px",
-                    border: 1,
-                    borderColor: 'rgba(0, 0, 0, 0.23)',
-                    borderRadius: 1
-                }}>
-                    <Typography sx={{ alignSelf: "flex-start" }}>Existing checkpoints for this model:</Typography>
-                    {modelCheckpoints ? modelCheckpoints.map((option, ind) => {
-                        return <Card key={option} sx={{ padding: "10px" }}>
-                            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
-                                <Typography sx={{ alignSelf: "center" }} color="text.primary">Checkpoint: {option.id}</Typography>
-                                <IconButton aria-label="delete" color="primary" onClick={() => { delCheckpoint(option.id) }}><DeleteIcon /></IconButton>
-                            </Box>
-                        </Card>
-                    }) : null}
-                </List>
-            </Grid> : null}
+                {modelCheckpoints.length > 0 ?
+                    <Paper disablePadding sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        marginTop: 3,
+                        flexDirection: "column",
+                        justifyContent: "flex-start",
+                    }}>
+                        <Typography sx={{ alignSelf: "flex-start" }}>Existing checkpoints for this model:</Typography>
+                        {modelCheckpoints ? modelCheckpoints.map((option, ind) => {
+                            return <Card key={option} sx={{ bgcolor: 'background.default !important' }}>
+                                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                    <Typography sx={{ alignSelf: "center" }} color="text.primary">Checkpoint: {option.id}</Typography>
+                                    <IconButton aria-label="delete" color="error" onClick={() => { setCheckpointDialog(true) }}><DeleteIcon /></IconButton>
+                                    <DeleteDialog 
+                                        id="checkpoint"
+                                        open={delCheckpointDialog}
+                                        handleClose={handleCloseDelDialog}
+                                        setDelDialog={setCheckpointDialog}
+                                        delFunction={() => delCheckpoint(option.id)} />
+                                </Box>
+                                <Typography color="text.secondary">
+                                    Timestamp: {option.timestamp}
+                                    <br/>
+                                    Final Loss: {option.final_loss}
+                                    </Typography>
+                            </Card>
+                        }) : null}
+                    </Paper>
+                    : null}
+            </Grid>
         </Grid>
     )
 }

@@ -348,6 +348,12 @@ export default function Training() {
             <Grid paddingTop={9} container>
                 <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: 3, padding: 3, alignContent: "space-around" }}>
                     <AccordionModels modelData={modelData} handleCheckpointChange={handleCheckpointChange} formCheckpoints={trainingForm.checkpoints} />
+
+
+                </Grid>
+
+                <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
+                    {trainingChartData.length > 0 ? <TrainingChart data={trainingChartData} /> : null}
                     {datasetOptions.length > 0 ?
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                             <SelectorDataset
@@ -426,35 +432,37 @@ export default function Training() {
                         lossOptions={lossOptions}
                     /> : null}
 
-
-                    <Button
-                        variant='contained'
-                        style={{ alignSelf: 'center', width: '150px' }}
-                        onClick={handleTrain}
-                        disabled={!trainingMode.selected}
-                    >
-                        Train/Test
-                    </Button>
-                    {isTraining ? <Button
-                        variant='contained'
-                        color='error'
-                        style={{ alignSelf: 'center', width: '150px', marginTop: '10px' }}
-                        onClick={() => {
-                            fetch("/cancel_training", { method: "POST" }).then(
-                                (response => {
-                                    if (response.ok) {
-                                        setIsTraining(false)
-                                    }
-                                })
-                            );
-                        }}
-                    >
-                        Cancel
-                    </Button> : null}
-                </Grid>
-
-                <Grid item sm={6} xs={12} sx={{ display: "flex", flexDirection: "column", gap: "10px", padding: "5px", alignContent: "space-around" }}>
-                    {trainingChartData.length > 0 ? <TrainingChart data={trainingChartData} /> : null}
+                    <Box sx={{
+                        display: "flex",
+                        flexDirection: "horizontal",
+                        justifyContent: isTraining ? 'space-between' : 'center',
+                        gap: 3
+                    }}>
+                        <Button
+                            variant='contained'
+                            style={{ width: '49%' }}
+                            onClick={handleTrain}
+                            disabled={!trainingMode.selected}
+                        >
+                            Train/Test
+                        </Button>
+                        {isTraining ? <Button
+                            variant='contained'
+                            color='error'
+                            style={{ width: '49%' }}
+                            onClick={() => {
+                                fetch("/cancel_training", { method: "POST" }).then(
+                                    (response => {
+                                        if (response.ok) {
+                                            setIsTraining(false)
+                                        }
+                                    })
+                                );
+                            }}
+                        >
+                            Cancel
+                        </Button> : null}
+                    </Box>
                 </Grid>
             </Grid>
         </Box>

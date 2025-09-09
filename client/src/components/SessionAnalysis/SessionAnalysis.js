@@ -41,6 +41,13 @@ function SessionAnalysis({ trainingSessions, modelData, split }) {
         <>
             <Typography>{split === "train" ? "Training" : "Test"} Session Analysis</Typography>
             {chartData.length > 0 ? split === "train" ? <TrainingChart data={chartData} /> : <TestChart data={chartData} /> : null}
+            <Box sx={{
+                gap: 3,
+                overflowY: "auto",
+                maxHeight: "80vh", "&::-webkit-scrollbar": {
+                    width: "6px",
+                },
+                }}>
             {
                 trainingSessions ?
                     trainingSessions.filter((session) => (split_enum.includes(session.split)))
@@ -49,7 +56,8 @@ function SessionAnalysis({ trainingSessions, modelData, split }) {
                         ))
                     :
                     null
-            }
+                }
+            </Box >
         </>
     )
 }

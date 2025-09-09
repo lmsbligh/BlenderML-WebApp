@@ -124,14 +124,7 @@ const TrainingHyperparams = ({ trainingForm, datasetSize, saveCallback }) => {
             <SelectorOptimizer
                 error={localForm.optimizer.error}
                 selectedOptimizer={selectedOptimizer}
-                sx={{
-                    "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "text.secondary",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "primary.main",
-                    }
-                }}
+                
                 handleChange={(event) => {
                     handleSelectorFormChange({
                         eve: event,

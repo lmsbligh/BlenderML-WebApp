@@ -22,14 +22,11 @@ export default function DatasetCard({ dataset, delDataset }) {
     const [delDatasetDialog, setDelDatasetDialog] = React.useState(false);
     return (
         <Card key={dataset.value} sx={{
-            flexBasis: "auto",
-            padding: "10px",
-            boxSizing: "border-box",
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between"
+            width: '100%'
         }}>
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '10px' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Typography sx={{ alignSelf: "center" }} color="text.primary">Profile Name: {dataset.datasetName}</Typography>
                 <DeleteDialog
                     id="dataset"
@@ -41,11 +38,10 @@ export default function DatasetCard({ dataset, delDataset }) {
 
                 <IconButton aria-label="delete" color="error" onClick={() => { setDelDatasetDialog(true) }}><DeleteIcon /></IconButton>
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '10px' }}>
-                <Typography color="text.primary">Split: {dataset.split}</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+                <Typography color="text.secondary">Split: {dataset.split}</Typography>
                 <Typography color="text.secondary">Render Date and Time: {dataset.value.slice(9)}</Typography>
                 <Typography color="text.secondary">Size: {dataset.datasetSize}</Typography>
-                <Typography color="text.secondary">Description: {dataset.description}</Typography>
             </Box>
         </Card>
     )

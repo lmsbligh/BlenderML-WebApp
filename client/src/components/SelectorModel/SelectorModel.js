@@ -32,19 +32,16 @@ function SelectorModel({ helperText, error, selectedModel, handleChange, modelOp
             >
                 {modelOptions.map(option => (
                     <MenuItem key={option.value} value={option.value}>
-                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                            {option.modelName}
-                        </Typography>
                         <Typography variant="body2">
-                            Value: {option.value}
-                            <br />
-                            Input size: {option.input}
-                            <br />
-                            Output size: {option.output}
-                            <br />
-                            Description:
+                            {option.modelName}
                             <br />
                             {option.description}
+                            <br />
+                            Input resolution: {option.imageWidth}x{option.imageHeight}
+                            <br />
+
+                            ID: {option.value}
+                            <br />
                         </Typography>
                     </MenuItem>
                 ))}{isModify ?

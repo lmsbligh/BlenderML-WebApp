@@ -41,7 +41,7 @@ function TrainingSessionCard({ session, models, chartData, setChartData}) {
 
 
     return (
-            <Card key={session.id} sx={{ backgroundColor: "primary", variant: "outlined" }}>
+            <Card key={session.id} sx={{ marginTop: 3, backgroundColor: "primary", variant: "outlined" }}>
                 <IconButton aria-label="graph" data-run-id={session.id} color="primary"
                     onClick={(event) => { handleGraphClick(event) }
                     }>

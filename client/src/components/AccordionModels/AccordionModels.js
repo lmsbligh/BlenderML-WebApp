@@ -28,10 +28,10 @@ const AccordionModels = ({ modelData, handleCheckpointChange, formCheckpoints })
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {formCheckpoints.length > 0 ?
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <Card sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <Typography>Selected checkpoints:</Typography>
                     {formCheckpoints.map((checkpoint) => (
-                        <Card key={checkpoint.model_id+checkpoint.id}sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Card key={checkpoint.model_id+checkpoint.id}sx={{ bgcolor: "background.default", display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Box>
                                 {console.log("!checkpoint: ", checkpoint)}
                                 {
@@ -51,7 +51,7 @@ const AccordionModels = ({ modelData, handleCheckpointChange, formCheckpoints })
                             <IconButton aria-label="delete" color="error" onClick={() => { handleCheckpointChange({model_id: checkpoint.model_id, id: checkpoint.id}) }} ><DeleteIcon /></IconButton>
                         </Card>
                     ))}
-                </Box>
+                </Card>
                 : null}
             <Accordion expandIcon={<ExpandMoreIcon />}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -59,7 +59,7 @@ const AccordionModels = ({ modelData, handleCheckpointChange, formCheckpoints })
                 </AccordionSummary>
                 <AccordionDetails >
                     {modelData ? modelData.map((model) => (
-                        <Paper variant='outlined' sx={{ gap: 3, marginTop: 3, display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
+                        <Paper variant='outlined' sx={{ gap: 3, marginTop: 3, display: 'flex', flexDirection: 'column', bgcolor: 'background.default !important' }}>
                             <Typography>Model name: {model.modelName}</Typography>
                             <Typography>Model ID: {model.value}</Typography>
                             <Typography>Input resolution: {model.imageWidth}x{model.imageHeight} </Typography>

@@ -7,11 +7,11 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 
 
-function SelectorDatasetProfile ({ selectedDatasetProfile, handleChange, profileOptions}){
-    
-    return (   
-        <FormControl> 
-            {!selectedDatasetProfile && <InputLabel >Select a dataset profile</InputLabel>}                  
+function SelectorDatasetProfile({ selectedDatasetProfile, handleChange, profileOptions }) {
+
+    return (
+        <FormControl>
+            {!selectedDatasetProfile && <InputLabel >Select a dataset profile</InputLabel>}
             <Select
                 labelId="Dataset-Profile-Selector-Label"
                 id="simple-select"
@@ -20,26 +20,28 @@ function SelectorDatasetProfile ({ selectedDatasetProfile, handleChange, profile
                 renderValue={(selected) => {
                     const selectedOption = profileOptions.find((option) => option.value === selected.value);
                     return selectedOption ? selectedOption.datasetName : <Typography>Select a profile</Typography>;
-                  }}
+                }}
             >
                 {profileOptions.length > 0 ? profileOptions.map(option => (
-                    <MenuItem key={option.value} value={option.value} sx={{display: 'flex', flexDirection: 'row'}}>        
-                                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                    {option.datasetName}
-                                </Typography>
-                                <Typography variant="body2">
-                                    {option.description}
-                                </Typography>
+                    <MenuItem key={option.value} value={option.value} sx={{}}>
+                        {option.datasetName}
+                        <br />
+                        {option.description}
+                        <br />
+                        Image resolution: {option.imageWidth}x{option.imageHeight}
+                        <br />
+                        ID: {option.value}
+                        <br />
                     </MenuItem>
                 )) : null}
-                <MenuItem key={-1} value={-1}>        
-                            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                New Dataset Profile
-                            </Typography>
+                <MenuItem key={-1} value={-1}>
+                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                        New Dataset Profile
+                    </Typography>
                 </MenuItem>
             </Select>
         </FormControl>
-            );
+    );
 }
 
 

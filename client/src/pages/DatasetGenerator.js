@@ -313,88 +313,87 @@ export default function DatasetGenerator() {
                                 error={profileForm.datasetSize.error}
                                 helperText={profileForm.datasetSize.error ? profileForm.datasetSize.helper : ''}
                                 value={profileForm.datasetSize.value}></TextField>
+                            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3 }}>
+                                <Box sx={{ position: 'relative', marginTop: 6, padding: 0, width: '50%' }}>
+                                    <InputLabel
+                                        shrink
+                                        sx={{
+                                            position: 'absolute',
+                                            top: '-12px',
+                                            left: '12px',
+                                            backgroundColor: 'alpha(0,0,0,0)',
+                                            paddingX: '4px',
+                                        }}
+                                    >
+                                        Cross Validation Set %
+                                    </InputLabel>
 
-                            <Box sx={{ position: 'relative', marginTop: 6, padding: 0 }}>
-                                <InputLabel
-                                    shrink
-                                    sx={{
-                                        position: 'absolute',
-                                        top: '-12px',
-                                        left: '12px',
-                                        backgroundColor: 'alpha(0,0,0,0)',
-                                        paddingX: '4px',
-                                    }}
-                                >
-                                    Cross Validation Set %
-                                </InputLabel>
+                                    <Box
+                                        sx={{
+                                            border: '1px solid',
+                                            borderColor: 'outline.input',
+                                            backgroundColor: 'background.paper',
+                                            borderRadius: '4px',
+                                            padding: '16px',
 
-                                <Box
-                                    sx={{
-                                        border: '1px solid',
-                                        borderColor: 'outline.input',
-                                        backgroundColor: 'background.paper',
-                                        borderRadius: '4px',
-                                        padding: '16px',
+                                        }}
+                                    >
+                                        <Slider
+                                            aria-label="Always visible"
+                                            label="CVPercentage"
+                                            name="CVPercentage"
+                                            onChange={sliderHandleChange}
+                                            value={Number(profileForm.CVPercentage.value)}
+                                            getAriaValueText={(value) => `${value}%`}
+                                            step={1}
+                                            min={0}
+                                            max={30}
+                                            valueLabelDisplay="auto"
+                                            marks={marks}
+                                        // valueLabelFormat={(x) => Math.ceil(x * 0.3)}
 
-                                    }}
-                                >
-                                    <Slider
-                                        aria-label="Always visible"
-                                        label="CVPercentage"
-                                        name="CVPercentage"
-                                        onChange={sliderHandleChange}
-                                        value={Number(profileForm.CVPercentage.value)}
-                                        getAriaValueText={(value) => `${value}%`}
-                                        step={1}
-                                        min={0}
-                                        max={30}
-                                        valueLabelDisplay="auto"
-                                        marks={marks}
-                                    // valueLabelFormat={(x) => Math.ceil(x * 0.3)}
+                                        />
+                                    </Box>
+                                </Box>
+                                <Box sx={{ position: 'relative', mt: 2, marginTop: 6, width: '50%' }}>
+                                    <InputLabel
+                                        shrink
+                                        sx={{
+                                            position: 'absolute',
+                                            top: '-12px',
+                                            left: '12px',
+                                            backgroundColor: 'alpha(0,0,0,0)',
+                                            paddingX: '4px',
+                                        }}
+                                    >
+                                        Test Set %
+                                    </InputLabel>
 
-                                    />
+                                    <Box
+                                        sx={{
+                                            border: '1px solid',
+                                            borderColor: 'outline.input',
+                                            backgroundColor: 'background.paper',
+                                            borderRadius: '4px',
+                                            padding: '16px',
+                                        }}
+                                    >
+                                        <Slider
+                                            aria-label="Always visible"
+                                            label="TestSetPercentage"
+                                            name="TestSetPercentage"
+                                            onChange={sliderHandleChange}
+                                            value={Number(profileForm.TestSetPercentage.value)}
+                                            getAriaValueText={(value) => `${value}%`}
+                                            step={1}
+                                            min={0}
+                                            max={30}
+                                            valueLabelDisplay="auto"
+                                            marks={marks}
+                                        />
+                                    </Box>
                                 </Box>
                             </Box>
-                            <Box sx={{ position: 'relative', mt: 2, marginTop: 6 }}>
-                                <InputLabel
-                                    shrink
-                                    sx={{
-                                        position: 'absolute',
-                                        top: '-12px',
-                                        left: '12px',
-                                        backgroundColor: 'alpha(0,0,0,0)',
-                                        paddingX: '4px',
-                                    }}
-                                >
-                                    Test Set %
-                                </InputLabel>
-
-                                <Box
-                                    sx={{
-                                        border: '1px solid',
-                                        borderColor: 'outline.input',
-                                        backgroundColor: 'background.paper',
-                                        borderRadius: '4px',
-                                        padding: '16px',
-                                        width: '50%'
-                                    }}
-                                >
-                                    <Slider
-                                        aria-label="Always visible"
-                                        label="TestSetPercentage"
-                                        name="TestSetPercentage"
-                                        onChange={sliderHandleChange}
-                                        value={Number(profileForm.TestSetPercentage.value)}
-                                        getAriaValueText={(value) => `${value}%`}
-                                        step={1}
-                                        min={0}
-                                        max={30}
-                                        valueLabelDisplay="auto"
-                                        marks={marks}
-                                    />
-                                </Box>
-                            </Box>
-
                             <Box sx={{
                                 display: "flex",
                                 flexDirection: "horizontal",
@@ -455,12 +454,20 @@ export default function DatasetGenerator() {
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "flex-start",
+                        alignItems: "stretch"
                     }}>
-                        <Box sx={{
+                        <Paper sx={{
                             display: "flex",
                             flexWrap: "wrap",
                             flexDirection: "horizontal",
                             justifyContent: 'flex-start',
+                            alignItems: "stretch",
+                            bgcolor: 'background.default',
+                            marginTop: 3,
+                            overflowY: "auto",
+                            maxHeight: "80vh", "&::-webkit-scrollbar": {
+                                width: "6px",
+                            },
                         }}>
                             {Array.isArray(sampleImages) && sampleImages.length > 0 ? (
                                 <Box sx={{
@@ -490,13 +497,15 @@ export default function DatasetGenerator() {
                                 justifyContent: "flex-start",
                                 gap: 3,
                                 padding: 3,
+                                alignItems: "stretch",
+                                width: '100%',
                             }}>
                                 <Typography>Existing datasets generated by this profile: </Typography>
                                 {profileDatasets ? profileDatasets.map((dataset, ind) => (
                                     <DatasetCard dataset={dataset} delDataset={delDataset} />
                                 )) : null}
                             </List>
-                        </Box>
+                        </Paper>
                     </Grid>
                 ) : null}
 

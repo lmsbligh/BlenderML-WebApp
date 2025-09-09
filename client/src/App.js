@@ -11,7 +11,6 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 import getTheme from './theme';
 
-
 function App() {
   const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
   const [mode, setMode] = React.useState(() => localStorage.getItem("color-mode") || (prefersDark ? "dark" : "light"));

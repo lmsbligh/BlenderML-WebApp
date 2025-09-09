@@ -1,36 +1,32 @@
 import React from 'react';
 
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import ListItem from '@mui/material/ListItem';
 
 function selectedModel({ selectedModel }) {
     return (
-        <><Typography>Selected Model: </Typography><ListItem>
+        <Box sx={{ bgcolor: "background.paper", p: 2 }}><Typography>Selected Model: </Typography><ListItem>
             <ListItemText>
                 Name: {selectedModel.modelName}
             </ListItemText>
-        </ListItem><ListItem>
+        </ListItem>
+            <ListItem>
                 <ListItemText>
                     Description: {selectedModel.description}
                 </ListItemText>
-            </ListItem><ListItem>
+            </ListItem>
+            <ListItem>
                 <ListItemText>
-                    Input Size: {selectedModel.input}
+                    Input resolution: {selectedModel.imageWidth}x{selectedModel.imageHeight}
                 </ListItemText>
-            </ListItem><ListItem>
+            </ListItem>
+            <ListItem>
                 <ListItemText>
-                    Output Size: {selectedModel.output}
+                    Number of layers: {selectedModel.layers.length}
                 </ListItemText>
-            </ListItem><ListItem>
-                <ListItemText>
-                    Number of layers: {selectedModel.n_layers}
-                </ListItemText>
-            </ListItem><ListItem>
-                <ListItemText>
-                    Types of layers: {selectedModel.layer_types}
-                </ListItemText>
-            </ListItem></>
+            </ListItem>
+        </Box>
     );
 }
 
