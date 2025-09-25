@@ -12,8 +12,10 @@ from config import Config
 from api.routes import datasets, models, training, material_generation
 
 
-
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
+
 socketio.init_app(app)
 app.config.from_object(Config)
 
@@ -29,7 +31,7 @@ def too_large(e):
 def handle_connect():
     print("✅ Client connected")
 if __name__ == "__main__":
-    socketio.run(app, host='127.0.0.1', port=5000, debug=True, use_reloader=False)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False)
     # app.run(debug=True, use_reloader=True)
 
 
