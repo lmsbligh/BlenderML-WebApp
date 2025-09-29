@@ -22,7 +22,7 @@ def target_loader(directory):
             material["nodes['Principled BSDF'].inputs[0].default_value"][1],
             material["nodes['Principled BSDF'].inputs[0].default_value"][2],
             material["nodes['Principled BSDF'].inputs[0].default_value"][3],
-            material["nodes['Principled BSDF'].inputs[6].default_value"],
-            material["nodes['Principled BSDF'].inputs[9].default_value"] 
+            material["nodes['Principled BSDF'].inputs[1].default_value"],
+            material["nodes['Principled BSDF'].inputs[2].default_value"] 
         ])
     return targets

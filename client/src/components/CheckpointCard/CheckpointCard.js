@@ -11,6 +11,8 @@ import SpeedIcon from '@mui/icons-material/Speed';
 import EditIcon from '@mui/icons-material/Edit';
 import HubIcon from '@mui/icons-material/Hub';
 import SaveIcon from '@mui/icons-material/Save';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import { appendData, handleCloseDelDialog, handleOpenDelDialog, handleTextFieldChange, pushData, validateField, validateForm } from '../../utils.js';
 import { fetchData, Validation, validateValidator } from '../../utils.js';
@@ -18,7 +20,7 @@ import TrainingChart from '../TrainingChart/TrainingChart.js';
 import DeleteDialog from '../DeleteDialog/DeleteDialog.js';
 
 
-const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, updateCheckpoints }) => {
+const CheckpointCard = ({ checkpoint, training=false, handleCheckpointChange = () => {}, formCheckpoints=[], updateCheckpoints = () => {} }) => {
 
     const defaultFields = {
         "name": new Validation({ required: false, regex: /^[A-Za-z0-9 -]{1,30}$/, helper: "Please enter an alphanumeric name for the checkpoint." }),
@@ -29,6 +31,7 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
     const [testSessions, setTestSessions] = React.useState([]);
     const [localFields, setLocalFields] = React.useState(structuredClone(defaultFields));
 
+    const checked = formCheckpoints.some(item => item.id === checkpoint.id && item.model_id === checkpoint.model_id)
     const [editName, setEditName] = React.useState(true)
     const [editDescription, setEditDescription] = React.useState(true)
     React.useEffect(() => {
@@ -91,7 +94,6 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
             }
         }, 0)
     }
-    const checked = formCheckpoints.some(item => item.id === checkpoint.id && item.model_id === checkpoint.model_id)
 
     const delCheckpoint = () => {
         pushData(`delete_checkpoint/${checkpoint.model_id}/${checkpoint.id}`).then(() => {
@@ -102,14 +104,21 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
 
     return (
         <Paper variant='outlined' sx={{ marginTop: 3, gap: 3, display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }} >
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Tooltip title="Select for training"><Checkbox data-model-id={checkpoint.model_id} checked={checked} data-checkpoint-id={checkpoint.id} onChange={(event) => handleCheckpointChange(checkpoint)} /></Tooltip>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: training ?'space-between' : 'flex-end' }}>
+                {training ? 
+                <Box sx={{ display: 'flex', justifySelf: 'flex-end' }}>
+                    <Tooltip title="Select for training">
+                        <Checkbox data-model-id={checkpoint.model_id} checked={checked} data-checkpoint-id={checkpoint.id} onChange={(event) => handleCheckpointChange(checkpoint)} />
+                        </Tooltip>
+                </Box>
+                : null }
                 <Tooltip>
                     <DeleteDialog id={"checkpoint"} open={delDialog} handleClose={handleCloseDelDialog} setDelDialog={setDelDialog} delFunction={delCheckpoint} />
                     <IconButton onClick={() => { handleOpenDelDialog(setDelDialog) }} aria-label="delete" color="error" >
                         <DeleteIcon />
                     </IconButton>
-                </Tooltip>
+                </Tooltip> 
+                
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 3 }}>
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -219,7 +228,7 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
                                         Dataset trained on: {option.training_dataset}
                                     </Typography>
                                     <Accordion>
-                                        <AccordionSummary >
+                                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                             Show hyperparameters.
                                         </AccordionSummary>
                                         <AccordionDetails>
@@ -229,6 +238,9 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
                                             </Typography>
                                             <Typography>
                                                 Learning rate: {option.learning_rate}
+                                            </Typography>
+                                            <Typography>
+                                                Batch size: {option.batch_size}
                                             </Typography>
                                             <Typography>
                                                 Loss function: {option.loss_function}
@@ -242,9 +254,8 @@ const CheckpointCard = ({ checkpoint, handleCheckpointChange, formCheckpoints, u
                                         </AccordionDetails>
                                     </Accordion>
                                     <Accordion>
-                                        <AccordionSummary
-
-                                        >
+                                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                        
                                             Show training graph.
                                         </AccordionSummary>
                                         <AccordionDetails>

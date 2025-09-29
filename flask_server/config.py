@@ -13,6 +13,7 @@ MODELS_DIR_PATH = os.path.join(PROJECT_ROOT, "MLApp", "data", "models")
 UPLOAD_FOLDER = os.path.join("MLApp", "data", "user_uploaded_test")
 class Config:
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+    PROJECT_ROOT = PROJECT_ROOT
     UPLOAD_FOLDER = UPLOAD_FOLDER
     DATABASE_PATH = DATABASE_PATH
     DATASETS_DIR_PATH = DATASETS_DIR_PATH

@@ -18,6 +18,7 @@ import ModelPropertiesModifier from '../components/ModelPropertiesModifier/Model
 import { fetchData, validateForm, pushData, Validation, Layer, validateField, handleCloseDelDialog } from '../utils.js'
 import { grey } from '@mui/material/colors';
 import DeleteDialog from '../components/DeleteDialog/DeleteDialog.js';
+import CheckpointCard from '../components/CheckpointCard/CheckpointCard.js';
 const defaultTheme = createTheme();
 
 
@@ -288,11 +289,6 @@ function CreateModifyModel() {
         })
     }
 
-    const delCheckpoint = (checkpointID) => {
-        pushData(`delete_checkpoint/${selectedModel.value}/${checkpointID}`).then(() => {
-            fetchData(`checkpoints/${selectedModel.value}`, setModelCheckpoints)
-        })
-    }
     return (
         <Grid paddingTop={9} container>
             <Grid item sm={6} xs={12} sx={{
@@ -315,9 +311,6 @@ function CreateModifyModel() {
                         {
 
                             modelForm && selectedModel ? modelForm.layers.map((option, ind) => {
-
-                                // console.log("LayerCard about to be run");
-                                // console.log("LayerCard from layer: ", option)
                                 return <LayerCard
                                     key={option.id}
                                     layerUpdater={updateLayer}
@@ -367,23 +360,7 @@ function CreateModifyModel() {
                     }}>
                         <Typography sx={{ alignSelf: "flex-start" }}>Existing checkpoints for this model:</Typography>
                         {modelCheckpoints ? modelCheckpoints.map((option, ind) => {
-                            return <Card key={option} sx={{ bgcolor: 'background.default !important' }}>
-                                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Typography sx={{ alignSelf: "center" }} color="text.primary">Checkpoint: {option.id}</Typography>
-                                    <IconButton aria-label="delete" color="error" onClick={() => { setCheckpointDialog(true) }}><DeleteIcon /></IconButton>
-                                    <DeleteDialog 
-                                        id="checkpoint"
-                                        open={delCheckpointDialog}
-                                        handleClose={handleCloseDelDialog}
-                                        setDelDialog={setCheckpointDialog}
-                                        delFunction={() => delCheckpoint(option.id)} />
-                                </Box>
-                                <Typography color="text.secondary">
-                                    Timestamp: {option.timestamp}
-                                    <br/>
-                                    Final Loss: {option.final_loss}
-                                    </Typography>
-                            </Card>
+                            return <CheckpointCard key={option.id} checkpoint={option} updateCheckpoints={() => {fetchData(`checkpoints/${selectedModel.value}`, setModelCheckpoints)}}/>
                         }) : null}
                     </Paper>
                     : null}

@@ -229,10 +229,11 @@ def submit_generate_dataset():
     """
 
     DATABASE_PATH = current_app.config["DATABASE_PATH"]
+    PROJECT_ROOT = current_app.config["PROJECT_ROOT"]
     generate_profile = json.loads(request.data.decode('utf-8'))
     time_stamp = time.strftime('%d-%m-%Y-%H%M-%S')
     dataset_value = f"{generate_profile['value']}-{time_stamp}"
-    prof_dir = os.path.join("MLApp", "data", "training_datasets", str(
+    prof_dir = os.path.join(PROJECT_ROOT, "MLApp", "data", "training_datasets", str(
         generate_profile['value']), time_stamp)
     generate_profile['renderDir'] = prof_dir
     size = generate_profile['datasetSize']
@@ -246,9 +247,9 @@ def submit_generate_dataset():
     sample_URLs = launch_blender(data=os.path.join(train_dir, "props"),
                                  script=os.path.join(
                                      "MLApp", render_data_script),
-                                 scene_props=os.path.join(
+                                 scene_props=os.path.join(PROJECT_ROOT,
                                      train_dir, "props", "scene_props.json"),
-                                 render_dir=train_dir)
+                                 render_dir=os.path.join(PROJECT_ROOT, train_dir))
 
     if (int(generate_profile["CVPercentage"]) > 0):
         split_dir = os.path.join(prof_dir, "CV")
@@ -372,3 +373,5 @@ def delete_dataset_profile():
     except Exception as e:
         return jsonify({"error": f"Deleted from database but not from filesytem: {str(e)}"})
     return jsonify({"body": "Profile deleted successfully!"}), 200
+
+

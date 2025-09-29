@@ -12,3 +12,4 @@ docs/docs
 docs/source
 docs/make
 docs/Makefile
+venv/

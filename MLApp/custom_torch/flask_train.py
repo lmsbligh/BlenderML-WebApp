@@ -113,7 +113,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
     model.to(device)
     if (model_checkpoint and model_checkpoint != "-1"):
         state_dict_path = os.path.join(
-            "MLApp", state_dict_dir, model_id, model_checkpoint)
+            state_dict_dir, model_id, model_checkpoint)
         model.load_state_dict(torch.load(state_dict_path+".pth"))
         model_checkpoint = model_checkpoint.replace(".pth", "")
 
@@ -253,7 +253,7 @@ def training_loop(session_id, dataset_id, epochs, model_id, model_checkpoint, le
     except OSError as e:
         print("OSError: ", e)
     save_state_path = os.path.join(
-        "MLApp", state_dict_dir, model_id, state_filename+".pth")
+        state_dict_dir, model_id, state_filename+".pth")
     torch.save(model.state_dict(), save_state_path)
 
 
@@ -285,7 +285,7 @@ def test_loop(session_id, dataset_id, model_id, model_checkpoint, data_loader, l
     model = CustomNet(json.loads(model_data['layers']))
     model.to(device)
     state_dict_path = os.path.join(
-        "MLApp", state_dict_dir, model_id, model_checkpoint)
+            state_dict_dir, model_id, model_checkpoint)
     model.load_state_dict(torch.load(state_dict_path+".pth"))
     total_loss = 0.0
     for i, data in enumerate(data_loader, 0):

@@ -229,20 +229,92 @@ def delete_checkpoint(model_ID, checkpoint_ID):
                 f"error, path {checkpoint_full_path} is not within datasets folder!!")
             abort(403)
         else:
+            print(f"DATABASE_PATH: {DATABASE_PATH}")
             print(f"deleting file: {checkpoint_full_path}")
+            print(f"checkpoint_ID: {checkpoint_ID}")
             os.remove(checkpoint_full_path+".pth")
             con = sqlite3.connect(DATABASE_PATH)
             cur = con.cursor()
-            cur.execute('DELETE FROM checkpoints WHERE id = ?',
-                        (checkpoint_ID,))
+            cur.execute('SELECT * FROM checkpoints WHERE id = ?', (checkpoint_ID,))
+            row = cur.fetchall()
+            
+            print(f"Deleting checkpoint: {row}")
+            cur.execute('DELETE FROM checkpoints WHERE id = ?', (checkpoint_ID,))
+            deleted_rows = cur.rowcount
 
             con.commit()
             con.close()
+
+            if deleted_rows == 0:
+                print(f"⚠️ No checkpoint with id={checkpoint_ID} found in DB")
+                return jsonify({"warning": f"No checkpoint with id={checkpoint_ID} found in DB"}), 404
 
     except Exception as e:
         return jsonify({"error": f"{str(e)}"})
 
     return jsonify({"body": "Checkpoint deleted successfully!"}), 200
+# @bp.route('/delete_checkpoint/<string:model_ID>/<string:checkpoint_ID>', methods=["POST"])
+# def delete_checkpoint(model_ID, checkpoint_ID):
+#     try:
+#         MODELS_DIR_PATH = current_app.config["MODELS_DIR_PATH"]
+#         DATABASE_PATH = current_app.config["DATABASE_PATH"]
+#         checkpoint_full_path = os.path.realpath(
+#             os.path.join(MODELS_DIR_PATH, model_ID, checkpoint_ID)
+#         )
+
+#         print("delete_checkpoint():")
+#         print(f"MODELS_DIR_PATH: {MODELS_DIR_PATH}")
+#         print(f"DATABASE_PATH: {DATABASE_PATH}")
+#         print(f"checkpoint_full_path: {checkpoint_full_path}")
+#         print(f"checkpoint_ID: '{checkpoint_ID}' (length={len(checkpoint_ID)})")
+#         print(f"model_ID: '{model_ID}'")
+
+#         # Safety check: prevent deleting outside models folder
+#         if not checkpoint_full_path.startswith(MODELS_DIR_PATH):
+#             print(f"❌ ERROR: path {checkpoint_full_path} is not within models folder!")
+#             abort(403)
+
+#         # Delete checkpoint file
+#         file_path = checkpoint_full_path + ".pth"
+#         if os.path.exists(file_path):
+#             print(f"Deleting file: {file_path}")
+#             os.remove(file_path)
+#         else:
+#             print(f"⚠️ File not found: {file_path}")
+
+#         # Connect to DB
+#         con = sqlite3.connect(DATABASE_PATH)
+#         cur = con.cursor()
+    
+#         # Debug: list all checkpoint IDs for this model
+#         cur.execute('SELECT id FROM checkpoints WHERE model_id = ?', (model_ID,))
+#         all_ids = cur.fetchall()
+#         print(f"All checkpoint IDs for model {model_ID}: {all_ids}")
+
+#         # Fetch the row to be deleted
+#         cur.execute('SELECT * FROM checkpoints WHERE id = ?', (checkpoint_ID,))
+#         row = cur.fetchone()
+#         if row:
+#             print(f"Deleting checkpoint from DB: {row}")
+#         else:
+#             print(f"⚠️ No checkpoint with id='{checkpoint_ID}' found in DB")
+
+#         # Delete the checkpoint from DB
+#         cur.execute('DELETE FROM checkpoints WHERE id = ?', (checkpoint_ID,))
+#         deleted_rows = cur.rowcount
+#         print(f"Deleted rows count: {deleted_rows}")
+
+#         con.commit()
+#         con.close()
+
+#         if deleted_rows == 0:
+#             return jsonify({"warning": f"No checkpoint with id={checkpoint_ID} found in DB"}), 404
+
+#         return jsonify({"success": f"Checkpoint {checkpoint_ID} deleted successfully"}), 200
+
+#     except Exception as e:
+#         print(f"❌ Exception: {e}")
+#         return jsonify({"error": f"{str(e)}"}), 500
 
 
 @bp.route('/checkpoint_update_fields/<string:checkpoint_ID>', methods=["POST"])

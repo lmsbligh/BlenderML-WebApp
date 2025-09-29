@@ -33,6 +33,7 @@ class CustomNet(nn.Module):
                     self.layers.append(nn.ReLU())
                 case "Sigmoid":
                     self.layers.append(nn.Sigmoid())
+            print(f"layers_dict: {layer}, added layer: {self.layers[-1].__class__.__name__}")
 
     def forward(self, x):
         """Returns tensor representing estimated material
@@ -46,6 +47,10 @@ class CustomNet(nn.Module):
             x = layer(x)
             if (i+1 < len(self.layers)):
                 # Flatten after last CNN layer
+                print(f"Flattening before layer {i+1} ({self.layers[i+1].__class__.__name__}):", x.shape)
+
                 if isinstance(layer, nn.MaxPool2d) and isinstance(self.layers[i+1], nn.Linear):
                     x = x.view(x.size(0), -1)
+                    print("After flatten:", x.shape)
+
         return x

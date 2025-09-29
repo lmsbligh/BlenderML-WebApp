@@ -55,7 +55,7 @@ const AccordionCheckpoints = ({ modelId, handleCheckpointChange, formCheckpoints
                             },
                         }}>
                             {checkpointOptions ? checkpointOptions.map((checkpoint) => (
-                                <CheckpointCard key={`${checkpoint.model_id}-${checkpoint.id}`} checkpoint={checkpoint} handleCheckpointChange={handleCheckpointChange} formCheckpoints={formCheckpoints} updateCheckpoints={updateCheckpoints} />
+                                <CheckpointCard key={`${checkpoint.model_id}-${checkpoint.id}`} checkpoint={checkpoint} training={true} handleCheckpointChange={handleCheckpointChange} formCheckpoints={formCheckpoints} updateCheckpoints={updateCheckpoints} />
                             )) : null}
                         </AccordionDetails>
                     </Accordion>

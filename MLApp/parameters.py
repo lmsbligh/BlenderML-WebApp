@@ -12,10 +12,11 @@ VALIDATION_SET_SIZE = 1500
 TEST_SET_SIZE = 1500
 #loss_function = nn.L1Loss()
 DATABASE_PATH = os.path.join(os.getcwd(), "MLApp", "data", "data.db")
-
+DATA_PATH = os.path.join(os.getcwd(), "MLApp", "data")
 OPTIMIZER = optim.Adam
-
-blender_executable = r"C:\Program Files\Blender Foundation\Blender 3.4\blender.exe"
+#add ability to locate Blender executable or autodetect it
+#blender_executable = r"C:\Program Files\Blender Foundation\Blender 3.4\blender.exe"
+blender_executable = "/Applications/Blender.app/Contents/MacOS/Blender"
 train_dir = os.path.join("data", "train")
 val_dir = os.path.join("data", "val")
 test_dir = os.path.join("data", "test")
@@ -29,5 +30,5 @@ device = (
     else "cpu"
 )
 
-state_dict_dir = os.path.join("data", "models")
+state_dict_dir = os.path.join(os.getcwd(), "MLApp", "data", "models")
 state_dict_path = os.path.join("data", "models", "model_checkpoint2.pth")

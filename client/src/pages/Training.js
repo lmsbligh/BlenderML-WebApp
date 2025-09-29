@@ -339,6 +339,15 @@ export default function Training() {
                 setIsTraining(true)
                 setTrainingLog([]);
                 pushData('submit_training', formToPush)
+                .then(response => {
+                    console.log('Training response:', response);
+                })
+                .catch(error => {
+                    console.error('Training error:', error);
+                })
+                .finally(() => {
+                    setIsTraining(false);
+                });
             }
         }, 0)
     }
@@ -416,7 +425,7 @@ export default function Training() {
                         }} />
                         : null}
 
-                    {trainingMode.selected ? null : <FormHelperText sx={{ color: 'error.main' }}>{trainingMode.helper}</FormHelperText>}
+                    {/* {trainingMode.selected ? null : <FormHelperText sx={{ color: 'error.main' }}>{trainingMode.helper}</FormHelperText>} */}
                     {trainingMode.selected ? <SelectorLoss
                         error={trainingForm.lossFunction.error}
                         selectedLoss={selectedLoss}

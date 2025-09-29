@@ -28,8 +28,7 @@ def flask_generate_material(test_form, upload_folder):
     image = Image.open(image_path).convert("RGB")
     image = transform(image)
     image = image.unsqueeze(0)
-    image = image.cuda()
-    image.to(device)
+    image = image.to(device)
     model_data = []
     try:
         con = sqlite3.connect(DATABASE_PATH)
@@ -48,8 +47,7 @@ def flask_generate_material(test_form, upload_folder):
 
     model = CustomNet(json.loads(model_data['layers']))
     model.to(device)
-    state_dict_path = os.path.join(
-        "MLApp", state_dict_dir, model_id, model_checkpoint + ".pth")
+    state_dict_path = os.path.join(state_dict_dir, model_id, model_checkpoint + ".pth")
     model.load_state_dict(torch.load(state_dict_path))
 
     model.eval()
@@ -62,7 +60,7 @@ def flask_generate_material(test_form, upload_folder):
                        output[2],
                        output[3],
                    ],
-                   "nodes['Principled BSDF'].inputs[6].default_value": output[4],
-                   "nodes['Principled BSDF'].inputs[9].default_value": output[5]
+                   "nodes['Principled BSDF'].inputs[1].default_value": output[4],
+                   "nodes['Principled BSDF'].inputs[2].default_value": output[5]
                    }
     return output_dict
